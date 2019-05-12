@@ -47,8 +47,8 @@ class Connection
         return isset(self::$_connectors[$name]) ? self::$_connectors[$name] : null;
     }
 
-    public static function setOne($name,$bucketConnector)
+    public static function setOne($name,$session)
     {
-        self::$_connectors[$name] = $bucketConnector;
+        self::$_connectors[$name] = $session;
     }
 }
