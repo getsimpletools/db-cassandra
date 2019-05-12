@@ -70,13 +70,13 @@ class Client
             throw new \Exception("Please specify your cluster settings first");
         }
 
-        $settings                   = self::$_gSettings[$this->___cluster];
-
         $this->___connection        = Connection::getOne($this->___cluster);
         if($this->___connection)
         {
             return $this;
         }
+
+        $settings                   = self::$_gSettings[$this->___cluster];
 
         $cluster = \Cassandra::cluster();
 
