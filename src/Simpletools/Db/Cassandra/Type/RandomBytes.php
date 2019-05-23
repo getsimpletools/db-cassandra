@@ -1,6 +1,6 @@
 <?php
 
-namespace Simpletools\Db\Cassandra\Id;
+namespace Simpletools\Db\Cassandra\Type;
 
 class RandomBytes
 {

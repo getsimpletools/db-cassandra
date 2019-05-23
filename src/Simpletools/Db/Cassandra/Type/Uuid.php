@@ -1,6 +1,6 @@
 <?php
 
-namespace Simpletools\Db\Cassandra\Uuid;
+namespace Simpletools\Db\Cassandra\Type;
 
 class Uuid
 {
@@ -8,14 +8,15 @@ class Uuid
 
     public function __construct($uuid=null)
     {
-        if($uuid) $this->_id = $uuid;
-
-        $this->_id = new \Cassandra\Uuid();
+        if($uuid)
+            $this->_id = (string) $uuid;
+        else
+            $this->_id = (string) new \Cassandra\Uuid();
     }
 
     public function id()
     {
-        return $this->_id = (string) $this->_id;
+        return $this->_id;
     }
 
     public function __toString()
