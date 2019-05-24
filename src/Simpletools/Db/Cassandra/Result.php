@@ -210,12 +210,12 @@ class Result implements \Iterator
 
     public function free()
     {
-        mysqli_free_result($this->_result);
+        //$this->_result = '';
     }
 
     public function __desctruct()
     {
-        mysqli_free_result($this->_result);
+			//$this->_result = '';
     }
 
     public function getAffectedRows()
