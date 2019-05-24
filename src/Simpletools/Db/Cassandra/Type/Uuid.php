@@ -2,7 +2,7 @@
 
 namespace Simpletools\Db\Cassandra\Type;
 
-class Uuid
+class Uuid implements \JsonSerializable
 {
     protected $_id;
 
@@ -16,8 +16,12 @@ class Uuid
 
     public function id()
     {
-        return $this->_id;
+        return (string)$this->_id;
     }
+
+		public function jsonSerialize() {
+			return $this->id();
+		}
 
     public function __toString()
     {
