@@ -49,7 +49,8 @@ class Query implements \Iterator
             $args = $args[0];
         }
 
-        $this->_query['columns'] = $args;
+        if($args)
+        	$this->_query['columns'] = $args;
 
         return $this;
     }

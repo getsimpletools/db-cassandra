@@ -191,8 +191,13 @@ class Client
 
     public function __call($table,$args)
     {
+				if(count($args) == 1)
+				{
+					$args = $args[0];
+				}
+
         $query = new Query($table);
-        $query->keyspace($this->___keyspace);
+        $query->keyspace($this->___keyspace)->columns($args);
 
         return $query;
     }
