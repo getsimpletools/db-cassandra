@@ -145,16 +145,19 @@ class AutoIncrement
             $res = (new Query(self::$_settings['table'] . '_lock'))
                 ->where('tag', $this->_tag);
 
+            $this->_lockAcquisitionTries++;
+
             /*
              * YES
              */
             if(!$res->isEmpty() && ((string) $res->author == (string) $this->_author))
             {
-                $this->_lockAcquisitionTries++;
-
                 $this->_checkLockTime();
 
                 $q = (new Query(self::$_settings['table']))
+                    ->options([
+                        'consistency'   => Query::CONSISTENCY_ALL
+                    ])
                     ->update([
                         'seq'   => new Cql('seq + 1')
                     ])
@@ -163,6 +166,9 @@ class AutoIncrement
                 $q->run();
 
                 (new Query(self::$_settings['table'] . '_lock'))
+                    ->options([
+                        'consistency'   => Query::CONSISTENCY_ALL
+                    ])
                     ->delete('tag',$this->_tag)
                     ->run();
 
