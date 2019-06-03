@@ -16,8 +16,10 @@ class Timestamp implements \JsonSerializable
             $time = strtotime($time);
         }
 
-        if($time)
-            $this->_value = new \Cassandra\Timestamp($time);
+				if($time instanceof  \Cassandra\Timestamp)
+					$this->_value = $time;
+        elseif($time)
+					$this->_value = new \Cassandra\Timestamp($time);
         else
             $this->_value = new \Cassandra\Timestamp();
     }
@@ -29,7 +31,8 @@ class Timestamp implements \JsonSerializable
 
     public function jsonSerialize()
     {
-        return $this->value();
+        return (string)$this->value();
+			//return (string)$this->value()->toDateTime()->format(DATE_ATOM);
     }
 
     public function __toString()

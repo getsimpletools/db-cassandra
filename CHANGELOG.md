@@ -1,3 +1,8 @@
+### 0.1.3 (2019-06-03)
+1. **Simpletools\Db\Cassandra\Doc**
+2. **Simpletools\Db\Cassandra\Doc\Body**
+3. **Simpletools\Db\Cassandra\Type\Map**
+
 ### 0.0.5 (2019-05-23)
 1. **Simpletools\Db\Cassandra\{all}**
 

@@ -458,7 +458,10 @@ class Query implements \Iterator
                 {
                     $this->_columnsMap[$idx]      = $column;
                     $column                       = $idx;
-                }
+                } //todo build query for map object;
+//								elseif($column instanceof Simpletools\Db\Cassandra\Type\Map){
+//									$this->_query['columns'][$idx] = $column->value();
+//								}
                 elseif($column instanceof Sql){
                     $this->_query['columns'][$idx] = (string) $column;
                 }
