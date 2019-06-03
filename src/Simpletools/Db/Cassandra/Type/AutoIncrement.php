@@ -35,14 +35,14 @@ class AutoIncrement
 
     public function locksTaken()
     {
-        $this->id();
+        $this->value();
 
         return $this->_lockAcquisitionTries;
     }
 
     public function timeTaken()
     {
-        $this->id();
+        $this->value();
 
         return $this->_finishTime-$this->_startTime;
     }
@@ -120,7 +120,7 @@ class AutoIncrement
         }
     }
 
-    public function id()
+    public function value()
     {
         if(isset($this->_counter)) return $this->_cast();
 
@@ -210,11 +210,11 @@ class AutoIncrement
 
     public function __toString()
     {
-        return (string) $this->id();
+        return (string) $this->value();
     }
 
     public function toInt()
     {
-        return (int) (string) $this->id();
+        return (int) (string) $this->value();
     }
 }

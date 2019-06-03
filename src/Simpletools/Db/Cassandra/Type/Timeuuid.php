@@ -6,38 +6,38 @@ use Simpletools\Db\Cassandra\Exception;
 
 class Timeuuid implements \JsonSerializable
 {
-    protected $_id;
+    protected $_value;
 
     public function __construct($timeSec=null)
     {
         if(is_numeric($timeSec)) {
 
             echo (int) $timeSec;
-            $this->_id = new \Cassandra\Timeuuid((int)$timeSec);
+            $this->_value = new \Cassandra\Timeuuid((int)$timeSec);
         }
         elseif($timeSec!==null)
             throw new Exception("Wrong argument type",401);
         else
-            $this->_id = new \Cassandra\Timeuuid();
+            $this->_value = new \Cassandra\Timeuuid();
     }
 
-    public function id()
+    public function value()
     {
-        return ($this->_id = (string) $this->_id);
+        return ($this->_value = (string) $this->_value);
     }
 
     public function jsonSerialize()
     {
-        return $this->id();
+        return $this->value();
     }
 
     public function __toString()
     {
-        return $this->id();
+        return $this->value();
     }
 
     public function time()
     {
-        return $this->_id->time();
+        return $this->_value->time();
     }
 }

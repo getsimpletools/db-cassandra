@@ -6,6 +6,7 @@ use Simpletools\Db\Cassandra\Type\AutoIncrement;
 use Simpletools\Db\Cassandra\Type\Timestamp;
 use Simpletools\Db\Cassandra\Type\Timeuuid;
 use Simpletools\Db\Cassandra\Type\Uuid;
+use Simpletools\Db\Cassandra\Type\Map;
 
 class Query implements \Iterator
 {
@@ -349,7 +350,8 @@ class Query implements \Iterator
         }
         elseif(
             $value instanceof Uuid OR
-            $value instanceof Timeuuid
+            $value instanceof Timeuuid OR
+						$value instanceof Map
         )
         {
             return (string) $value;
@@ -358,7 +360,7 @@ class Query implements \Iterator
             $value instanceof AutoIncrement
         )
         {
-            return $value->id();
+            return $value->value();
         }
         elseif(
             $value instanceof Timestamp

@@ -153,12 +153,14 @@ class Client
 
                 elseif (
                     $arg instanceof Type\Timestamp OR
-                    $arg instanceof Type\BigInt
+                    $arg instanceof Type\BigInt OR
+										$arg instanceof Type\Map
                 ) {
-                    $compiledArguments[] = $arg->id();
+                    $compiledArguments[] = $arg->value();
                 }
+
                 elseif ($arg instanceof Type\AutoIncrement)
-                    $compiledArguments[] = new \Cassandra\BigInt((string) $arg->id());
+                    $compiledArguments[] = new \Cassandra\BigInt((string) $arg->value());
 
                 else
                     $compiledArguments[] = $arg;

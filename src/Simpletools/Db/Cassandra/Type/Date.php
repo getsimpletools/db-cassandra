@@ -4,20 +4,20 @@ namespace Simpletools\Db\Cassandra\Type;
 
 class Date
 {
-    protected $_id;
+    protected $_value;
 
     public function __construct($seconds)
     {
-        $this->_id = (string) new \Cassandra\Date($seconds);
+        $this->_value = (string) new \Cassandra\Date($seconds);
     }
 
-    public function id()
+    public function value()
     {
-        return $this->_id;
+        return $this->_value;
     }
 
     public function __toString()
     {
-        return $this->id();
+        return $this->value();
     }
 }

@@ -4,7 +4,7 @@ namespace Simpletools\Db\Cassandra\Type;
 
 class RandomBytes
 {
-    protected $_id;
+    protected $_value;
     protected static $_length = 20;
     protected $_olength;
 
@@ -36,26 +36,26 @@ class RandomBytes
     {
         $length = $this->_olength;
 
-        if(!$this->_id) {
+        if(!$this->_value) {
             if (function_exists('random_bytes')) {
-                $this->_id = bin2hex(random_bytes($length));
+                $this->_value = bin2hex(random_bytes($length));
             } elseif (function_exists('openssl_random_pseudo_bytes')) {
-                $this->_id = bin2hex(openssl_random_pseudo_bytes($length));
+                $this->_value = bin2hex(openssl_random_pseudo_bytes($length));
             } else {
                 throw new Exception("No random bytes generator found, please install random_bytes() or openssl_random_pseudo_bytes()", 404);
             }
         }
 
-        return $this->_id;
+        return $this->_value;
     }
 
-    public function id()
+    public function value()
     {
         return $this->_generate();
     }
 
     public function __toString()
     {
-        return $this->id();
+        return $this->value();
     }
 }

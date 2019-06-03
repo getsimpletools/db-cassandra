@@ -4,28 +4,28 @@ namespace Simpletools\Db\Cassandra\Type;
 
 class Uuid implements \JsonSerializable
 {
-    protected $_id;
+    protected $_value;
 
     public function __construct($uuid=null)
     {
         if($uuid)
-            $this->_id = $uuid;
+            $this->_value = $uuid;
         else
-            $this->_id = new \Cassandra\Uuid();
+            $this->_value = new \Cassandra\Uuid();
     }
 
-    public function id()
+    public function value()
     {
-        return ($this->_id = (string) $this->_id);
+        return ($this->_value = (string) $this->_value);
     }
 
     public function jsonSerialize()
     {
-        return $this->id();
+        return $this->value();
     }
 
     public function __toString()
     {
-        return $this->id();
+        return $this->value();
     }
 }

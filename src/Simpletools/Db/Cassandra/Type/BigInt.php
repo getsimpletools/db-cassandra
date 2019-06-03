@@ -4,30 +4,30 @@ namespace Simpletools\Db\Cassandra\Type;
 
 class BigInt
 {
-    protected $_id;
+    protected $_value;
 
     public function __construct($bigint)
     {
-        $this->_id = new \Cassandra\BigInt((string) $bigint);
-    }
-
-    public function id()
-    {
-        return $this->_id;
+        $this->_value = new \Cassandra\BigInt((string) $bigint);
     }
 
     public function value()
     {
-        return (string) $this->_id;
+        return $this->_value;
     }
+
+//    public function value()
+//    {
+//        return (string) $this->_value;
+//    }
 
     public function __toString()
     {
-        return (string) $this->id();
+        return (string) $this->value();
     }
 
     public function toInt()
     {
-        return (int) (string) $this->id();
+        return (int) (string) $this->value();
     }
 }

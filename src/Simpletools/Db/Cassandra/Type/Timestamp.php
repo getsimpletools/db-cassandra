@@ -4,7 +4,7 @@ namespace Simpletools\Db\Cassandra\Type;
 
 class Timestamp implements \JsonSerializable
 {
-    protected $_id;
+    protected $_value;
 
     public function __construct($time=null)
     {
@@ -17,39 +17,39 @@ class Timestamp implements \JsonSerializable
         }
 
         if($time)
-            $this->_id = new \Cassandra\Timestamp($time);
+            $this->_value = new \Cassandra\Timestamp($time);
         else
-            $this->_id = new \Cassandra\Timestamp();
+            $this->_value = new \Cassandra\Timestamp();
     }
 
-    public function id()
+    public function value()
     {
-        return $this->_id;
+        return $this->_value;
     }
 
     public function jsonSerialize()
     {
-        return $this->id();
+        return $this->value();
     }
 
     public function __toString()
     {
-        return (string) $this->id();
+        return (string) $this->value();
     }
 
     public function time()
     {
-        return $this->_id->time();
+        return $this->_value->time();
     }
 
     public function microtime($get_as_float=null)
     {
-        return $this->_id->microtime($get_as_float);
+        return $this->_value->microtime($get_as_float);
     }
 
     public function toDateTime()
     {
-        return $this->_id->toDateTime();
+        return $this->_value->toDateTime();
     }
 }
 
