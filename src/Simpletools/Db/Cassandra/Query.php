@@ -2,8 +2,27 @@
 
 namespace Simpletools\Db\Cassandra;
 
+use Simpletools\Db\Cassandra\Type\AutoIncrement;
+use Simpletools\Db\Cassandra\Type\Timestamp;
+use Simpletools\Db\Cassandra\Type\Timeuuid;
+use Simpletools\Db\Cassandra\Type\Uuid;
+
 class Query implements \Iterator
 {
+    //https://datastax.github.io/php-driver/api/class.Cassandra/
+    const CONSISTENCY_ANY           = 0;
+    const CONSISTENCY_ONE           = 1;
+    const CONSISTENCY_TWO           = 2;
+    const CONSISTENCY_THREE         = 3;
+    const CONSISTENCY_QUORUM        = 4;
+    const CONSISTENCY_ALL           = 5;
+    const CONSISTENCY_LOCAL_QUORUM  = 6;
+    const CONSISTENCY_EACH_QUORUM   = 7;
+    const CONSISTENCY_SERIAL        = 8;
+    const CONSISTENCY_LOCAL_SERIAL  = 9;
+    const CONSISTENCY_LOCAL_ONE     = 10;
+
+
     protected $_query 	    = array();
     protected $_columnsMap  = array();
     protected $_client;
@@ -279,11 +298,24 @@ class Query implements \Iterator
         return $this;
     }
 
+    protected $___options = array();
+    public function options($options=array())
+    {
+        $this->___options = $options;
+
+        return $this;
+    }
+
     public function run($options=array())
     {
         if($this->_result) return $this->_result;
 
         $query = $this->getQuery(true);
+
+        if(!$options)
+        {
+            $options = $this->___options;
+        }
 
         $this->_result =
             $this->_client
@@ -307,7 +339,7 @@ class Query implements \Iterator
 
     public function _escape($value)
     {
-        if($value instanceof Sql)
+        if($value instanceof Cql)
         {
             return (string) $value;
         }
@@ -315,10 +347,24 @@ class Query implements \Iterator
         {
             return $value;
         }
-        elseif($value instanceof Json)
+        elseif(
+            $value instanceof Uuid OR
+            $value instanceof Timeuuid
+        )
         {
-            $value->setClient($this->_client);
             return (string) $value;
+        }
+        elseif(
+            $value instanceof AutoIncrement
+        )
+        {
+            return $value->id();
+        }
+        elseif(
+            $value instanceof Timestamp
+        )
+        {
+            return "'".$value->toDateTime()->format(DATE_ATOM)."'";
         }
         elseif(is_bool($value))
         {
@@ -330,7 +376,7 @@ class Query implements \Iterator
         }
         else
         {
-            return '"'.$this->_client->escape($value).'"';
+            return "'".$this->_client->escape($value)."'";
         }
     }
 
@@ -529,10 +575,9 @@ class Query implements \Iterator
                 {
                     $set[] = $this->escapeKey($key).' = NULL';
                 }
-                elseif($value instanceof Json)
+                elseif($value instanceof Cql)
                 {
-                    $value->setDataSourceOut($key);
-                    $set[] = $this->_escape($value);
+                    $set[] = $this->escapeKey($key).' = '.(string) $value;
                 }
                 else
                 {
@@ -575,16 +620,18 @@ class Query implements \Iterator
             }
 
             $ttl = '';
+            $ifNotExists = '';
             if($this->_ttl)
             {
                 $ttl = ' USING TTL '.$this->_ttl;
             }
 
-            if(isset($this->_query['ifNotExists'])) {
-                $query[] = 'IF NOT EXISTS';
+            if(isset($this->_query['ifNotExists']))
+            {
+                $ifNotExists = 'IF NOT EXISTS';
             }
 
-            $set[] = '('.implode(', ',$keys).') VALUES('.implode(',',$values).' ) '.$ttl;
+            $set[] = '('.implode(', ',$keys).') VALUES('.implode(',',$values).' ) '.$ifNotExists.' '.$ttl;
 
             $query[] = implode(', ',$set);
         }
@@ -1018,6 +1065,11 @@ class Query implements \Iterator
     public function valid()
     {
         return $this->_result->valid();
+    }
+
+    public function __toString()
+    {
+        return $this->getQuery();
     }
 
 }

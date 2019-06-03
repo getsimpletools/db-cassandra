@@ -9,19 +9,20 @@ class Uuid implements \JsonSerializable
     public function __construct($uuid=null)
     {
         if($uuid)
-            $this->_id = (string) $uuid;
+            $this->_id = $uuid;
         else
-            $this->_id = (string) new \Cassandra\Uuid();
+            $this->_id = new \Cassandra\Uuid();
     }
 
     public function id()
     {
-        return (string)$this->_id;
+        return ($this->_id = (string) $this->_id);
     }
 
-		public function jsonSerialize() {
-			return $this->id();
-		}
+    public function jsonSerialize()
+    {
+        return $this->id();
+    }
 
     public function __toString()
     {

@@ -36,6 +36,7 @@
 
 namespace Simpletools\Db\Cassandra;
 
+use Simpletools\Db\Cassandra\Type\BigInt;
 use Simpletools\Db\Cassandra\Type\Uuid;
 
 class Result implements \Iterator
@@ -180,10 +181,7 @@ class Result implements \Iterator
 
         foreach($result as $key => $value)
         {
-            if($value instanceof \Cassandra\Uuid)
-            {
-                $result[$key] = new Uuid((string) $value);
-            }
+            $result[$key] = $this->_parseCell($value);
         }
 
         return $this->_parseColumnsMap($result);
@@ -234,11 +232,36 @@ class Result implements \Iterator
 
         if(!$this->_firstRowCached)
         {
-            $this->_firstRowCache 	= (object) $this->_result->first();
+            $this->_firstRowCache 	= $this->_result->first();
             $this->_firstRowCached 	= true;
+
+            if($this->_firstRowCache)
+            {
+                foreach ($this->_firstRowCache as $key => $value) {
+                    $this->_firstRowCache[$key] = $this->_parseCell($value);
+                }
+
+                $this->_firstRowCache = (object)$this->_firstRowCache;
+            }
+
             $this->_result->rewind();
         }
     }
+
+    protected function _parseCell($value)
+    {
+        if($value instanceof \Cassandra\Uuid)
+        {
+            return new Uuid((string) $value);
+        }
+        elseif($value instanceof \Cassandra\BigInt)
+        {
+            return new BigInt((string) $value);
+        }
+
+        return $value;
+    }
+
 
     public function getFirstRow()
     {

@@ -149,7 +149,17 @@ class Client
             $compiledArguments = [];
             foreach ($input as $arg) {
                 if ($arg instanceof Type\Uuid)
-                    $compiledArguments[] = new \Cassandra\Uuid((string)$arg);
+                    $compiledArguments[] = new \Cassandra\Uuid((string) $arg);
+
+                elseif (
+                    $arg instanceof Type\Timestamp OR
+                    $arg instanceof Type\BigInt
+                ) {
+                    $compiledArguments[] = $arg->id();
+                }
+                elseif ($arg instanceof Type\AutoIncrement)
+                    $compiledArguments[] = new \Cassandra\BigInt((string) $arg->id());
+
                 else
                     $compiledArguments[] = $arg;
             }
