@@ -139,6 +139,7 @@ class Doc
 				->run();
 		$this->_query = null;
 		//$this->load();
+		return $this;
 	}
 
 	public function load()
