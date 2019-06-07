@@ -399,8 +399,6 @@ class Query implements \Iterator
     public function run($options=array())
     {
         if($this->_result) return $this;
-        $this->toSchema();
-
         $query = $this->getQuery(true);
 
         if(!$options)
@@ -526,6 +524,7 @@ class Query implements \Iterator
 
     public function getQuery($runtime=false)
     {
+				$this->toSchema();
         $args = [];
 
         if(!isset($this->_query['type']))
