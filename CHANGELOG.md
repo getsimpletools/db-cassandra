@@ -1,3 +1,10 @@
+### 0.2.1 (2019-06-07)
+1. **Simpletools\Db\Cassandra\Doc**
+2. **Simpletools\Db\Cassandra\Type\Blob**
+3. **Simpletools\Db\Cassandra\Type\Decimal**
+4. **Simpletools\Db\Cassandra\Type\SimpleFloat**
+5. **Simpletools\Db\Cassandra\Type\Tunyint**
+
 ### 0.1.3 (2019-06-03)
 1. **Simpletools\Db\Cassandra\Doc**
 2. **Simpletools\Db\Cassandra\Doc\Body**

@@ -8,24 +8,29 @@ class Uuid implements \JsonSerializable
 
     public function __construct($uuid=null)
     {
-        if($uuid)
-            $this->_value = $uuid;
-        else
-            $this->_value = new \Cassandra\Uuid();
+			if($uuid !== null && !is_string($uuid) && $uuid instanceof \Cassandra\Uuid)
+				throw new \Exception("Uuid: value is not a string or null");
+
+			if($uuid instanceof \Cassandra\Uuid)
+				$this->_value = $uuid;
+			elseif($uuid)
+					$this->_value = new \Cassandra\Uuid($uuid);
+			else
+					$this->_value = new \Cassandra\Uuid();
     }
 
     public function value()
     {
-        return ($this->_value = (string) $this->_value);
+        return $this->_value;
     }
 
     public function jsonSerialize()
     {
-        return $this->value();
+        return (string)$this->value();
     }
 
     public function __toString()
     {
-        return $this->value();
+        return (string)$this->value();
     }
 }

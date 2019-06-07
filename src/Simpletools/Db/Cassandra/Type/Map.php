@@ -15,10 +15,9 @@ class Map implements \JsonSerializable
 
 	public function __construct($body, $keyType = \Cassandra::TYPE_TEXT, $valueType = \Cassandra::TYPE_TEXT)
 	{
-
-		if (is_array($body)) $body = (object)$body;
-
-		if (is_string($body)) $body = json_decode($body);
+		if($body === null) 					$body = (object) array();
+		elseif (is_string($body)) 	$body = json_decode($body);
+		elseif (is_array($body)) 		$body = (object)$body;
 
 		if ($body instanceof \Cassandra\Map)
 		{
@@ -47,16 +46,25 @@ class Map implements \JsonSerializable
 	{
 		$this->_value = new \Cassandra\Map($this->_keyType, $this->_valueType);
 
-		foreach ($this->_body  as $k =>$v)
+		if($this->_body)
 		{
-			if(is_object($v) || is_array($v)) $v = json_encode($v);
-			$this->_value->set($k,$v);
+			foreach ($this->_body  as $k =>$v)
+			{
+				if(is_object($v) || is_array($v)) $v = json_encode($v);
+				$this->_value->set($k,$v);
+			}
 		}
 
 		return $this->_value;
 	}
 
-	public function jsonSerialize() {
+	public function jsonSerialize()
+	{
+		return $this->_body;
+	}
+
+	public function toObject()
+	{
 		return $this->_body;
 	}
 
@@ -93,6 +101,12 @@ class Map implements \JsonSerializable
 		{
 			return null;
 		}
+	}
+
+	public function setDefault()
+	{
+		$this->_body = (object) array();
+		return $this;
 	}
 
 

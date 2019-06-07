@@ -51,11 +51,7 @@ class Doc
 	protected $_table;
 	protected $_keyspace;
 	protected $_columns;
-
-
-	protected $_client;
-
-
+	protected $_ttl;
 
 	protected $_body;
 
@@ -123,15 +119,57 @@ class Doc
 	public function save()
 	{
 		$this->connect();
-		$this->_query->set((array)$this->_body->toObject())->run();
+
+		if($this->_id instanceof Uuid)
+		{
+			$this->_body->id = $this->_id;
+		}
+		elseif(is_array($this->_id))
+		{
+			foreach ($this->_id as $key =>$val)
+			{
+				$this->body->{$key} = $val;
+			}
+		}
+
+
+		$this->_query
+				->set((array)$this->_body->toObject())
+				->expires($this->_ttl)
+				->run();
 		$this->_query = null;
-		$this->load();
+		//$this->load();
 	}
 
 	public function load()
 	{
 		$this->connect();
-		$this->body($this->_query->get($this->_id)->run()->fetch());
+
+
+		if($this->_id instanceof Uuid)
+		{
+			$this->body(
+					$this->_query->get($this->_id)
+							->columns($this->_columns)
+							->run()
+							->fetch()
+			);
+		}
+		elseif(is_array($this->_id))
+		{
+			$keys = $this->_id;
+
+
+			$this->_query->columns($this->_columns)->where(key($keys), array_shift($keys));
+
+			foreach ($keys as $key =>$val)
+			{
+				$this->_query->also($key, $val);
+			}
+
+			$this->body($this->_query->run()->fetch());
+		}
+
 		$this->_query = null;
 
 		return $this;
@@ -170,52 +208,32 @@ class Doc
 			return $this;
 		}
 
-		$this->_body = new Body((object) array());
+
 
 		if(is_array($body)) $body = (object)$body;
 
 		if(is_string($body)) $body = json_decode($body);
 
-		if(is_object($body))
-		{
-			foreach ($body as $key => $val)
-			{
-				//todo suport more types
-				if($val instanceof \Cassandra\Uuid)
-					$this->_body->{$key} = new Uuid($val);
-				elseif($val instanceof \Cassandra\Timestamp)
-					$this->_body->{$key} = new Timestamp($val);
-				elseif($val instanceof \Cassandra\Map)
-					$this->_body->{$key} = new Map($val);
-				else
-					$this->_body->{$key}  = $val;
-
-			}
-		}
-
+		$this->_body = new Body($body);
 
 		return $this;
 	}
 
 
-	//todo
-
-
-	public function expire($expire = null)
+	public function expires($seconds = null)
 	{
-
+		$this->_ttl = $seconds;
 		return $this;
 	}
 
 
-
-	public function loaded()
-	{
-		//$this->_loaded = true;
-		//$this->_originBody = new Body(unserialize(serialize($this->_body)));
-
-		return $this;
-	}
+//	public function loaded()
+//	{
+//		//$this->_loaded = true;
+//		//$this->_originBody = new Body(unserialize(serialize($this->_body)));
+//
+//		return $this;
+//	}
 
 
 
@@ -286,7 +304,7 @@ class Doc
 			}
 			else
 			{
-				if(property_exists($origin, $k))//todo
+				if(property_exists($origin, $k))/
 				{
 					if(gettype ($v) != gettype($origin->{$k}) || $v != $origin->{$k})
 					{
@@ -323,7 +341,7 @@ class Doc
 //
 //			$this->getDifference($new,$origin);
 //			//	$this->_diff['upsert']['engine.variants[0].capacity'] = 2;
-//			//echo"<pre>";var_dump($this->_diff);die;//todo
+//			//echo"<pre>";var_dump($this->_diff);die;
 //
 //
 //			if($this->_diff['upsert'] || $this->_diff['delete'])

@@ -3,8 +3,14 @@
 namespace Simpletools\Db\Cassandra;
 
 use Simpletools\Db\Cassandra\Type\AutoIncrement;
+use Simpletools\Db\Cassandra\Type\BigInt;
+use Simpletools\Db\Cassandra\Type\Blob;
+use Simpletools\Db\Cassandra\Type\Date;
+use Simpletools\Db\Cassandra\Type\Decimal;
 use Simpletools\Db\Cassandra\Type\Timestamp;
 use Simpletools\Db\Cassandra\Type\Timeuuid;
+use Simpletools\Db\Cassandra\Type\SimpleFloat;
+use Simpletools\Db\Cassandra\Type\Tinyint;
 use Simpletools\Db\Cassandra\Type\Uuid;
 use Simpletools\Db\Cassandra\Type\Map;
 
@@ -29,6 +35,7 @@ class Query implements \Iterator
     protected $_client;
 
     protected $_result      = null;
+    protected $_schema      = array();
 
     public function __construct($table,$keyspace=null)
     {
@@ -192,7 +199,8 @@ class Query implements \Iterator
 
     public function keyspace($keyspace)
     {
-        $this->_query['db'] = $keyspace;
+    		if($keyspace)
+        	$this->_query['db'] = $keyspace;
 
         return $this;
     }
@@ -307,9 +315,91 @@ class Query implements \Iterator
         return $this;
     }
 
+
+    public function getSchema()
+		{
+			if($this->_schema) return $this->_schema;
+
+			$schema   = $this->_client->connector()->schema();
+			$table   = $schema->keyspace($this->_query['db'])->table($this->_query['table']);
+
+			//echo"<pre>";var_dump($table->primaryKey()[0]->name(),$table->partitionKey()[0]->name(),$table->clusteringKey(), $table->clusteringOrder());die;
+
+			foreach ($table->columns() as $column)
+			{
+				$this->_schema[$column->name()] = (string)$column->type();
+			}
+
+			return $this->_schema;
+		}
+
+		protected function toSchemaType($key, $value)
+		{
+			if(isset($this->_schema[$key]))
+			{
+				if($this->_schema[$key] == 'int')
+				{
+					if(!is_numeric($value))
+						throw new \Exception("Your key($key) is not numeric");
+
+					return (int)$value;
+				}
+				elseif (substr($this->_schema[$key],0,3)== 'map')
+				{
+					$types = explode(',',str_replace(['map','<','>',' ',],'',$this->_schema[$key]));
+					return new Map($value, $types[0], $types[1]);
+				}
+				elseif($this->_schema[$key] == 'double')
+				{
+					if(!is_numeric($value))
+						throw new \Exception("Your key($key) is not numeric");
+
+					return (float)$value;
+				}
+				elseif($this->_schema[$key] == 'boolean')
+				{
+					if(!is_bool($value))
+						throw new \Exception("Your key($key) is not a boolean");
+
+					return (bool)$value;
+				}
+				elseif($this->_schema[$key] == 'text') 				return (string)$value;
+				elseif($this->_schema[$key] == 'uuid') 				return new Uuid($value);
+				elseif($this->_schema[$key] == 'timestamp') 	return new Timestamp($value);
+				elseif($this->_schema[$key] == 'decimal') 		return new Decimal($value);
+				elseif($this->_schema[$key] == 'float') 			return new SimpleFloat($value);
+				elseif($this->_schema[$key] == 'bigint') 			return new BigInt($value);
+				elseif($this->_schema[$key] == 'tinyint') 		return new Tinyint($value);
+				elseif($this->_schema[$key] == 'date') 				return new Date($value);
+				elseif($this->_schema[$key] == 'timeuuid') 		return new Timeuuid($value);
+				elseif($this->_schema[$key] == 'blob') 				return new Blob($value);
+				else
+					throw new \Exception("Your key($key) using unsupported data type");
+			}
+			else
+				throw new \Exception("Your key($key) is missing in table schema");
+
+		}
+
+    protected function toSchema()
+		{
+			$this->getSchema();
+			if(isset($this->_query['data']))
+			{
+				foreach ($this->_query['data'] as $key => $val)
+				{
+					if(!is_object($val) || $val instanceof \stdClass)
+					{
+						$this->_query['data'][$key] = $this->toSchemaType($key,$val);
+					}
+				}
+			}
+		}
+
     public function run($options=array())
     {
-        if($this->_result) return $this->_result;
+        if($this->_result) return $this;
+        $this->toSchema();
 
         $query = $this->getQuery(true);
 
@@ -324,9 +414,11 @@ class Query implements \Iterator
                 ->prepare($query['preparedQuery'])
                 ->execute($query['arguments']);
 
-        $this->_result->mapColumns($this->_columnsMap);
 
-        return $this->_result;
+				$this->_result->setSchema($this->_schema);
+				$this->_result->mapColumns($this->_columnsMap);
+
+        return $this;
     }
 
     public function get($id,$column='id')
@@ -458,10 +550,20 @@ class Query implements \Iterator
                 {
                     $this->_columnsMap[$idx]      = $column;
                     $column                       = $idx;
-                } //todo build query for map object;
-//								elseif($column instanceof Simpletools\Db\Cassandra\Type\Map){
-//									$this->_query['columns'][$idx] = $column->value();
-//								}
+                }
+								elseif($column instanceof Map
+										|| $column instanceof BigInt
+										|| $column instanceof Timestamp
+										|| $column instanceof Uuid
+										|| $column instanceof Timeuuid
+										|| $column instanceof Date
+										|| $column instanceof Tinyint
+										|| $column instanceof Decimal
+										|| $column instanceof SimpleFloat
+										|| $column instanceof Blob
+								){
+									$this->_query['columns'][$idx] = $column->value();
+								}
                 elseif($column instanceof Sql){
                     $this->_query['columns'][$idx] = (string) $column;
                 }
@@ -511,7 +613,7 @@ class Query implements \Iterator
                 $this->_query['db'] = $this->_client->keyspace();
                 if(!$this->_query['db'])
                 {
-                    throw new \Exception("Please set your Database name under connect settings or using ->setDb", 1);
+                    throw new \Exception("Please set your Database name under connect settings or using ->keyspace", 1);
                 }
             }
 
@@ -528,38 +630,38 @@ class Query implements \Iterator
             $query[] = 'as '.$this->escapeKey($this->_query['as']);
         }
 
-        if(isset($this->_query['join']))
-        {
-            foreach($this->_query['join'] as $join)
-            {
-                $db = isset($join['db']) ? $join['db'] : $this->_client->getCurrentDb();
-
-                if(strpos($join['table'],'.')===false)
-                {
-                    $syntax 	= strtoupper($join['direction']).' JOIN '.$this->escapeKey($db.'.'.$join['table']);
-                }
-                else
-                {
-                    $syntax 	= strtoupper($join['direction']).' JOIN '.$this->escapeKey($join['table']);
-                }
-
-                if(isset($join['as']))
-                {
-                    $syntax .= ' as '.$join['as'];
-                }
-
-                if(isset($join['on']))
-                {
-                    $syntax .= ' ON ('.$join['on'].')';
-                }
-                elseif(isset($join['using']))
-                {
-                    $syntax .= ' USING ('.$join['using'].')';
-                }
-
-                $query[] 	= $syntax;
-            }
-        }
+//        if(isset($this->_query['join']))
+//        {
+//            foreach($this->_query['join'] as $join)
+//            {
+//                $db = isset($join['db']) ? $join['db'] : $this->_client->getCurrentDb();
+//
+//                if(strpos($join['table'],'.')===false)
+//                {
+//                    $syntax 	= strtoupper($join['direction']).' JOIN '.$this->escapeKey($db.'.'.$join['table']);
+//                }
+//                else
+//                {
+//                    $syntax 	= strtoupper($join['direction']).' JOIN '.$this->escapeKey($join['table']);
+//                }
+//
+//                if(isset($join['as']))
+//                {
+//                    $syntax .= ' as '.$join['as'];
+//                }
+//
+//                if(isset($join['on']))
+//                {
+//                    $syntax .= ' ON ('.$join['on'].')';
+//                }
+//                elseif(isset($join['using']))
+//                {
+//                    $syntax .= ' USING ('.$join['using'].')';
+//                }
+//
+//                $query[] 	= $syntax;
+//            }
+//        }
 
         $setTypes = array(
             'UPDATE' 				=> 1,
@@ -610,7 +712,20 @@ class Query implements \Iterator
                 $keys[]     = $this->escapeKey($key);
                 $values[]   = ' ?';
 
-                if(is_null($value))
+								if($value instanceof Map
+										|| $value instanceof BigInt
+										|| $value instanceof Timestamp
+										|| $value instanceof Uuid
+										|| $value instanceof Timeuuid
+										|| $value instanceof Date
+										|| $value instanceof Tinyint
+										|| $value instanceof Decimal
+										|| $value instanceof SimpleFloat
+										|| $value instanceof Blob
+								){
+									$args[] = $value->value();
+								}
+                elseif(is_null($value))
                 {
                     //$set[] = $this->escapeKey($key).' = NULL';
                     $args[] = 'NULL';
@@ -641,34 +756,34 @@ class Query implements \Iterator
             $query[] = implode(', ',$set);
         }
 
-        if(isset($this->_query['onDuplicateData']))
-        {
-            $query[] = 'ON DUPLICATE KEY UPDATE';
-
-            $set = array();
-
-            foreach($this->_query['onDuplicateData'] as $key => $value)
-            {
-                if(is_null($value))
-                {
-                    $set[] = $this->escapeKey($key) . ' = NULL';
-                }
-                elseif($value instanceof Json)
-                {
-                    $value->setDataSourceOut($key);
-                    $set[] = $this->_escape($value);
-                }
-                else
-                {
-                    //$set[] = $this->escapeKey($key) . ' = ' . $this->_escape($value);
-                    $set[]  = $this->escapeKey($key).' = ?';
-                    $args[] = $value;
-                }
-
-            }
-
-            $query[] = implode(', ',$set);
-        }
+//        if(isset($this->_query['onDuplicateData']))
+//        {
+//            $query[] = 'ON DUPLICATE KEY UPDATE';
+//
+//            $set = array();
+//
+//            foreach($this->_query['onDuplicateData'] as $key => $value)
+//            {
+//                if(is_null($value))
+//                {
+//                    $set[] = $this->escapeKey($key) . ' = NULL';
+//                }
+//                elseif($value instanceof Json)
+//                {
+//                    $value->setDataSourceOut($key);
+//                    $set[] = $this->_escape($value);
+//                }
+//                else
+//                {
+//                    //$set[] = $this->escapeKey($key) . ' = ' . $this->_escape($value);
+//                    $set[]  = $this->escapeKey($key).' = ?';
+//                    $args[] = $value;
+//                }
+//
+//            }
+//
+//            $query[] = implode(', ',$set);
+//        }
 
         if(isset($this->_query['where']))
         {
@@ -798,7 +913,11 @@ class Query implements \Iterator
             $query[] = 'OFFSET '.$this->_query['offset'];
         }
 
-        $this->_query = array();
+
+        $this->_query = array(
+        		'db' => $this->_query['db'],
+						'table' => $this->_query['table'],
+				);
 
         $query = implode(' ',$query);
 
@@ -885,9 +1004,10 @@ class Query implements \Iterator
 
     public function ttl($seconds=null)
     {
-        if($seconds===null) return $this->_ttl;
-
-        $this->_ttl = (int) $seconds;
+        if($seconds!==null)
+				{
+					$this->_ttl = (int) $seconds;
+				}
 
         return $this;
     }

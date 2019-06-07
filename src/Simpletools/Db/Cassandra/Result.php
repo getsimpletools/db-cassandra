@@ -37,6 +37,10 @@
 namespace Simpletools\Db\Cassandra;
 
 use Simpletools\Db\Cassandra\Type\BigInt;
+use Simpletools\Db\Cassandra\Type\Blob;
+use Simpletools\Db\Cassandra\Type\Date;
+use Simpletools\Db\Cassandra\Type\Map;
+use Simpletools\Db\Cassandra\Type\Timestamp;
 use Simpletools\Db\Cassandra\Type\Uuid;
 
 class Result implements \Iterator
@@ -50,6 +54,7 @@ class Result implements \Iterator
     protected $_position 		= 0;
     protected $_currentRow 		= false;
     protected $_columnsMap      = array();
+    protected $_schema = array();
 
     public function __construct($result, $connection)
     {
@@ -179,13 +184,23 @@ class Result implements \Iterator
 
         if(!$result) return false;
 
-        foreach($result as $key => $value)
+        foreach($result as $key => $val)
         {
-            $result[$key] = $this->_parseCell($value);
+					if(is_object($val) || $val===null)
+					{
+						$result[$key] = $this->toResultType($key,$val);
+					}
+           // $result[$key] = $this->_parseCell($value);
         }
 
-        return $this->_parseColumnsMap($result);
+        return $result;
+        //return $this->_parseColumnsMap($result);
     }
+
+    public function setSchema($schema)
+		{
+			$this->_schema = $schema;
+		}
 
     public function fetchAll($returnObject=true)
     {
@@ -312,4 +327,36 @@ class Result implements \Iterator
     {
         return ($this->_currentRow!==null) ? true : false;
     }
+
+
+	protected function toResultType($key, $value)
+	{
+		if(isset($this->_schema[$key]))
+		{
+			if($this->_schema[$key] == 'int') return (int)0;
+			elseif (substr($this->_schema[$key],0,3)== 'map')
+			{
+				$types = explode(',',str_replace(['map','<','>',' ',],'',$this->_schema[$key]));
+
+				return (new Map($value, $types[0], $types[1]))->toObject();
+			}
+			elseif($this->_schema[$key] == 'double') 			return (float)$value;
+			elseif($this->_schema[$key] == 'boolean') 		return $value;
+			elseif($this->_schema[$key] == 'text') 				return '';
+			elseif($this->_schema[$key] == 'uuid') 				return (string)$value;
+			elseif($this->_schema[$key] == 'timestamp') 	return $value === null  ? (new Timestamp($value))->setDefault()->toInt() : (new Timestamp($value))->toInt();
+			elseif($this->_schema[$key] == 'decimal') 		return (float)$value;
+			elseif($this->_schema[$key] == 'float') 			return (float)$value;
+			elseif($this->_schema[$key] == 'bigint') 			return (string)($value);
+			elseif($this->_schema[$key] == 'tinyint') 		return (int)($value);
+			elseif($this->_schema[$key] == 'date') 				return $value === null  ? (new Date($value))->setDefault()->toInt() : (new Date($value))->toInt();
+			elseif($this->_schema[$key] == 'timeuuid') 		return (string)($value);
+			elseif($this->_schema[$key] == 'blob') 				return (new Blob($value))->getContent();
+			else
+				throw new \Exception("Your key($key) using unsupported data type");
+		}
+		else
+			throw new \Exception("Your key($key) is missing in table schema");
+
+	}
 }

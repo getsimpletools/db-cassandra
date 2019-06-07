@@ -4,55 +4,58 @@ namespace Simpletools\Db\Cassandra\Type;
 
 class Timestamp implements \JsonSerializable
 {
-    protected $_value;
+	protected $_value;
 
-    public function __construct($time=null)
-    {
-        //$this->_microtime = microtime(true);
-        //$this->_id = (int) floor($this->_microtime*1000);
+	public function __construct($time = null)
+	{
+		if(is_numeric($time) && strlen($time) <= 10)
+			$this->_value = new \Cassandra\Timestamp((int)$time);
+		elseif (is_string($time) && ($time = strtotime($time)))
+			$this->_value = new \Cassandra\Timestamp($time);
+		elseif ($time===null)
+			$this->_value = new \Cassandra\Timestamp();
+		elseif ($time instanceof \Cassandra\Timestamp)
+			$this->_value = $time;
+		else
+			throw new \Exception("Timestamp: Value is not a timestamp or date");
 
-        if(is_string($time))
-        {
-            $time = strtotime($time);
-        }
+	}
 
-				if($time instanceof  \Cassandra\Timestamp)
-					$this->_value = $time;
-        elseif($time)
-					$this->_value = new \Cassandra\Timestamp($time);
-        else
-            $this->_value = new \Cassandra\Timestamp();
-    }
+	public function value()
+	{
+		return $this->_value;
+	}
 
-    public function value()
-    {
-        return $this->_value;
-    }
+	public function jsonSerialize()
+	{
+		return $this->toInt();
+		//return (string)$this->value()->toDateTime()->format(DATE_ATOM);
+	}
 
-    public function jsonSerialize()
-    {
-        return (string)$this->value();
-			//return (string)$this->value()->toDateTime()->format(DATE_ATOM);
-    }
+	public function __toString()
+	{
+		return substr((string)$this->value(),0,10);
+	}
 
-    public function __toString()
-    {
-        return (string) $this->value();
-    }
+	public function toInt()
+	{
+		return (int)substr((string)$this->value(),0,10);
+	}
 
-    public function time()
-    {
-        return $this->_value->time();
-    }
+	public function microtime($get_as_float=null)
+	{
+			return $this->_value->microtime($get_as_float);
+	}
 
-    public function microtime($get_as_float=null)
-    {
-        return $this->_value->microtime($get_as_float);
-    }
+	public function toDateTime()
+	{
+			return $this->_value->toDateTime();
+	}
 
-    public function toDateTime()
-    {
-        return $this->_value->toDateTime();
-    }
+	public function setDefault()
+	{
+			$this->_value = new \Cassandra\Timestamp(0);
+			return $this;
+	}
 }
 

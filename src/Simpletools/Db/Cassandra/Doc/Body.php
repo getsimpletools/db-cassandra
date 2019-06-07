@@ -36,6 +36,13 @@
 
 namespace Simpletools\Db\Cassandra\Doc;
 
+use Simpletools\Db\Cassandra\Type\BigInt;
+use Simpletools\Db\Cassandra\Type\Blob;
+use Simpletools\Db\Cassandra\Type\Date;
+use Simpletools\Db\Cassandra\Type\Timestamp;
+use Simpletools\Db\Cassandra\Type\Map;
+use Simpletools\Db\Cassandra\Type\Timeuuid;
+
 class Body implements \JsonSerializable
 {
     protected $_object;
@@ -89,7 +96,8 @@ class Body implements \JsonSerializable
 
 		public function __unset($name)
 		{
-			unset($this->_object->{$name});
+			throw new \Exception("You can't unset property, set it for some default value instead");
+			//$this->_object->{$name} = null;
 		}
 
     public function &__get($name)
