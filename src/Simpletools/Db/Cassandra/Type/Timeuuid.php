@@ -12,7 +12,7 @@ class Timeuuid implements \JsonSerializable
     {
 			if(is_numeric($time) && strlen($time) <= 10)
 				$this->_value = new \Cassandra\Timeuuid((int)$time);
-			if(is_string($time) && strlen($time) == 36)
+			elseif(is_string($time) && strlen($time) == 36)
 				$this->_value = new \Cassandra\Timeuuid($time);
 			elseif (is_string($time) && ($time = strtotime($time)))
 				$this->_value = new \Cassandra\Timeuuid($time);
@@ -22,6 +22,7 @@ class Timeuuid implements \JsonSerializable
 				$this->_value = $time;
 			else
 				throw new \Exception("Timeuuid: Value is not a timestamp or date");
+
 
 
     }

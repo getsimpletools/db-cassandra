@@ -8,6 +8,8 @@ class Blob implements \JsonSerializable
 
 	public function __construct($content)
 	{
+		if($content === null) $content ='';
+
 		if(is_string($content))
 			$this->_value = new \Cassandra\Blob($content);
 		elseif($content instanceof  \Cassandra\Blob)

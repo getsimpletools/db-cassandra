@@ -2,6 +2,7 @@
 
 namespace Simpletools\Db\Cassandra;
 
+use Simpletools\Db\Cassandra\Doc\Body;
 use Simpletools\Db\Cassandra\Type\AutoIncrement;
 use Simpletools\Db\Cassandra\Type\BigInt;
 use Simpletools\Db\Cassandra\Type\Blob;
@@ -253,7 +254,7 @@ class Query implements \Iterator
     public function set($data)
     {
         $this->_query['type'] = "INSERT";
-        $this->_query['data'] = $data;
+        $this->_query['data'] = (array)(new Body($data))->toObject();
 
         return $this;
     }
@@ -261,7 +262,7 @@ class Query implements \Iterator
     public function insertIgnore($data)
     {
         $this->_query['type']   = "INSERT";
-        $this->_query['data']   = $data;
+        $this->_query['data']   = (array)(new Body($data))->toObject();
 
         $this->_query['ifNotExists'] = true;
 
@@ -278,7 +279,7 @@ class Query implements \Iterator
     public function update($data)
     {
         $this->_query['type'] = "UPDATE";
-        $this->_query['data'] = $data;
+        $this->_query['data'] = (array)(new Body($data))->toObject();
 
         return $this;
     }
@@ -286,26 +287,26 @@ class Query implements \Iterator
     public function replace($data)
     {
         $this->_query['type'] = "REPLACE";
-        $this->_query['data'] = $data;
+        $this->_query['data'] = (array)(new Body($data))->toObject();
 
         return $this;
     }
 
-    public function replaceDelayed($data)
-    {
-        $this->_query['type'] = "REPLACE DELAYED";
-        $this->_query['data'] = $data;
+//    public function replaceDelayed($data)
+//    {
+//        $this->_query['type'] = "REPLACE DELAYED";
+//        $this->_query['data'] = $data;
+//
+//        return $this;
+//    }
 
-        return $this;
-    }
-
-    public function replaceLowPriority($data)
-    {
-        $this->_query['type'] = "REPLACE LOW_PRIORITY";
-        $this->_query['data'] = $data;
-
-        return $this;
-    }
+//    public function replaceLowPriority($data)
+//    {
+//        $this->_query['type'] = "REPLACE LOW_PRIORITY";
+//        $this->_query['data'] = $data;
+//
+//        return $this;
+//    }
 
     protected $___options = array();
     public function options($options=array())
@@ -438,10 +439,14 @@ class Query implements \Iterator
         {
             return $value;
         }
+        elseif ($value instanceof \Cassandra\Map)
+				{
+					return (string) new Map($value);
+				}
         elseif(
             $value instanceof Uuid OR
-            $value instanceof Timeuuid OR
-						$value instanceof Map
+            $value instanceof Timeuuid
+					//	$value instanceof Map
         )
         {
             return (string) $value;

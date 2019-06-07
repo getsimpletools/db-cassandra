@@ -134,7 +134,7 @@ class Doc
 
 
 		$this->_query
-				->set((array)$this->_body->toObject())
+				->set($this->_body)
 				->expires($this->_ttl)
 				->run();
 		$this->_query = null;
@@ -207,12 +207,6 @@ class Doc
 			$this->_body = new Body($body);
 			return $this;
 		}
-
-
-
-		if(is_array($body)) $body = (object)$body;
-
-		if(is_string($body)) $body = json_decode($body);
 
 		$this->_body = new Body($body);
 

@@ -49,14 +49,15 @@ class Body implements \JsonSerializable
 
     public function __construct($object)
     {
-        if(
-            $object instanceof Body
-        )
+        if($object instanceof Body)
         {
             $this->_object    = $object->toObject();
         }
         else
         {
+					if(is_array($object)) $object = (object)$object;
+					elseif(is_string($object)) $object = json_decode($object);
+
             $this->_object = $object;
         }
     }
