@@ -42,4 +42,9 @@ class Model extends Client
 
         return $query;
     }
+
+		public function doc($id =null)
+		{
+			return new Doc($id);
+		}
 }

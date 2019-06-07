@@ -1201,4 +1201,9 @@ class Query implements \Iterator
         return $this->getQuery();
     }
 
+		public function doc($id =null)
+		{
+			return (new Doc($id))->table($this->_query['table']);
+		}
+
 }
