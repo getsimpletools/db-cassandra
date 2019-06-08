@@ -221,6 +221,31 @@ class Doc
 		return $this;
 	}
 
+	public function remove()
+	{
+		$this->connect();
+		if($this->_id instanceof Uuid)
+		{
+			$this->_query->delete('id', $this->_id)
+					->run();
+
+			$this->body(array());
+		}
+		elseif(is_array($this->_id))
+		{
+			$keys = $this->_id;
+			$this->_query->delete(key($keys), array_shift($keys));
+
+			foreach ($keys as $key =>$val)
+			{
+				$this->_query->also($key, $val);
+			}
+
+			$this->_query->run();
+			$this->body(array());
+		}
+	}
+
 
 //	public function loaded()
 //	{
