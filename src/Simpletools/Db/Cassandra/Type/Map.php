@@ -25,12 +25,26 @@ class Map implements \JsonSerializable
 			$this->_keyType = $body->type()->keyType();
 			$this->_valueType = $body->type()->valueType();
 
-			foreach (array_combine($body->keys(), $body->values()) as $key => $v)
+			if($this->_keyType =='int') // map<int,text> can be use as an array
 			{
-				if (substr((string)$v, 0, 1) == '{' && ($obj = json_decode($v)))
-					$this->_body->{$key} = $obj;
-				else
-					$this->_body->{$key} = $v;
+				$this->_body = array();
+				foreach (array_combine($body->keys(), $body->values()) as $key => $v)
+				{
+					if (substr((string)$v, 0, 1) == '{' && ($obj = json_decode($v)))
+						$this->_body[$key] = $obj;
+					else
+						$this->_body[$key] = $v;
+				}
+			}
+			else
+			{
+				foreach (array_combine($body->keys(), $body->values()) as $key => $v)
+				{
+					if (substr((string)$v, 0, 1) == '{' && ($obj = json_decode($v)))
+						$this->_body->{$key} = $obj;
+					else
+						$this->_body->{$key} = $v;
+				}
 			}
 		}
 		else
@@ -48,10 +62,23 @@ class Map implements \JsonSerializable
 
 		if($this->_body)
 		{
-			foreach ($this->_body  as $k =>$v)
+			if($this->_keyType =='int')  // map<int,text> can be use as an array
 			{
-				if(is_object($v) || is_array($v)) $v = json_encode($v);
-				$this->_value->set($k,$v);
+				foreach ($this->_body  as $k =>$v)
+				{
+					if (is_numeric($k)) $k = (int)$k;
+					if (is_object($v) || is_array($v)) $v = json_encode($v);
+					$this->_value->set($k, $v);
+				}
+
+			}
+			else
+			{
+				foreach ($this->_body  as $k =>$v)
+				{
+					if(is_object($v) || is_array($v)) $v = json_encode($v);
+					$this->_value->set($k,$v);
+				}
 			}
 		}
 
