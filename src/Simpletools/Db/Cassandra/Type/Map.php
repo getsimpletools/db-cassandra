@@ -49,7 +49,7 @@ class Map implements \JsonSerializable
 		}
 		else
 		{
-			$this->_body = $body;
+			$this->_body = $keyType == 'int' ? (array)$body : $body;
 			$this->_keyType = $keyType;
 			$this->_valueType = $valueType;
 		}
