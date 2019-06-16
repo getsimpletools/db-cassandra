@@ -190,7 +190,7 @@ class Result implements \Iterator
         {
 					if(is_object($val) || $val===null)
 					{
-						$result[$key] = $this->toResultType($key,$val);
+						$result->{$key} = $this->toResultType($key,$val);
 					}
            // $result[$key] = $this->_parseCell($value);
         }
