@@ -30,7 +30,8 @@ class Map implements \JsonSerializable
 				$this->_body = array();
 				foreach (array_combine($body->keys(), $body->values()) as $key => $v)
 				{
-					if (substr((string)$v, 0, 1) == '{' && ($obj = json_decode($v)))
+					$firstChar  = substr((string)$v, 0, 1);
+					if (($firstChar == '{' || $firstChar =='[')  && ($obj = json_decode($v)))
 						$this->_body[$key] = $obj;
 					else
 						$this->_body[$key] = $v;
@@ -40,7 +41,8 @@ class Map implements \JsonSerializable
 			{
 				foreach (array_combine($body->keys(), $body->values()) as $key => $v)
 				{
-					if (substr((string)$v, 0, 1) == '{' && ($obj = json_decode($v)))
+					$firstChar  = substr((string)$v, 0, 1);
+					if (($firstChar == '{' || $firstChar =='[')  && ($obj = json_decode($v)))
 						$this->_body->{$key} = $obj;
 					else
 						$this->_body->{$key} = $v;

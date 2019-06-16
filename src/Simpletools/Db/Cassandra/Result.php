@@ -184,6 +184,8 @@ class Result implements \Iterator
 
         if(!$result) return false;
 
+				$result = (object)$result;
+
         foreach($result as $key => $val)
         {
 					if(is_object($val) || $val===null)

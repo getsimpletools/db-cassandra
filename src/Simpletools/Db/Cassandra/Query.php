@@ -917,6 +917,11 @@ class Query implements \Iterator
             $query[] = 'OFFSET '.$this->_query['offset'];
         }
 
+				if(isset($this->_query['allow_filtering']) && $this->_query['allow_filtering'])
+				{
+					$query[] = 'ALLOW FILTERING';
+				}
+
 
         $this->_query = array(
         		'db' => $this->_query['db'],
@@ -1035,6 +1040,13 @@ class Query implements \Iterator
 
         return $this;
     }
+
+		public function &allowFiltering($allow = true)
+		{
+			$this->_query['allow_filtering'] 	= $allow;
+
+			return $this;
+		}
 
     public function &limit($limit)
     {
