@@ -9,10 +9,6 @@ class Map implements \JsonSerializable
 	protected $_keyType;
 	protected $_valueType;
 
-	//protected $type;
-	//protected $keys;
-	//protected $values;
-
 	public function __construct($body, $keyType = \Cassandra::TYPE_TEXT, $valueType = \Cassandra::TYPE_TEXT)
 	{
 		if($body === null) 					$body = (object) array();
@@ -30,22 +26,14 @@ class Map implements \JsonSerializable
 				$this->_body = array();
 				foreach (array_combine($body->keys(), $body->values()) as $key => $v)
 				{
-					$firstChar  = substr((string)$v, 0, 1);
-					if (($firstChar == '{' || $firstChar =='[')  && ($obj = json_decode($v)))
-						$this->_body[$key] = $obj;
-					else
-						$this->_body[$key] = $v;
+					$this->_body[$key] = json_decode($v);
 				}
 			}
 			else
 			{
 				foreach (array_combine($body->keys(), $body->values()) as $key => $v)
 				{
-					$firstChar  = substr((string)$v, 0, 1);
-					if (($firstChar == '{' || $firstChar =='[')  && ($obj = json_decode($v)))
-						$this->_body->{$key} = $obj;
-					else
-						$this->_body->{$key} = $v;
+					$this->_body->{$key} = json_decode($v);
 				}
 			}
 		}
@@ -69,8 +57,7 @@ class Map implements \JsonSerializable
 				foreach ($this->_body  as $k =>$v)
 				{
 					if (is_numeric($k)) $k = (int)$k;
-					if (is_object($v) || is_array($v)) $v = json_encode($v);
-					$this->_value->set($k, $v);
+					$this->_value->set($k, json_encode($v));
 				}
 
 			}
@@ -78,8 +65,7 @@ class Map implements \JsonSerializable
 			{
 				foreach ($this->_body  as $k =>$v)
 				{
-					if(is_object($v) || is_array($v)) $v = json_encode($v);
-					$this->_value->set($k,$v);
+					$this->_value->set($k,json_encode($v));
 				}
 			}
 		}
