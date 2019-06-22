@@ -1,3 +1,7 @@
+### 0.2.14 (2019-06-22)
+1. **Simpletools\Db\Cassandra\Batch**
+    1. Replaced [] with array() for older PHP versions support
+
 ### 0.2.13 (2019-06-22)
 1. **Simpletools\Db\Cassandra\Batch**
     1. Improved batch auto runs

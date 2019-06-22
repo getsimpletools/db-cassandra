@@ -100,7 +100,7 @@ class Batch
 
             foreach ($this->_queries as $query) {
                 $q = $query->getQuery(true);
-                $this->_queriesParsed[] = ['statement' => $q['preparedQuery'], 'args' => $q['arguments']];
+                $this->_queriesParsed[] = array('statement' => $q['preparedQuery'], 'args' => $q['arguments']);
             }
         }
 
