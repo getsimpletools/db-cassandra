@@ -1,3 +1,7 @@
+### 0.2.13 (2019-06-22)
+1. **Simpletools\Db\Cassandra\Batch**
+    1. Improved batch auto runs
+    
 ### 0.2.12 (2019-06-22)
 1. **Simpletools\Db\Cassandra\Batch**
     1. Added ->runEvery() for batch auto runs

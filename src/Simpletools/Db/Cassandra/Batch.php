@@ -2,8 +2,6 @@
 
 namespace Simpletools\Db\Cassandra;
 
-use Simpletools\Db\Cassandra\Type\Uuid;
-
 class Batch
 {
     const LOGGED            = 0;
@@ -16,7 +14,7 @@ class Batch
     protected $_hasRun  = false;
     protected $_queriesParsed = array();
 
-    protected $_runOnBatchSize = 0;
+    protected $_runOnBatchSize = 0; //0 - only manual batch run()
 
     public function __construct($type = self::LOGGED)
     {
@@ -44,7 +42,7 @@ class Batch
 
         $this->_queries[] = $query;
 
-        if(count($this->_queries)==$this->_runOnBatchSize)
+        if($this->_runOnBatchSize && count($this->_queries)==$this->_runOnBatchSize)
         {
             $this->run();
         }
