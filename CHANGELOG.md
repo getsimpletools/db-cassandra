@@ -1,3 +1,14 @@
+### 0.2.10 (2019-06-22)
+1. **Simpletools\Db\Cassandra\Batch**
+    1. Added ->runEvery() for batch auto runs
+    2. Added ->runIfNotEmpty()
+    3. Added ->size() to see current size of the batch
+    4. Fixed ->reset()
+    5. Removed ->rewind()
+    6. Added ->reset() after ->run()
+2. **Simpletools\Db\Cassandra\Query**
+    1. Added Exception for ->getSchema() if non existence namespace has been provided 
+
 ### 0.2.1 (2019-06-07)
 1. **Simpletools\Db\Cassandra\Doc**
 2. **Simpletools\Db\Cassandra\Type\Blob**

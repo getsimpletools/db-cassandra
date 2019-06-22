@@ -322,7 +322,14 @@ class Query implements \Iterator
 			if($this->_schema) return $this->_schema;
 
 			$schema   = $this->_client->connector()->schema();
-			$table   = $schema->keyspace($this->_query['db'])->table($this->_query['table']);
+			$keyspace = $schema->keyspace($this->_query['db']);
+
+			if($keyspace===false)
+            {
+                throw new Exception("Provided keyspace (".$this->_query['db'].") doesn't exist",404);
+            }
+
+            $table   = $keyspace->table($this->_query['table']);
 
 			//echo"<pre>";var_dump($table->primaryKey()[0]->name(),$table->partitionKey()[0]->name(),$table->clusteringKey(), $table->clusteringOrder());die;
 

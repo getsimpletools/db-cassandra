@@ -16,10 +16,11 @@ class Batch
     protected $_hasRun  = false;
     protected $_queriesParsed = array();
 
+    protected $_runOnBatchSize = 0;
+
     public function __construct($type = self::LOGGED)
     {
         $this->_type = $type;
-        $this->_batch = new \Cassandra\BatchStatement($this->_type);
     }
 
     public function client($client)
@@ -42,6 +43,11 @@ class Batch
         }
 
         $this->_queries[] = $query;
+
+        if(count($this->_queries)==$this->_runOnBatchSize)
+        {
+            $this->run();
+        }
 
         return $this;
     }
@@ -75,11 +81,16 @@ class Batch
         return implode($delimeter,$_queries);
     }
 
+    public function size()
+    {
+        return count($this->_queries);
+    }
+
     public function run()
     {
         if($this->_hasRun)
         {
-            throw new Exception("This batch has run, rewind() or reset() and try again",400);
+            throw new Exception("This batch has run, reset() and try again",400);
         }
 
         if(!$this->_queries)
@@ -90,22 +101,12 @@ class Batch
         if(!$this->_queriesParsed) {
 
             foreach ($this->_queries as $query) {
-                $q = ($query->getQuery(true));
-
-                $args = array();
-
-                foreach ($q['arguments'] as $arg) {
-                    if ($arg instanceof Uuid)
-                        $args[] = new \Cassandra\Uuid($arg->value());
-                    elseif (is_object($arg))
-                        $args[] = $arg->value();
-                    else
-                        $args[] = $arg;
-                }
-
-                $this->_queriesParsed[] = ['statement' => $q['preparedQuery'], 'args' => $args];
+                $q = $query->getQuery(true);
+                $this->_queriesParsed[] = ['statement' => $q['preparedQuery'], 'args' => $q['arguments']];
             }
         }
+
+        $batch = new \Cassandra\BatchStatement($this->_type);
 
         if(!$this->_client)
             $this->_client = new Client();
@@ -113,22 +114,25 @@ class Batch
         $this->_client->connect();
 
         foreach($this->_queriesParsed as $q) {
-            $this->_batch->add($q['statement'], $q['args']);
+            $batch->add($q['statement'], $q['args']);
         }
 
-        $res = $this->_client->connector()->execute($this->_batch);
+        $res = $this->_client->connector()->execute($batch);
+        unset($batch);
 
         $this->_hasRun = true;
+
+        $this->reset();
 
         if($res) return true;
     }
 
-
-    public function rewind()
+    public function runIfNotEmpty()
     {
-        $this->_hasRun = false;
-
-        return $this;
+        if(!$this->_queries)
+            return false;
+        else
+            return $this->run();
     }
 
     public function reset()
@@ -136,6 +140,13 @@ class Batch
         $this->_hasRun          = false;
         $this->_queries         = array();
         $this->_queriesParsed   = array();
+
+        return $this;
+    }
+
+    public function runEvery($batchSize)
+    {
+        $this->_runOnBatchSize = (int) $batchSize;
 
         return $this;
     }
