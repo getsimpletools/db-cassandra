@@ -116,7 +116,7 @@ class AutoIncrement
         */
         else
         {
-            return new BigInt($this->_counter);
+            return new BigInt($val);
         }
     }
 
@@ -205,7 +205,7 @@ class AutoIncrement
             }
         }
 
-        return $this->_tag;
+        return $this->_counter;
     }
 
     public function __toString()

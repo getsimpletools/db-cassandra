@@ -332,6 +332,11 @@ class Query implements \Iterator
 
             $table   = $keyspace->table($this->_query['table']);
 
+			if(!$table)
+            {
+                throw new Exception("Provided table (".$this->_query['table'].") doesn't exist",404);
+            }
+
 			//echo"<pre>";var_dump($table->primaryKey()[0]->name(),$table->partitionKey()[0]->name(),$table->clusteringKey(), $table->clusteringOrder());die;
 
 			foreach ($table->columns() as $column)

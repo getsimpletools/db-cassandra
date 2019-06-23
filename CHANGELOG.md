@@ -1,3 +1,9 @@
+### 0.2.16 (2019-06-23)
+1. **Simpletools\Db\Cassandra\Query**
+    1. Added more readable exception on non existing table
+2. **Simpletools\Db\Cassandra\Type\AutoIncrement**
+    1. Fixed type auto casting
+    
 ### 0.2.15 (2019-06-23)
 1. **Simpletools\Db\Cassandra\Query**
     1. Fixed getQuery() auto casting
