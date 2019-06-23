@@ -10,6 +10,7 @@ use Simpletools\Db\Cassandra\Type\Date;
 use Simpletools\Db\Cassandra\Type\Decimal;
 use Simpletools\Db\Cassandra\Type\Timestamp;
 use Simpletools\Db\Cassandra\Type\Timeuuid;
+use Simpletools\Db\Cassandra\Type\Time;
 use Simpletools\Db\Cassandra\Type\SimpleFloat;
 use Simpletools\Db\Cassandra\Type\Tinyint;
 use Simpletools\Db\Cassandra\Type\Uuid;
@@ -343,7 +344,11 @@ class Query implements \Iterator
 
 		protected function toSchemaType($key, $value)
 		{
-			if(isset($this->_schema[$key]))
+		    if(is_null($value))
+            {
+                return $value;
+            }
+			elseif(isset($this->_schema[$key]))
 			{
 				if($this->_schema[$key] == 'int')
 				{
@@ -379,6 +384,7 @@ class Query implements \Iterator
 				elseif($this->_schema[$key] == 'bigint') 			return new BigInt($value);
 				elseif($this->_schema[$key] == 'tinyint') 		return new Tinyint($value);
 				elseif($this->_schema[$key] == 'date') 				return new Date($value);
+                elseif($this->_schema[$key] == 'time') 				return new Time($value);
 				elseif($this->_schema[$key] == 'timeuuid') 		return new Timeuuid($value);
 				elseif($this->_schema[$key] == 'blob') 				return new Blob($value);
 				else
@@ -442,21 +448,44 @@ class Query implements \Iterator
         {
             return (string) $value;
         }
+        elseif($value instanceof Map
+            || $value instanceof Uuid
+            || $value instanceof Timeuuid
+            || $value instanceof Blob
+        ){
+            return $value->value();
+        }
+        elseif($value instanceof Timestamp)
+        {
+            return "'".$value->toDateTime()->format(DATE_ATOM)."'";
+        }
+        elseif($value instanceof Date)
+        {
+            return "'".$value->toDateTime()->format('Y-m-d')."'";
+        }
+        elseif($value instanceof Time)
+        {
+            return "'".date('H:i:s',$value->seconds())."'";
+        }
+        elseif($value instanceof BigInt
+            || $value instanceof Tinyint
+        )
+        {
+            return $value->toInt();
+        }
+        elseif($value instanceof Decimal
+            || $value instanceof SimpleFloat
+        )
+        {
+            return $value->toFloat();
+        }
         elseif(is_float($value) || is_integer($value))
         {
             return $value;
         }
         elseif ($value instanceof \Cassandra\Map)
-				{
-					return (string) new Map($value);
-				}
-        elseif(
-            $value instanceof Uuid OR
-            $value instanceof Timeuuid
-					//	$value instanceof Map
-        )
         {
-            return (string) $value;
+            return (string) new Map($value);
         }
         elseif(
             $value instanceof AutoIncrement
@@ -464,19 +493,13 @@ class Query implements \Iterator
         {
             return $value->value();
         }
-        elseif(
-            $value instanceof Timestamp
-        )
-        {
-            return "'".$value->toDateTime()->format(DATE_ATOM)."'";
-        }
         elseif(is_bool($value))
         {
             return (int) $value;
         }
         elseif(is_null($value))
         {
-            return null;
+            return 'NULL';
         }
         else
         {
@@ -536,7 +559,7 @@ class Query implements \Iterator
 
     public function getQuery($runtime=false)
     {
-				$this->toSchema();
+        $this->toSchema();
         $args = [];
 
         if(!isset($this->_query['type']))
@@ -568,6 +591,7 @@ class Query implements \Iterator
 										|| $column instanceof Uuid
 										|| $column instanceof Timeuuid
 										|| $column instanceof Date
+                                        || $column instanceof Time
 										|| $column instanceof Tinyint
 										|| $column instanceof Decimal
 										|| $column instanceof SimpleFloat
@@ -722,32 +746,7 @@ class Query implements \Iterator
             {
                 $keys[]     = $this->escapeKey($key);
                 $values[]   = ' ?';
-
-								if($value instanceof Map
-										|| $value instanceof BigInt
-										|| $value instanceof Timestamp
-										|| $value instanceof Uuid
-										|| $value instanceof Timeuuid
-										|| $value instanceof Date
-										|| $value instanceof Tinyint
-										|| $value instanceof Decimal
-										|| $value instanceof SimpleFloat
-										|| $value instanceof Blob
-								){
-									$args[] = $value->value();
-								}
-                elseif(is_null($value))
-                {
-                    //$set[] = $this->escapeKey($key).' = NULL';
-                    $args[] = 'NULL';
-                }
-                else
-                {
-                    //$set[] = $this->escapeKey($key).' = '.$this->_escape($value);
-                    //$set[]  = $this->escapeKey($key).' = ?';
-
-                    $args[] = $value;
-                }
+                $args[]     = $value;
             }
 
             $ttl = '';
@@ -811,8 +810,8 @@ class Query implements \Iterator
                         }
                         else{
                             //$query[] = @$operands[-1] . ' ' . $this->escapeKey($operands[0]) . " = " . $this->_escape($operands[1]);
-                            $query[] = @$operands[-1] . ' ' . $this->escapeKey($operands[0]) . " = ?";
-                            $args[] = $operands[1];
+                            $query[]    = @$operands[-1] . ' ' . $this->escapeKey($operands[0]) . " = ?";
+                            $args[]     = $this->toSchemaType(@$operands[0],$operands[1]);
                         }
 
                     }
@@ -820,18 +819,25 @@ class Query implements \Iterator
                     {
                         $operands[1] = strtoupper($operands[1]);
 
-                        if($operands[1] == "IN" AND is_array($operands[2]))
+                        if($operands[1] == "IN")
                         {
                             $operands_ = array();
 
-                            foreach($operands[2] as $op)
+                            if(is_array($operands[2]))
                             {
-                                //$operands_[] = $this->_escape($op);
-                                $operands_[]    = ' ?';
-                                $args[] =        $op;
+                                foreach ($operands[2] as $op) {
+                                    //$operands_[] = $this->_escape($op);
+                                    $operands_[] = ' ?';
+                                    $args[] = $this->toSchemaType($operands[0], $op);
+                                }
+                            }
+                            else
+                            {
+                                $operands_[] = ' ?';
+                                $args[] = $this->toSchemaType($operands[0], $operands[2]);
                             }
 
-                            $query[] = @$operands[-1].' '.$this->escapeKey($operands[0])." ".$operands[1]." (".implode(",",$operands_).')';
+                            $query[] = @$operands[-1].' '.$this->escapeKey($operands[0])." ".$operands[1]." (".implode(",",$operands_).' )';
                         }
                         else
                         {
@@ -842,8 +848,7 @@ class Query implements \Iterator
                             {
                                 //$query[] = @$operands[-1] . ' ' . $this->escapeKey($operands[0]) . " " . $operands[1] . " " . $this->_escape($operands[2]);
                                 $query[] = @$operands[-1] . ' ' . $this->escapeKey($operands[0]) . " " . $operands[1] . " ?";
-                                $args[] = $operands[2];
-
+                                $args[] = $this->toSchemaType($operands[0],$operands[2]);
                             }
 
                         }
@@ -956,7 +961,26 @@ class Query implements \Iterator
 
             return (string) new FullyQualifiedQuery($parsedQuery);
         }
-
+        else
+        {
+            foreach($args as $i=>$arg)
+            {
+                if($arg instanceof Map
+                    || $arg instanceof BigInt
+                    || $arg instanceof Timestamp
+                    || $arg instanceof Uuid
+                    || $arg instanceof Timeuuid
+                    || $arg instanceof Date
+                    || $arg instanceof Time
+                    || $arg instanceof Tinyint
+                    || $arg instanceof Decimal
+                    || $arg instanceof SimpleFloat
+                    || $arg instanceof Blob
+                ){
+                    $args[$i] = $arg->value();
+                }
+            }
+        }
 
         return [
             'preparedQuery'     => (string) new FullyQualifiedQuery($query),

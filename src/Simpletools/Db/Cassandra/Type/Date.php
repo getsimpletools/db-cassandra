@@ -6,7 +6,7 @@ class Date implements \JsonSerializable
 {
     protected $_value;
 
-    public function __construct($time)
+    public function __construct($time = null)
     {
 
 			if(is_numeric($time) && strlen($time) <= 10)
@@ -31,19 +31,24 @@ class Date implements \JsonSerializable
         return $this->_value;
     }
 
-		public function toInt()
-		{
-			return $this->_value->toDateTime()->getTimestamp();
-		}
+    public function toInt()
+    {
+        return $this->_value->toDateTime()->getTimestamp();
+    }
+
+    public function toDateTime()
+    {
+        return $this->_value->toDateTime();
+    }
 
     public function __toString()
     {
 			return (string)$this->_value->toDateTime()->getTimestamp();
     }
 
-		public function setDefault()
-		{
-			$this->_value =  new \Cassandra\Date(0);
-			return $this;
-		}
+    public function setDefault()
+    {
+        $this->_value =  new \Cassandra\Date(0);
+        return $this;
+    }
 }

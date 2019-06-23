@@ -184,14 +184,14 @@ class Result implements \Iterator
 
         if(!$result) return false;
 
-				$result = (object)$result;
+        $result = (object)$result;
 
         foreach($result as $key => $val)
         {
-					if(is_object($val) || $val===null)
-					{
-						$result->{$key} = $this->toResultType($key,$val);
-					}
+            if(is_object($val))
+            {
+                $result->{$key} = $this->toResultType($key,$val);
+            }
            // $result[$key] = $this->_parseCell($value);
         }
 

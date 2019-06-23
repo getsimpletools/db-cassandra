@@ -54,8 +54,8 @@ class Timestamp implements \JsonSerializable
 
 	public function setDefault()
 	{
-			$this->_value = new \Cassandra\Timestamp(0);
-			return $this;
+        $this->_value = new \Cassandra\Timestamp();
+        return $this;
 	}
 }
 

@@ -1,3 +1,19 @@
+### 0.2.15 (2019-06-23)
+1. **Simpletools\Db\Cassandra\Query**
+    1. Fixed getQuery() auto casting
+    2. Added type auto casting support on any where methods (->where(), ->also(), alternatively()) etc.
+    3. Fixed NULL auto casting
+1. **Simpletools\Db\Cassandra\Result**
+    1. Fixed NULL auto casting
+2. **Simpletools\Db\Cassandra\Type\Data**
+    1. Added ->toDateTime()
+    2. Changed default from 0 to now
+3. **Simpletools\Db\Cassandra\Type\Timestamp**
+    1. Changed default from 0 to now
+4. **Simpletools\Db\Cassandra\Type\Time**
+    1. Introduced new type
+
+
 ### 0.2.14 (2019-06-22)
 1. **Simpletools\Db\Cassandra\Batch**
     1. Replaced [] with array() for older PHP versions support
