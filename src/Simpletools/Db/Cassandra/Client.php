@@ -106,8 +106,49 @@ class Client
             ->withPort($settings['port'])
             ->withRoundRobinLoadBalancingPolicy(); //todo - enable more LB policies
 
+        if(isset($settings['consistency']))
+            $cluster->withDefaultConsistency($settings['consistency']);
+
+        if(isset($settings['pageSize']))
+            $cluster->withDefaultPageSize($settings['pageSize']);
+
+        if(isset($settings['timeout']))
+            $cluster->withDefaultTimeout($settings['timeout']);
+
         if(@$settings['username'] && @$settings['password'])
             $cluster->withCredentials($settings['username'], $settings['password']);
+
+        if(isset($settings['routing']))
+        {
+            if(is_array($settings['routing']))
+            {
+                foreach($settings['routing'] as $routing)
+                {
+                    if ($routing == Connection::ROUTING_TOKEN_AWARE) {
+                        $cluster->withTokenAwareRouting(true);
+                        break;
+                    }
+
+                    if ($routing == Connection::ROUTING_LATENCY_AWARE) {
+                        $cluster->withLatencyAwareRouting(true);
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                if ($settings['routing'] == Connection::ROUTING_TOKEN_AWARE)
+                    $cluster->withTokenAwareRouting(true);
+
+                if ($settings['routing'] == Connection::ROUTING_LATENCY_AWARE)
+                    $cluster->withLatencyAwareRouting(true);
+            }
+        }
+
+
+        if(@$settings['persistentSessions'])
+            $cluster->withPersistentSessions((bool) $settings['persistentSessions']);
+
 
         $session = $cluster->build()->connect();
         $this->___connection = $session;

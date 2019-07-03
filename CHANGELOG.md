@@ -1,3 +1,14 @@
+### 0.2.17 (2019-07-03)
+1. **Simpletools\Db\Cassandra\Connection**
+    1. Added routing and consistency constants (`CONSISTENCY_ANY`, `CONSISTENCY_ONE`, `CONSISTENCY_TWO`, `CONSISTENCY_THREE`, `CONSISTENCY_QUORUM`, `CONSISTENCY_ALL`, `CONSISTENCY_LOCAL_QUORUM`, `CONSISTENCY_EACH_QUORUM`, `CONSISTENCY_SERIAL`, `CONSISTENCY_LOCAL_SERIAL`, `CONSISTENCY_LOCAL_ONE`)
+2. **Simpletools\Db\Cassandra\Client**
+    1. Added `consistency` cluster settings option (`Connection::CONSISTENCY_*`)
+    2. Added `pageSize` cluster settings option
+    3. Added `timeout` cluster settings option
+    4. Added `routing` cluster settings option (`Connection::ROUTING_TOKEN_AWARE`, `Connection::ROUTING_LATENCY_AWARE`), passed as string or an array of options
+    5. Added `persistentSessions` cluster settings option (`true` or `false`)
+
+    
 ### 0.2.16 (2019-06-23)
 1. **Simpletools\Db\Cassandra\Query**
     1. Added more readable exception on non existing table
