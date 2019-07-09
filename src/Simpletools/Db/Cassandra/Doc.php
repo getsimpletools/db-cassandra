@@ -52,6 +52,7 @@ class Doc
 	protected $_keyspace;
 	protected $_columns;
 	protected $_ttl;
+	protected $_convertMapToJson;
 
 	protected $_body;
 
@@ -115,7 +116,6 @@ class Doc
 		return $this;
 	}
 
-
 	public function save()
 	{
 		$this->connect();
@@ -136,6 +136,7 @@ class Doc
 		$this->_query
 				->set($this->_body)
 				->expires($this->_ttl)
+				->convertMapToJson($this->_convertMapToJson)
 				->run();
 		$this->_query = null;
 		//$this->load();
@@ -152,6 +153,7 @@ class Doc
 			$this->body(
 					$this->_query->get($this->_id)
 							->columns($this->_columns)
+							->convertMapToJson($this->_convertMapToJson)
 							->run()
 							->fetch()
 			);
@@ -168,7 +170,7 @@ class Doc
 				$this->_query->also($key, $val);
 			}
 
-			$this->body($this->_query->run()->fetch());
+			$this->body($this->_query->convertMapToJson($this->_convertMapToJson)->run()->fetch());
 		}
 
 		$this->_query = null;
@@ -244,6 +246,13 @@ class Doc
 			$this->_query->run();
 			$this->body(array());
 		}
+	}
+
+
+	public function convertMapToJson($boolean = true)
+	{
+		$this->_convertMapToJson = $boolean;
+		return $this;
 	}
 
 

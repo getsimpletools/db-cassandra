@@ -1,3 +1,17 @@
+### 0.2.18 (2019-07-09)
+1. **Simpletools\Db\Cassandra\Client**
+    1. Added `pluginSettings` defines global plugin settings
+    2. Added `convertMapToJson` a plugin setting which defines whether all map columns should be always converted to JSON in the database
+2. **Simpletools\Db\Cassandra\Query**
+    1. Added `convertMapToJson`
+    2. ->expires($time) - $time can be seconds or timestamp
+3. **Simpletools\Db\Cassandra\Doc**
+    1. Added `convertMapToJson`
+    2. ->expires($time) - $time can be seconds or timestamp
+    3. unset($doc->body->property) - sets null in the database
+4. **Simpletools\Db\Cassandra\Result**
+    1. Added `convertMapToJson`
+
 ### 0.2.17 (2019-07-03)
 1. **Simpletools\Db\Cassandra\Connection**
     1. Added routing and consistency constants (`CONSISTENCY_ANY`, `CONSISTENCY_ONE`, `CONSISTENCY_TWO`, `CONSISTENCY_THREE`, `CONSISTENCY_QUORUM`, `CONSISTENCY_ALL`, `CONSISTENCY_LOCAL_QUORUM`, `CONSISTENCY_EACH_QUORUM`, `CONSISTENCY_SERIAL`, `CONSISTENCY_LOCAL_SERIAL`, `CONSISTENCY_LOCAL_ONE`, `ROUTING_TOKEN_AWARE`, `ROUTING_LATENCY_AWARE`)

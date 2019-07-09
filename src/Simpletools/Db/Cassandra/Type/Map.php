@@ -2,15 +2,21 @@
 
 namespace Simpletools\Db\Cassandra\Type;
 
+use Simpletools\Db\Cassandra\Client;
+
 class Map implements \JsonSerializable
 {
 	protected $_body;
 	protected $_value;
 	protected $_keyType;
 	protected $_valueType;
+	protected $_convertMapToJson;
 
-	public function __construct($body, $keyType = \Cassandra::TYPE_TEXT, $valueType = \Cassandra::TYPE_TEXT)
+	public function __construct($body, $keyType = \Cassandra::TYPE_TEXT, $valueType = \Cassandra::TYPE_TEXT, $convertMapToJson = null)
 	{
+		$this->_convertMapToJson = $convertMapToJson;
+
+
 		if($body === null) 					$body = (object) array();
 		elseif (is_string($body)) 	$body = json_decode($body);
 		elseif (is_array($body)) 		$body = (object)$body;
@@ -21,19 +27,40 @@ class Map implements \JsonSerializable
 			$this->_keyType = $body->type()->keyType();
 			$this->_valueType = $body->type()->valueType();
 
-			if($this->_keyType =='int') // map<int,text> can be use as an array
+			if($this->_convertMapToJson === false || Client::getPluginSetting('convertMapToJson') === false)
 			{
-				$this->_body = array();
-				foreach (array_combine($body->keys(), $body->values()) as $key => $v)
+				if($this->_keyType =='int') // map<int,text> can be use as an array
 				{
-					$this->_body[$key] = json_decode($v);
+					$this->_body = array();
+					foreach (array_combine($body->keys(), $body->values()) as $key => $v)
+					{
+						$this->_body[$key] = $v;
+					}
+				}
+				else
+				{
+					foreach (array_combine($body->keys(), $body->values()) as $key => $v)
+					{
+						$this->_body->{$key} = $v;
+					}
 				}
 			}
 			else
 			{
-				foreach (array_combine($body->keys(), $body->values()) as $key => $v)
+				if ($this->_keyType == 'int') // map<int,text> can be use as an array
 				{
-					$this->_body->{$key} = json_decode($v);
+					$this->_body = array();
+					foreach (array_combine($body->keys(), $body->values()) as $key => $v)
+					{
+						$this->_body[$key] = json_decode($v);
+					}
+				}
+				else
+				{
+					foreach (array_combine($body->keys(), $body->values()) as $key => $v)
+					{
+						$this->_body->{$key} = json_decode($v);
+					}
 				}
 			}
 		}
@@ -52,20 +79,42 @@ class Map implements \JsonSerializable
 
 		if($this->_body)
 		{
-			if($this->_keyType =='int')  // map<int,text> can be use as an array
+			if($this->_convertMapToJson === false || Client::getPluginSetting('convertMapToJson') === false)
 			{
-				foreach ($this->_body  as $k =>$v)
+				if($this->_keyType =='int')  // map<int,text> can be use as an array
 				{
-					if (is_numeric($k)) $k = (int)$k;
-					$this->_value->set($k, json_encode($v));
-				}
+					foreach ($this->_body  as $k =>$v)
+					{
+						if (is_numeric($k)) $k = (int)$k;
+						$this->_value->set($k, $v);
+					}
 
+				}
+				else
+				{
+					foreach ($this->_body  as $k =>$v)
+					{
+						$this->_value->set($k,$v);
+					}
+				}
 			}
 			else
 			{
-				foreach ($this->_body  as $k =>$v)
+				if($this->_keyType =='int')  // map<int,text> can be use as an array
 				{
-					$this->_value->set($k,json_encode($v));
+					foreach ($this->_body  as $k =>$v)
+					{
+						if (is_numeric($k)) $k = (int)$k;
+						$this->_value->set($k, json_encode($v));
+					}
+
+				}
+				else
+				{
+					foreach ($this->_body  as $k =>$v)
+					{
+						$this->_value->set($k,json_encode($v));
+					}
 				}
 			}
 		}

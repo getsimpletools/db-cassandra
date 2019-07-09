@@ -97,8 +97,8 @@ class Body implements \JsonSerializable
 
 		public function __unset($name)
 		{
-			throw new \Exception("You can't unset property, set it for some default value instead");
-			//$this->_object->{$name} = null;
+			//throw new \Exception("You can't unset property, set it for some default value instead");
+			$this->_object->{$name} = null;
 		}
 
     public function &__get($name)

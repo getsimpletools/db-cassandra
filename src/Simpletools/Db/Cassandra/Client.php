@@ -4,9 +4,10 @@ namespace Simpletools\Db\Cassandra;
 
 class Client
 {
-    protected static $_gSettings            = array();
+		protected static $_gSettings            = array();
+		protected static $_pluginSettings            = array(); //['convertMapToJson' => true|false]
 
-    protected static $_defaultCluster       = 'default';
+		protected static $_defaultCluster       = 'default';
     protected $___cluster	                = 'default';
 
     protected $___keyspace;
@@ -33,6 +34,8 @@ class Client
         {
             throw new Exception("No settings for provided cluser $cluster",400);
         }
+
+				self::$_pluginSettings[$cluster] = array();
     }
 
     public static function cluster(array $settings,$cluster='default')
@@ -62,6 +65,16 @@ class Client
 
         self::$_gSettings[$cluster] = $settings;
     }
+
+    public static function setPluginSetting($settingName, $value, $cluster='default')
+		{
+			self::$_pluginSettings[$cluster][$settingName] = $value;
+		}
+
+		public static function getPluginSetting($settingName,$cluster='default')
+		{
+			return @self::$_pluginSettings[$cluster][$settingName];
+		}
 
     public function keyspace($keyspace=null)
     {

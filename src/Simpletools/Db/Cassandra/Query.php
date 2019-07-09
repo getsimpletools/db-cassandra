@@ -38,6 +38,7 @@ class Query implements \Iterator
 
     protected $_result      = null;
     protected $_schema      = array();
+		protected $_convertMapToJson;
 
     public function __construct($table,$keyspace=null)
     {
@@ -365,7 +366,7 @@ class Query implements \Iterator
 				elseif (substr($this->_schema[$key],0,3)== 'map')
 				{
 					$types = explode(',',str_replace(['map','<','>',' ',],'',$this->_schema[$key]));
-					return new Map($value, $types[0], $types[1]);
+					return new Map($value, $types[0], $types[1], $this->_convertMapToJson);
 				}
 				elseif($this->_schema[$key] == 'double')
 				{
@@ -432,6 +433,7 @@ class Query implements \Iterator
                 ->execute($query['arguments']);
 
 
+        $this->_result->convertMapToJson($this->_convertMapToJson);
 				$this->_result->setSchema($this->_schema);
 				$this->_result->mapColumns($this->_columnsMap);
 
@@ -1051,7 +1053,7 @@ class Query implements \Iterator
     {
         if($seconds!==null)
 				{
-					$this->_ttl = (int) $seconds;
+					$this->_ttl = $seconds > time() ? $seconds - time() : (int) $seconds;
 				}
 
         return $this;
@@ -1252,6 +1254,12 @@ class Query implements \Iterator
 		public function doc($id =null)
 		{
 			return (new Doc($id))->table($this->_query['table']);
+		}
+
+		public function convertMapToJson($boolean = true)
+		{
+			$this->_convertMapToJson = $boolean;
+			return $this;
 		}
 
 }

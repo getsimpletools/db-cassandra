@@ -55,6 +55,7 @@ class Result implements \Iterator
     protected $_currentRow 		= false;
     protected $_columnsMap      = array();
     protected $_schema = array();
+		protected $_convertMapToJson;
 
     public function __construct($result, $connection)
     {
@@ -340,7 +341,7 @@ class Result implements \Iterator
 			{
 				$types = explode(',',str_replace(['map','<','>',' ',],'',$this->_schema[$key]));
 
-				return (new Map($value, $types[0], $types[1]))->toObject();
+				return (new Map($value, $types[0], $types[1], $this->_convertMapToJson))->toObject();
 			}
 			elseif($this->_schema[$key] == 'double') 			return (float)$value;
 			elseif($this->_schema[$key] == 'boolean') 		return $value;
@@ -360,5 +361,11 @@ class Result implements \Iterator
 		else
 			throw new \Exception("Your key($key) is missing in table schema");
 
+	}
+
+	public function convertMapToJson($boolean = true)
+	{
+		$this->_convertMapToJson = $boolean;
+		return $this;
 	}
 }
