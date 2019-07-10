@@ -150,13 +150,23 @@ class Doc
 
 		if($this->_id instanceof Uuid)
 		{
-			$this->body(
-					$this->_query->get($this->_id)
-							->columns($this->_columns)
-							->convertMapToJson($this->_convertMapToJson)
-							->run()
-							->fetch()
-			);
+			$this->_query->get($this->_id)
+					->columns($this->_columns)
+					->convertMapToJson($this->_convertMapToJson)
+					->limit(2)
+					->run();
+
+
+			if($this->_query->length() == 0)
+			{
+				throw new \Exception("Your key(". (is_array($this->_id) ? json_encode($this->_id):$this->_id).") does not exists in the '$this->_table' table");
+			}
+			elseif($this->_query->length() > 1)
+			{
+				throw new \Exception("Unsafe loading of document your key(". (is_array($this->_id) ? json_encode($this->_id):$this->_id).") returns more then one document from the '$this->_table' table");
+			}
+
+			$this->body($this->_query->fetch());
 		}
 		elseif(is_array($this->_id))
 		{
@@ -170,7 +180,21 @@ class Doc
 				$this->_query->also($key, $val);
 			}
 
-			$this->body($this->_query->convertMapToJson($this->_convertMapToJson)->run()->fetch());
+			$this->_query
+					->convertMapToJson($this->_convertMapToJson)
+					->limit(2)
+					->run();
+
+			if($this->_query->length() == 0)
+			{
+				throw new \Exception("Your key(". (is_array($this->_id) ? json_encode($this->_id):$this->_id).") does not exists in the '$this->_table' table");
+			}
+			elseif($this->_query->length() > 1)
+			{
+				throw new \Exception("Unsafe loading of document your key(". (is_array($this->_id) ? json_encode($this->_id):$this->_id).") returns more then one document from the '$this->_table' table");
+			}
+
+			$this->body($this->_query->fetch());
 		}
 
 		$this->_query = null;
