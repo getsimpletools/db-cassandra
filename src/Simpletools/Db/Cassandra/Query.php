@@ -327,16 +327,21 @@ class Query implements \Iterator
 			$keyspace = $schema->keyspace($this->_query['db']);
 
 			if($keyspace===false)
-            {
-                throw new Exception("Provided keyspace (".$this->_query['db'].") doesn't exist",404);
-            }
+			{
+					throw new Exception("Provided keyspace (".$this->_query['db'].") doesn't exist",404);
+			}
 
-            $table   = $keyspace->table($this->_query['table']);
+
+			$table   = $keyspace->table($this->_query['table']);
 
 			if(!$table)
-            {
-                throw new Exception("Provided table (".$this->_query['table'].") doesn't exist",404);
-            }
+			{
+				$table   = $keyspace->materializedView($this->_query['table']);
+				if(!$table)
+				{
+					throw new Exception("Provided table (".$this->_query['table'].") doesn't exist",404);
+				}
+			}
 
 			//echo"<pre>";var_dump($table->primaryKey()[0]->name(),$table->partitionKey()[0]->name(),$table->clusteringKey(), $table->clusteringOrder());die;
 

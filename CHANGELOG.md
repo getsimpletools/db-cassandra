@@ -1,3 +1,7 @@
+### 0.2.19 (2019-07-10)
+1. **Simpletools\Db\Cassandra\Query**
+    1. Added the schema of the materialized view
+
 ### 0.2.18 (2019-07-09)
 1. **Simpletools\Db\Cassandra\Client**
     1. Added `pluginSettings` defines global plugin settings
