@@ -173,6 +173,7 @@ class Result implements \Iterator
 
     public function length()
     {
+    	//echo"<pre>";var_dump($this->_result);die;
         if(!$this->_result) return 0;
 
         return $this->_result->count();
