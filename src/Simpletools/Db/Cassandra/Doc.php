@@ -76,7 +76,7 @@ class Doc
 		}
 		else
 		{
-			$this->_id = $id;
+			$this->_id = (array)$id;
 		}
 	}
 
