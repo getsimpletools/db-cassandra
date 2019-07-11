@@ -187,10 +187,12 @@ class Doc
 
 			if($this->_query->length() == 0)
 			{
+				$this->_query = null;
 				throw new \Exception("Your key(". (is_array($this->_id) ? json_encode($this->_id):$this->_id).") does not exists in the '$this->_table' table", 404);
 			}
 			elseif($this->_query->length() > 1)
 			{
+				$this->_query = null;
 				throw new \Exception("Unsafe loading of document your key(". (is_array($this->_id) ? json_encode($this->_id):$this->_id).") returns more then one document from the '$this->_table' table", 400);
 			}
 
