@@ -1024,7 +1024,7 @@ class Query implements \Iterator
         }
         elseif(strpos($key,'.')===false)
         {
-            return $key;
+            return '"'.$key.'"';
         }
         else
         {
@@ -1034,7 +1034,7 @@ class Query implements \Iterator
                 $keys[$index] = $key;
             }
 
-            return implode('.',$keys);
+            return '"'.implode('.',$keys).'"';
         }
     }
 

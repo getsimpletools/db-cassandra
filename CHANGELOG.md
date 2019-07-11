@@ -1,3 +1,7 @@
+### 0.2.22 (2019-07-11)
+1. **Simpletools\Db\Cassandra\Query**
+    1. Added double quotes to all column names
+
 ### 0.2.20 (2019-07-10)
 1. **Simpletools\Db\Cassandra\Doc**
     1. Added Exception on not existing documents and when try get more then one
