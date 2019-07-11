@@ -100,6 +100,11 @@ class Doc
 		return $this;
 	}
 
+	public function keyspace($keyspace)
+	{
+		$this->_keyspace = $keyspace;
+		return $this;
+	}
 
 	public function columns()
 	{
