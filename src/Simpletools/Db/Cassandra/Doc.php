@@ -74,6 +74,10 @@ class Doc
 			$this->_id = new Uuid($id);
 			$this->_body->id = $this->_id;
 		}
+		elseif($id instanceof Uuid)
+		{
+			$this->_id = $id;
+		}
 		else
 		{
 			$this->_id = (array)$id;
