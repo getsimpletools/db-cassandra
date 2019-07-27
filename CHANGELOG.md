@@ -1,3 +1,7 @@
+### 0.3.0 (2019-07-27)
+1. **Simpletools\Db\Cassandra\SessionHandler**
+    1. Added `SessionHandler` class implementing PHP `SessionHandlerInterface` and `SessionIdInterface`
+    
 ### 0.2.22 (2019-07-11)
 1. **Simpletools\Db\Cassandra\Query**
     1. Added double quotes to all column names
