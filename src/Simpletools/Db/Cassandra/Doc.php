@@ -125,7 +125,7 @@ class Doc
 		return $this;
 	}
 
-	public function save()
+	public function getSaveQuery()
 	{
 		$this->connect();
 
@@ -145,14 +145,22 @@ class Doc
 		$this->_query
 				->set($this->_body)
 				->expires($this->_ttl)
-				->convertMapToJson($this->_convertMapToJson)
-				->run();
+				->convertMapToJson($this->_convertMapToJson);
+
+		return $this->_query;
+	}
+
+	public function save()
+	{
+		$this->getSaveQuery();
+		$this->_query->run();
 		$this->_query = null;
-		//$this->load();
+
 		return $this;
 	}
 
-	public function load()
+
+	public function getLoadQuery()
 	{
 		$this->connect();
 
@@ -162,27 +170,11 @@ class Doc
 			$this->_query->get($this->_id)
 					->columns($this->_columns)
 					->convertMapToJson($this->_convertMapToJson)
-					->limit(2)
-					->run();
-
-
-			if($this->_query->length() == 0)
-			{
-				$this->_query = null;
-				throw new \Exception("Your key(". (is_array($this->_id) ? json_encode($this->_id):$this->_id).") does not exists in the '$this->_table' table",404);
-			}
-			elseif($this->_query->length() > 1)
-			{
-				$this->_query = null;
-				throw new \Exception("Unsafe loading of document your key(". (is_array($this->_id) ? json_encode($this->_id):$this->_id).") returns more then one document from the '$this->_table' table",400);
-			}
-
-			$this->body($this->_query->fetch());
+					->limit(2);
 		}
 		elseif(is_array($this->_id))
 		{
 			$keys = $this->_id;
-
 
 			$this->_query->columns($this->_columns)->where(key($keys), array_shift($keys));
 
@@ -193,22 +185,30 @@ class Doc
 
 			$this->_query
 					->convertMapToJson($this->_convertMapToJson)
-					->limit(2)
-					->run();
-
-			if($this->_query->length() == 0)
-			{
-				$this->_query = null;
-				throw new \Exception("Your key(". (is_array($this->_id) ? json_encode($this->_id):$this->_id).") does not exists in the '$this->_table' table", 404);
-			}
-			elseif($this->_query->length() > 1)
-			{
-				$this->_query = null;
-				throw new \Exception("Unsafe loading of document your key(". (is_array($this->_id) ? json_encode($this->_id):$this->_id).") returns more then one document from the '$this->_table' table", 400);
-			}
-
-			$this->body($this->_query->fetch());
+					->limit(2);
 		}
+
+		return $this->_query;
+	}
+
+	public function load()
+	{
+
+		$this->getLoadQuery();
+		$this->_query->run();
+
+		if($this->_query->length() == 0)
+		{
+			$this->_query = null;
+			throw new \Exception("Your key(". (is_array($this->_id) ? json_encode($this->_id):$this->_id).") does not exists in the '$this->_table' table", 404);
+		}
+		elseif($this->_query->length() > 1)
+		{
+			$this->_query = null;
+			throw new \Exception("Unsafe loading of document your key(". (is_array($this->_id) ? json_encode($this->_id):$this->_id).") returns more then one document from the '$this->_table' table",400);
+		}
+
+		$this->body($this->_query->fetch());
 
 		$this->_query = null;
 
@@ -260,15 +260,12 @@ class Doc
 		return $this;
 	}
 
-	public function remove()
+	public function getRemoveQuery()
 	{
 		$this->connect();
 		if($this->_id instanceof Uuid)
 		{
-			$this->_query->delete('id', $this->_id)
-					->run();
-
-			$this->body(array());
+			$this->_query->delete('id', $this->_id);
 		}
 		elseif(is_array($this->_id))
 		{
@@ -279,10 +276,16 @@ class Doc
 			{
 				$this->_query->also($key, $val);
 			}
-
-			$this->_query->run();
-			$this->body(array());
 		}
+
+		return $this->_query;
+	}
+
+	public function remove()
+	{
+		$this->getRemoveQuery();
+		$this->_query->run();
+		$this->body(array());
 	}
 
 
@@ -292,17 +295,10 @@ class Doc
 		return $this;
 	}
 
-
-//	public function loaded()
-//	{
-//		//$this->_loaded = true;
-//		//$this->_originBody = new Body(unserialize(serialize($this->_body)));
-//
-//		return $this;
-//	}
-
-
-
+	public function resetQuery()
+	{
+		$this->_query = null;
+	}
 
 
 	/*
@@ -460,14 +456,6 @@ class Doc
 //
 //		return $this;
 //	}
-
-
-
-	public function remove()
-	{
-
-	}
-
 
 
 	protected function convertToNestedBody($body, $keys, $val)

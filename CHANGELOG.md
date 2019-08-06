@@ -1,3 +1,11 @@
+### 0.3.1 (2019-08-06)
+1. **Simpletools\Db\Cassandra\Schema**
+    1. Added `Schema` class
+2. **Simpletools\Db\Cassandra\Query**
+    1. Moved schema to `Schema` class and cached per connection
+3. **Simpletools\Db\Cassandra\Docs**
+    1. Added `Docs` class
+
 ### 0.3.0 (2019-07-27)
 1. **Simpletools\Db\Cassandra\SessionHandler**
     1. Added `SessionHandler` class implementing PHP `SessionHandlerInterface` and `SessionIdInterface`

@@ -56,6 +56,8 @@ class Query implements \Iterator
                 $this->keyspace($keyspace);
             }
         }
+
+				$this->_schema = Schema::getSchema($this->_client, $keyspace, $table);
     }
 
     public function client($client)
@@ -318,39 +320,9 @@ class Query implements \Iterator
         return $this;
     }
 
-
-    public function getSchema()
+		public function getPrimaryKey()
 		{
-			if($this->_schema) return $this->_schema;
-
-			$schema   = $this->_client->connector()->schema();
-			$keyspace = $schema->keyspace($this->_query['db']);
-
-			if($keyspace===false)
-			{
-					throw new Exception("Provided keyspace (".$this->_query['db'].") doesn't exist",404);
-			}
-
-
-			$table   = $keyspace->table($this->_query['table']);
-
-			if(!$table)
-			{
-				$table   = $keyspace->materializedView($this->_query['table']);
-				if(!$table)
-				{
-					throw new Exception("Provided table (".$this->_query['table'].") doesn't exist",404);
-				}
-			}
-
-			//echo"<pre>";var_dump($table->primaryKey()[0]->name(),$table->partitionKey()[0]->name(),$table->clusteringKey(), $table->clusteringOrder());die;
-
-			foreach ($table->columns() as $column)
-			{
-				$this->_schema[$column->name()] = (string)$column->type();
-			}
-
-			return $this->_schema;
+			return Schema::getPrimaryKey($this->_client, $this->_query['db'], $this->_query['table']);
 		}
 
 		protected function toSchemaType($key, $value)
@@ -408,7 +380,6 @@ class Query implements \Iterator
 
     protected function toSchema()
 		{
-			$this->getSchema();
 			if(isset($this->_query['data']))
 			{
 				foreach ($this->_query['data'] as $key => $val)
@@ -603,7 +574,7 @@ class Query implements \Iterator
 										|| $column instanceof Uuid
 										|| $column instanceof Timeuuid
 										|| $column instanceof Date
-                                        || $column instanceof Time
+										|| $column instanceof Time
 										|| $column instanceof Tinyint
 										|| $column instanceof Decimal
 										|| $column instanceof SimpleFloat
@@ -874,41 +845,40 @@ class Query implements \Iterator
                 $args[]     = $this->_query['where'];
             }
         }
+//        elseif(isset($this->_query['whereSql']))
+//        {
+//            if(!isset($query['WHERE'])) $query['WHERE'] = 'WHERE';
+//
+//            if($this->_query['whereSql']['vars'])
+//            {
+//                $query[] = $this->_prepareQuery($this->_query['whereSql']['statement'],$this->_query['whereSql']['vars']);
+//            }
+//            else
+//            {
+//                $query[] = $this->_query['whereSql']['statement'];
+//            }
+//        }
 
-        if(isset($this->_query['whereSql']))
-        {
-            if(!isset($query['WHERE'])) $query['WHERE'] = 'WHERE';
-
-            if($this->_query['whereSql']['vars'])
-            {
-                $query[] = $this->_prepareQuery($this->_query['whereSql']['statement'],$this->_query['whereSql']['vars']);
-            }
-            else
-            {
-                $query[] = $this->_query['whereSql']['statement'];
-            }
-        }
-
-        if(isset($this->_query['groupBy']))
-        {
-            $query[] = 'GROUP BY';
-
-            if(!is_array($this->_query['groupBy']))
-            {
-                $query[] = $this->_query['groupBy'];
-            }
-            else
-            {
-                $groupBy = array();
-
-                foreach($this->_query['groupBy'] as $column)
-                {
-                    $groupBy[] = $column;
-                }
-
-                $query[] = implode(', ',$groupBy);
-            }
-        }
+//        if(isset($this->_query['groupBy']))
+//        {
+//            $query[] = 'GROUP BY';
+//
+//            if(!is_array($this->_query['groupBy']))
+//            {
+//                $query[] = $this->_query['groupBy'];
+//            }
+//            else
+//            {
+//                $groupBy = array();
+//
+//                foreach($this->_query['groupBy'] as $column)
+//                {
+//                    $groupBy[] = $column;
+//                }
+//
+//                $query[] = implode(', ',$groupBy);
+//            }
+//        }
 
         if(isset($this->_query['sort']))
         {
@@ -936,10 +906,10 @@ class Query implements \Iterator
             $query[] = 'LIMIT '.$this->_query['limit'];
         }
 
-        if(isset($this->_query['offset']))
-        {
-            $query[] = 'OFFSET '.$this->_query['offset'];
-        }
+//        if(isset($this->_query['offset']))
+//        {
+//            $query[] = 'OFFSET '.$this->_query['offset'];
+//        }
 
 				if(isset($this->_query['allow_filtering']) && $this->_query['allow_filtering'])
 				{
@@ -1250,6 +1220,27 @@ class Query implements \Iterator
     {
         return $this->_result->valid();
     }
+
+    public function getKeyspace()
+		{
+			return $this->_query['db'];
+		}
+
+		public function getTable()
+		{
+			return $this->_query['table'];
+		}
+
+		public function getWhereArguments()
+		{
+			return $this->_query['where'];
+		}
+
+		public function resetResult()
+		{
+			$this->_result = null;
+			return $this;
+		}
 
     public function __toString()
     {

@@ -66,6 +66,11 @@ class Client
         self::$_gSettings[$cluster] = $settings;
     }
 
+    public function getCluster()
+		{
+			return $this->___cluster;
+		}
+
     public static function setPluginSetting($settingName, $value, $cluster='default')
 		{
 			self::$_pluginSettings[$cluster][$settingName] = $value;
