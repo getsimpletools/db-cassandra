@@ -329,7 +329,7 @@ class Result implements \Iterator
 
     public function valid()
     {
-        return ($this->_currentRow!==null) ? true : false;
+        return ($this->_currentRow!==false) ? true : false;
     }
 
 
