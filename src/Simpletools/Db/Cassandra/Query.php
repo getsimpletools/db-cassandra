@@ -786,7 +786,15 @@ class Query implements \Iterator
             {
                 foreach($this->_query['where'] as $operands)
                 {
-                    if(!isset($operands[2]))
+                		if($operands instanceof Lucene)
+										{
+											$query[] = " expr(".$operands->indexName.", '".$operands->statement."')";
+										}
+                		else if(is_array($operands) && $operands[0] instanceof Lucene)
+										{
+											$query[] = @$operands[-1]." expr(".$operands[0]->indexName.", '".$operands[0]->statement."')";
+										}
+                    elseif(!isset($operands[2]))
                     {
                         if($operands[1]===null) {
                             $query[] = @$operands[-1] . ' ' . $this->escapeKey($operands[0]) . " IS NULL";

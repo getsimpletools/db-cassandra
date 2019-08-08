@@ -1,3 +1,7 @@
+### 0.3.3 (2019-08-08)
+1. **Simpletools\Db\Cassandra\Lucene**
+    1. Added `Lucene` class
+
 ### 0.3.1 (2019-08-06)
 1. **Simpletools\Db\Cassandra\Schema**
     1. Added `Schema` class

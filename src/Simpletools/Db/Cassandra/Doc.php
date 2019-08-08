@@ -58,6 +58,7 @@ class Doc
 
 	protected $_loaded = false;
 	protected $_originBody;
+	protected $_lucene;
 
 
 //	protected $_diff = [
@@ -69,12 +70,7 @@ class Doc
 	{
 		$this->_body = new Body((object) array());
 
-		if(is_string($id))
-		{
-			$this->_id = new Uuid($id);
-			$this->_body->id = $this->_id;
-		}
-		elseif($id instanceof Uuid)
+		if($id !== null)
 		{
 			$this->_id = $id;
 		}
@@ -82,6 +78,12 @@ class Doc
 		{
 			$this->_id = (array)$id;
 		}
+	}
+
+	public function lucene($indexName,  $luceneQuery)
+	{
+			$this->_lucene = new Lucene($indexName, $luceneQuery);
+			return $this;
 	}
 
 	protected function connect()
@@ -93,6 +95,13 @@ class Doc
 		if(!$this->_query)
 		{
 			$this->_query = new Query($this->_table, $this->_keyspace);
+		}
+
+		if($this->_id !== null && !is_array($this->_id))
+		{
+			$this->_id = [
+					$this->_query->getPrimaryKey()[0] => $this->_id
+			];
 		}
 
 		$this->columns($this->_columns);
@@ -120,7 +129,10 @@ class Doc
 		}
 
 		if($args)
+		{
 			$this->_columns = $args;
+			if(is_string($this->_columns)) $this->_columns =  explode(',',$this->_columns);
+		}
 
 		return $this;
 	}
@@ -129,17 +141,18 @@ class Doc
 	{
 		$this->connect();
 
-		if($this->_id instanceof Uuid)
+		if(is_array($this->_id))
 		{
-			$this->_body->id = $this->_id;
-		}
-		elseif(is_array($this->_id))
-		{
-			foreach ($this->_id as $key =>$val)
+			foreach ($this->_query->getPrimaryKey() as $key)
 			{
-				$this->body->{$key} = $val;
+				if(isset($this->_id[$key]))
+					$this->body->{$key} = $this->_id[$key];
+				else
+					throw new \Exception("Couldn't save the doc, missing primary key($key)",400);
 			}
 		}
+		else
+			throw new \Exception("Couldn't save the doc, missing primary key",400);
 
 
 		$this->_query
@@ -164,15 +177,16 @@ class Doc
 	{
 		$this->connect();
 
-
-		if($this->_id instanceof Uuid)
+		if($this->_columns)
 		{
-			$this->_query->get($this->_id)
-					->columns($this->_columns)
-					->convertMapToJson($this->_convertMapToJson)
-					->limit(2);
+			foreach ($this->_query->getPrimaryKey() as $key)
+			{
+				if(!in_array($key,$this->_columns))
+					$this->_columns[] = $key;
+			}
 		}
-		elseif(is_array($this->_id))
+
+		if(is_array($this->_id) && count($this->_id))
 		{
 			$keys = $this->_id;
 
@@ -183,6 +197,16 @@ class Doc
 				$this->_query->also($key, $val);
 			}
 
+			if($this->_lucene)
+				$this->_query->also($this->_lucene);
+
+			$this->_query
+					->convertMapToJson($this->_convertMapToJson)
+					->limit(2);
+		}
+		elseif ($this->_lucene instanceof Lucene)
+		{
+			$this->_query->columns($this->_columns)->where($this->_lucene);
 			$this->_query
 					->convertMapToJson($this->_convertMapToJson)
 					->limit(2);
@@ -193,7 +217,6 @@ class Doc
 
 	public function load()
 	{
-
 		$this->getLoadQuery();
 		$this->_query->run();
 
@@ -210,6 +233,13 @@ class Doc
 
 		$this->body($this->_query->fetch());
 
+
+		foreach ($this->_query->getPrimaryKey() as $k)
+		{
+			$this->_id[$k] = $this->_body->{$k};
+		}
+
+		$this->_lucene = null;
 		$this->_query = null;
 
 		return $this;
