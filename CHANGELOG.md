@@ -1,3 +1,7 @@
+### 0.3.4 (2019-08-20)
+1. **Simpletools\Db\Cassandra\Result**
+    1. Added automatic pagination on ->fetch()
+
 ### 0.3.3 (2019-08-08)
 1. **Simpletools\Db\Cassandra\Lucene**
     1. Added `Lucene` class

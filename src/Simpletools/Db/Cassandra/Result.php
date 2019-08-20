@@ -184,9 +184,17 @@ class Result implements \Iterator
         $result = $this->_result->current();
         $this->_result->next();
 
-        if(!$result) return false;
+				if(!$result)
+				{
+					if($this->_result->isLastPage())
+						return false;
 
-        $result = (object)$result;
+					$this->_result = $this->_result->nextPage();
+					$result = $this->_result->current();
+					$this->_result->next();
+				}
+
+				$result = (object)$result;
 
         foreach($result as $key => $val)
         {
