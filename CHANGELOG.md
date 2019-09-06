@@ -1,3 +1,7 @@
+### 0.3.5 (2019-09-06)
+1. **Simpletools\Db\Cassandra\Query**
+    1. Added ->getSchema()
+
 ### 0.3.4 (2019-08-20)
 1. **Simpletools\Db\Cassandra\Result**
     1. Added automatic pagination on ->fetch()

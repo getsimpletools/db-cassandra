@@ -325,6 +325,11 @@ class Query implements \Iterator
 			return Schema::getPrimaryKey($this->_client, $this->_query['db'], $this->_query['table']);
 		}
 
+		public function getSchema()
+		{
+			return Schema::getSchema($this->_client, $this->_query['db'], $this->_query['table']);
+		}
+
 		protected function toSchemaType($key, $value)
 		{
 		    if(is_null($value))
