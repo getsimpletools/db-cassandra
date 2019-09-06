@@ -330,6 +330,17 @@ class Query implements \Iterator
 			return Schema::getSchema($this->_client, $this->_query['db'], $this->_query['table']);
 		}
 
+		public function getPartitionKey()
+		{
+			return Schema::getPartitionKey($this->_client, $this->_query['db'], $this->_query['table']);
+		}
+
+		public function getClusteringKey()
+		{
+			return Schema::getClusteringKey($this->_client, $this->_query['db'], $this->_query['table']);
+		}
+
+
 		protected function toSchemaType($key, $value)
 		{
 		    if(is_null($value))
