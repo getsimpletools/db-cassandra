@@ -1,10 +1,12 @@
+### 0.3.7 (2019-09-13)
+1. **Simpletools\Db\Cassandra\Query**
+    1. ->keyspace() - made this function private
+
 ### 0.3.6 (2019-08-06)
 1. **Simpletools\Db\Cassandra\Schema**
     1. Added ->getPartitionKey() and ->getClusteringKey() 
 2. **Simpletools\Db\Cassandra\Query**
     1. Added ->getPartitionKey() and ->getClusteringKey() 
-
-
 
 ### 0.3.5 (2019-09-06)
 1. **Simpletools\Db\Cassandra\Query**

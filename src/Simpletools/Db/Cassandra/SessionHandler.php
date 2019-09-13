@@ -103,8 +103,7 @@ class SessionHandler implements \SessionHandlerInterface, \SessionIdInterface
 
     protected function getQuery()
     {
-        $q = (new Query(self::$_settings['table']))
-            ->keyspace(self::$_settings['keyspace'])
+        $q = (new Query(self::$_settings['table'],self::$_settings['keyspace']))
             ->client(new Client(self::$_settings['cluster']));
 
         if(@self::$_settings['consistency'])

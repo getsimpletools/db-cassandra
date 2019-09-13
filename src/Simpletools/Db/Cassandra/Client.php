@@ -254,8 +254,7 @@ class Client
 
     public function __get($table)
     {
-        $query = new Query($table);
-        $query->keyspace($this->___keyspace);
+        $query = new Query($table, $this->___keyspace);
 
         return $query;
     }
@@ -267,8 +266,8 @@ class Client
 					$args = $args[0];
 				}
 
-        $query = new Query($table);
-        $query->keyspace($this->___keyspace)->columns($args);
+        $query = new Query($table, $this->___keyspace);
+        $query->columns($args);
 
         return $query;
     }

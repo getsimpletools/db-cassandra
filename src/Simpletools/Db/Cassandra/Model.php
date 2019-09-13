@@ -37,8 +37,7 @@ class Model extends Client
         $args 	= func_get_args();
         $table 	= array_shift($args);
 
-        $query = new Query($table);
-        $query->keyspace($this->___keyspace);
+        $query = new Query($table, $this->___keyspace);
 
         return $query;
     }

@@ -202,7 +202,7 @@ class Query implements \Iterator
         return $this;
     }
 
-    public function keyspace($keyspace)
+    private function keyspace($keyspace)
     {
     		if($keyspace)
         	$this->_query['db'] = $keyspace;
