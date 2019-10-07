@@ -288,6 +288,18 @@ class Query implements \Iterator
         return $this;
     }
 
+		public function ifNotExists()
+		{
+			$this->_query['ifNotExists'] = true;
+			return $this;
+		}
+
+		public function ifExists()
+		{
+			$this->_query['ifExists'] = true;
+			return $this;
+		}
+
     public function replace($data)
     {
         $this->_query['type'] = "REPLACE";
@@ -706,6 +718,12 @@ class Query implements \Iterator
 
         if(isset($setTypes[$this->_query['type']]))
         {
+
+						if($this->_ttl)
+						{
+							$query[] =  'USING TTL '.$this->_ttl;
+						}
+
             $query[] = 'SET';
 
             $set = array();
@@ -720,6 +738,27 @@ class Query implements \Iterator
                 {
                     $set[] = $this->escapeKey($key).' = '.(string) $value;
                 }
+								elseif($value instanceof Map)
+								{
+									$mapFieldsToAdd = unserialize(serialize($value));
+									$mapFieldsToAdd->removeNullFields();
+									$mapFieldsToRemove = unserialize(serialize($value));
+									$mapFieldsToRemove->removeNotNullFields();
+
+									$set[] = $this->escapeKey($key) . ' = ' . $this->escapeKey($key) . ' + ?';
+									$args[] = $mapFieldsToAdd;
+
+
+									$queryMap = [];
+									foreach ($mapFieldsToRemove->toObject() as $k => $val)
+									{
+										$queryMap[] = str_replace('"', "'", $this->escapeKey($k));
+									}
+
+									if ($queryMap)
+										$set[] = $this->escapeKey($key).' = '.$this->escapeKey($key).' - {'.implode(', ',$queryMap).'}';
+
+								}
                 else
                 {
                     //$set[] = $this->escapeKey($key).' = '.$this->_escape($value);
@@ -759,6 +798,10 @@ class Query implements \Iterator
             {
                 $ifNotExists = 'IF NOT EXISTS';
             }
+            elseif(isset($this->_query['ifExists']))
+						{
+							$ifNotExists = 'IF EXISTS';
+						}
 
             $set[] = '('.implode(', ',$keys).') VALUES('.implode(',',$values).' ) '.$ifNotExists.' '.$ttl;
 
@@ -941,7 +984,21 @@ class Query implements \Iterator
 				}
 
 
-        $this->_query = array(
+				if(!isset($insertTypes[$this->_query['type']]))
+				{
+					if(isset($this->_query['ifNotExists']))
+					{
+						$query[] = 'IF NOT EXISTS';
+					}
+
+					if(isset($this->_query['ifExists']))
+					{
+						$query[] = 'IF EXISTS';
+					}
+				}
+
+
+			$this->_query = array(
         		'db' => $this->_query['db'],
 						'table' => $this->_query['table'],
 				);
@@ -1052,6 +1109,7 @@ class Query implements \Iterator
     {
         if($seconds!==null)
 				{
+					if(is_string($seconds)) $seconds = strtotime($seconds);
 					$this->_ttl = $seconds > time() ? $seconds - time() : (int) $seconds;
 				}
 

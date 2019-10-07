@@ -172,6 +172,44 @@ class Doc
 		return $this;
 	}
 
+	public function getUpdateQuery()
+	{
+		$this->connect();
+
+
+		$this->_query
+				->update($this->_body);
+
+		if(is_array($this->_id))
+		{
+			foreach ($this->_query->getPrimaryKey() as $key)
+			{
+				if(isset($this->_id[$key]))
+					$this->_query->filter($key,$this->_id[$key]);
+				else
+					throw new \Exception("Couldn't save the doc, missing primary key($key)",400);
+			}
+		}
+		else
+			throw new \Exception("Couldn't save the doc, missing primary key",400);
+
+
+		$this->_query
+				->expires($this->_ttl)
+				->convertMapToJson($this->_convertMapToJson);
+
+		return $this->_query;
+	}
+
+	public function update()
+	{
+		$this->getUpdateQuery();
+		$this->_query->run();
+		$this->_query = null;
+
+		return $this;
+	}
+
 
 	public function getLoadQuery()
 	{

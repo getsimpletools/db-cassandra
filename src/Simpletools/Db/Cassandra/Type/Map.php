@@ -122,6 +122,23 @@ class Map implements \JsonSerializable
 		return $this->_value;
 	}
 
+
+	public function removeNullFields()
+	{
+		foreach ($this->_body  as $k =>$v)
+		{
+			if($v === null)  unset($this->_body->{$k});
+		}
+	}
+
+	public function removeNotNullFields()
+	{
+		foreach ($this->_body  as $k =>$v)
+		{
+			if($v !== null)  unset($this->_body->{$k});
+		}
+	}
+
 	public function jsonSerialize()
 	{
 		return $this->_body;

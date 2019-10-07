@@ -1,3 +1,10 @@
+### 0.3.8 (2019-10-07)
+1. **Simpletools\Db\Cassandra\Query**
+    1. Added ->ifNotExists() and ->ifExists()
+    2. Added partial Map update.
+1. **Simpletools\Db\Cassandra\Doc**
+    1. Added partial Map update.
+
 ### 0.3.7 (2019-09-13)
 1. **Simpletools\Db\Cassandra\Query**
     1. ->keyspace() - made this function private
