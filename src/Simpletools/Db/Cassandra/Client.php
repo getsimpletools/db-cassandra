@@ -133,6 +133,12 @@ class Client
         if(isset($settings['timeout']))
             $cluster->withDefaultTimeout($settings['timeout']);
 
+				if(isset($settings['connectTimeout']))
+					$cluster->withConnectTimeout($settings['connectTimeout']);
+
+				if(isset($settings['requestTimeout']))
+					$cluster->withRequestTimeout($settings['requestTimeout']);
+
         if(@$settings['username'] && @$settings['password'])
             $cluster->withCredentials($settings['username'], $settings['password']);
 

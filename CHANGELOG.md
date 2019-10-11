@@ -1,3 +1,7 @@
+### 0.3.10 (2019-10-11)
+1. **Simpletools\Db\Cassandra\Client**
+    1. Added `connectTimeout` and `requestTimeout` settings
+
 ### 0.3.8 (2019-10-07)
 1. **Simpletools\Db\Cassandra\Query**
     1. Added ->ifNotExists() and ->ifExists()
