@@ -1109,7 +1109,7 @@ class Query implements \Iterator
     {
         if($seconds!==null)
 				{
-					if(is_string($seconds)) $seconds = strtotime($seconds);
+					if(is_string($seconds) && !is_numeric($seconds)) $seconds = strtotime($seconds);
 					$this->_ttl = $seconds > time() ? $seconds - time() : (int) $seconds;
 				}
 
