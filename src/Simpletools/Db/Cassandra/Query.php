@@ -15,6 +15,7 @@ use Simpletools\Db\Cassandra\Type\SimpleFloat;
 use Simpletools\Db\Cassandra\Type\Tinyint;
 use Simpletools\Db\Cassandra\Type\Uuid;
 use Simpletools\Db\Cassandra\Type\Map;
+use Simpletools\Db\Cassandra\Type\Set;
 
 class Query implements \Iterator
 {
@@ -39,6 +40,7 @@ class Query implements \Iterator
     protected $_result      = null;
     protected $_schema      = array();
 		protected $_convertMapToJson;
+		protected $_removeFromSet;
 
     public function __construct($table,$keyspace=null)
     {
@@ -373,6 +375,11 @@ class Query implements \Iterator
 					$types = explode(',',str_replace(['map','<','>',' ',],'',$this->_schema[$key]));
 					return new Map($value, $types[0], $types[1], $this->_convertMapToJson);
 				}
+				elseif (substr($this->_schema[$key],0,3)== 'set')
+				{
+					$types = explode(',',str_replace(['set','<','>',' ',],'',$this->_schema[$key]));
+					return new Set($value, $types[0]);
+				}
 				elseif($this->_schema[$key] == 'double')
 				{
 					if(!is_numeric($value))
@@ -460,6 +467,7 @@ class Query implements \Iterator
             return (string) $value;
         }
         elseif($value instanceof Map
+						|| $value instanceof Set
             || $value instanceof Uuid
             || $value instanceof Timeuuid
             || $value instanceof Blob
@@ -498,6 +506,10 @@ class Query implements \Iterator
         {
             return (string) new Map($value);
         }
+				elseif ($value instanceof \Cassandra\Set)
+				{
+					return (string) new Set($value);
+				}
         elseif(
             $value instanceof AutoIncrement
         )
@@ -597,6 +609,7 @@ class Query implements \Iterator
                     $column                       = $idx;
                 }
 								elseif($column instanceof Map
+										|| $column instanceof Set
 										|| $column instanceof BigInt
 										|| $column instanceof Timestamp
 										|| $column instanceof Uuid
@@ -730,6 +743,8 @@ class Query implements \Iterator
 
             foreach($this->_query['data'] as $key => $value)
             {
+            		if(in_array($key,$this->getPrimaryKey())) continue;
+
                 if(is_null($value))
                 {
                     $set[] = $this->escapeKey($key).' = NULL';
@@ -738,6 +753,11 @@ class Query implements \Iterator
                 {
                     $set[] = $this->escapeKey($key).' = '.(string) $value;
                 }
+								elseif($value instanceof Set)
+								{
+									$set[] = $this->escapeKey($key) . ' = ' . $this->escapeKey($key) . ' + ?';
+									$args[] = $value;
+								}
 								elseif($value instanceof Map)
 								{
 									$mapFieldsToAdd = unserialize(serialize($value));
@@ -766,6 +786,15 @@ class Query implements \Iterator
                     $args[] = $value;
                 }
             }
+
+            if($this->_removeFromSet)
+						{
+							foreach ($this->_removeFromSet as $setField => $setVal)
+							{
+								$set[] = $this->escapeKey($setField) . ' = ' . $this->escapeKey($setField) . ' - ?';
+								$args[] = $this->toSchemaType($setField,$setVal);
+							}
+						}
 
             $query[] = implode(', ',$set);
         }
@@ -1029,6 +1058,7 @@ class Query implements \Iterator
             foreach($args as $i=>$arg)
             {
                 if($arg instanceof Map
+										|| $arg instanceof Set
                     || $arg instanceof BigInt
                     || $arg instanceof Timestamp
                     || $arg instanceof Uuid
@@ -1337,6 +1367,12 @@ class Query implements \Iterator
 		public function convertMapToJson($boolean = true)
 		{
 			$this->_convertMapToJson = $boolean;
+			return $this;
+		}
+
+		public function removeFromSet($data)
+		{
+			$this->_removeFromSet = $data;
 			return $this;
 		}
 

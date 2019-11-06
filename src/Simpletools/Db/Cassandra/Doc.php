@@ -53,6 +53,7 @@ class Doc
 	protected $_columns;
 	protected $_ttl;
 	protected $_convertMapToJson;
+	protected $_removeFromSet;
 
 	protected $_body;
 
@@ -76,7 +77,7 @@ class Doc
 		}
 		else
 		{
-			$this->_id = (array)$id;
+			$this->_id = new Uuid();
 		}
 	}
 
@@ -196,6 +197,7 @@ class Doc
 
 		$this->_query
 				->expires($this->_ttl)
+				->removeFromSet($this->_removeFromSet)
 				->convertMapToJson($this->_convertMapToJson);
 
 		return $this->_query;
@@ -207,6 +209,18 @@ class Doc
 		$this->_query->run();
 		$this->_query = null;
 
+		if($this->_removeFromSet)
+		{
+			foreach ($this->_removeFromSet as $setField => $setVal)
+			{
+				if(isset($this->_body->{$setField}))
+				{
+					$this->_body->{$setField} = array_diff($this->_body->{$setField}, $setVal);
+				}
+			}
+
+
+		}
 		return $this;
 	}
 
@@ -360,6 +374,12 @@ class Doc
 	public function convertMapToJson($boolean = true)
 	{
 		$this->_convertMapToJson = $boolean;
+		return $this;
+	}
+
+	public function removeFromSet($data)
+	{
+		$this->_removeFromSet = $data;
 		return $this;
 	}
 

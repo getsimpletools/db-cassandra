@@ -42,6 +42,7 @@ use Simpletools\Db\Cassandra\Type\Date;
 use Simpletools\Db\Cassandra\Type\Map;
 use Simpletools\Db\Cassandra\Type\Timestamp;
 use Simpletools\Db\Cassandra\Type\Uuid;
+use Simpletools\Db\Cassandra\Type\Set;
 
 class Result implements \Iterator
 {
@@ -351,6 +352,12 @@ class Result implements \Iterator
 				$types = explode(',',str_replace(['map','<','>',' ',],'',$this->_schema[$key]));
 
 				return (new Map($value, $types[0], $types[1], $this->_convertMapToJson))->toObject();
+			}
+			elseif (substr($this->_schema[$key],0,3)== 'set')
+			{
+				$types = explode(',',str_replace(['set','<','>',' ',],'',$this->_schema[$key]));
+
+				return (new Set($value, $types[0]))->toArray();
 			}
 			elseif($this->_schema[$key] == 'double') 			return (float)$value;
 			elseif($this->_schema[$key] == 'boolean') 		return $value;

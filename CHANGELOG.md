@@ -1,3 +1,7 @@
+### 0.3.12 (2019-11-06)
+4. **Simpletools\Db\Cassandra\Type\Set**
+    1. Introduced new type
+
 ### 0.3.10 (2019-10-11)
 1. **Simpletools\Db\Cassandra\Client**
     1. Added `connectTimeout` and `requestTimeout` settings
