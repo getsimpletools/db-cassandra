@@ -142,6 +142,9 @@ class Client
         if(@$settings['username'] && @$settings['password'])
             $cluster->withCredentials($settings['username'], $settings['password']);
 
+				if(isset($settings['ioThreads']))
+					$cluster->withIOThreads($settings['ioThreads']);
+
         if(isset($settings['routing']))
         {
             if(is_array($settings['routing']))

@@ -1,4 +1,8 @@
-### 0.3.12 (2019-11-06)
+### 0.3.14 (2019-10-14)
+1. **Simpletools\Db\Cassandra\Client**
+    1. Added `ioThreads` settings
+
+### 0.3.13 (2019-11-14)
 4. **Simpletools\Db\Cassandra\Async**
     1. Added `Async` for the bulk write operations
 
