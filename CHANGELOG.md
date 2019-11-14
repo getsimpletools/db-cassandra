@@ -1,4 +1,8 @@
 ### 0.3.12 (2019-11-06)
+4. **Simpletools\Db\Cassandra\Async**
+    1. Added `Async` for the bulk write operations
+
+### 0.3.12 (2019-11-06)
 4. **Simpletools\Db\Cassandra\Type\Set**
     1. Introduced new type
 

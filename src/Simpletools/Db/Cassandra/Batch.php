@@ -35,6 +35,11 @@ class Batch
 
     public function add($query)
     {
+				if($query instanceof Doc)
+				{
+					$query = $query->getSaveQuery();
+				}
+
         if(!($query instanceof Query))
         {
             throw new Exception("Query is not of a Query type",400);
