@@ -120,7 +120,7 @@ class SessionHandler implements \SessionHandlerInterface, \SessionIdInterface
     {
         $q = $this->getQuery();
 
-        $q->insertIgnore([
+        $q->set([
             'id'                =>  $id,
             'data'              =>  $data,
             'date_modified'     =>  time(),
