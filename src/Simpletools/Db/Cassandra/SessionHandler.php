@@ -136,9 +136,7 @@ class SessionHandler implements \SessionHandlerInterface, \SessionIdInterface
     {
         $q = $this->getQuery();
 
-        $q->delete([
-            'id'    => $id
-        ])->run();
+        $q->delete('id', $id)->run();
 
         return true;
     }
