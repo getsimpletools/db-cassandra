@@ -134,7 +134,9 @@ class SessionHandler implements \SessionHandlerInterface, \SessionIdInterface
 
     public function destroy($id)
     {
-        $this->_sessionTable->delete([
+        $q = $this->getQuery();
+
+        $q->delete([
             'id'    => $id
         ])->run();
 
