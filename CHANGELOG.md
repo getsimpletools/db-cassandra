@@ -1,3 +1,7 @@
+### 0.3.18 (2019-11-27)
+1. **Simpletools\Db\Cassandra\SessionHandler**
+    1. Clear cookies on ->destroy()
+
 ### 0.3.14 (2019-10-14)
 1. **Simpletools\Db\Cassandra\Client**
     1. Added `ioThreads` settings
