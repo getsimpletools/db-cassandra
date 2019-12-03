@@ -56,7 +56,7 @@ class SessionHandler implements \SessionHandlerInterface, \SessionIdInterface
 
         $client->execute('
             CREATE TABLE IF NOT EXISTS '.self::$_settings['keyspace'].'.'.self::$_settings['table'].' (
-              id uuid,
+              id text,
               data varchar,
               date_modified TIMESTAMP,
               date_expires TIMESTAMP,
