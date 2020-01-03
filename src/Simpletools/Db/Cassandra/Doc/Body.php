@@ -38,6 +38,7 @@ namespace Simpletools\Db\Cassandra\Doc;
 
 use Simpletools\Db\Cassandra\Type\BigInt;
 use Simpletools\Db\Cassandra\Type\Blob;
+use Simpletools\Db\Cassandra\Type\Inet;
 use Simpletools\Db\Cassandra\Type\Date;
 use Simpletools\Db\Cassandra\Type\Timestamp;
 use Simpletools\Db\Cassandra\Type\Map;

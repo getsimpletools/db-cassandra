@@ -6,6 +6,7 @@ use Simpletools\Db\Cassandra\Doc\Body;
 use Simpletools\Db\Cassandra\Type\AutoIncrement;
 use Simpletools\Db\Cassandra\Type\BigInt;
 use Simpletools\Db\Cassandra\Type\Blob;
+use Simpletools\Db\Cassandra\Type\Inet;
 use Simpletools\Db\Cassandra\Type\Date;
 use Simpletools\Db\Cassandra\Type\Decimal;
 use Simpletools\Db\Cassandra\Type\Timestamp;
@@ -405,6 +406,7 @@ class Query implements \Iterator
                 elseif($this->_schema[$key] == 'time') 				return new Time($value);
 				elseif($this->_schema[$key] == 'timeuuid') 		return new Timeuuid($value);
 				elseif($this->_schema[$key] == 'blob') 				return new Blob($value);
+                elseif($this->_schema[$key] == 'inet') 				return new Inet($value);
 				else
 					throw new \Exception("Your key($key) using unsupported data type");
 			}
@@ -471,6 +473,7 @@ class Query implements \Iterator
             || $value instanceof Uuid
             || $value instanceof Timeuuid
             || $value instanceof Blob
+            || $value instanceof Inet
         ){
             return $value->value();
         }
@@ -620,6 +623,7 @@ class Query implements \Iterator
 										|| $column instanceof Decimal
 										|| $column instanceof SimpleFloat
 										|| $column instanceof Blob
+                                        || $column instanceof Inet
 								){
 									$this->_query['columns'][$idx] = $column->value();
 								}
@@ -1069,6 +1073,7 @@ class Query implements \Iterator
                     || $arg instanceof Decimal
                     || $arg instanceof SimpleFloat
                     || $arg instanceof Blob
+                    || $arg instanceof Inet
                 ){
                     $args[$i] = $arg->value();
                 }

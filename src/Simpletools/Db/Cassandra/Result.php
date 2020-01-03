@@ -38,6 +38,7 @@ namespace Simpletools\Db\Cassandra;
 
 use Simpletools\Db\Cassandra\Type\BigInt;
 use Simpletools\Db\Cassandra\Type\Blob;
+use Simpletools\Db\Cassandra\Type\Inet;
 use Simpletools\Db\Cassandra\Type\Date;
 use Simpletools\Db\Cassandra\Type\Map;
 use Simpletools\Db\Cassandra\Type\Timestamp;
@@ -371,6 +372,7 @@ class Result implements \Iterator
 			elseif($this->_schema[$key] == 'date') 				return $value === null  ? (new Date($value))->setDefault()->toInt() : (new Date($value))->toInt();
 			elseif($this->_schema[$key] == 'timeuuid') 		return (string)($value);
 			elseif($this->_schema[$key] == 'blob') 				return (new Blob($value))->getContent();
+            elseif($this->_schema[$key] == 'inet') 				return (string)$value;
 			else
 				throw new \Exception("Your key($key) using unsupported data type");
 		}
