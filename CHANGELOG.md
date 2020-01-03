@@ -1,3 +1,7 @@
+### 0.3.20 (2020-01-03)
+1. **Simpletools\Db\Cassandra\Type\Inet**
+    1. Introduced new type
+
 ### 0.3.18 (2019-11-27)
 1. **Simpletools\Db\Cassandra\SessionHandler**
     1. Clear cookies on ->destroy()
