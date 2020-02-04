@@ -369,6 +369,7 @@ class Result implements \Iterator
 			elseif($this->_schema[$key] == 'float') 			return (float)$value;
 			elseif($this->_schema[$key] == 'bigint') 			return (string)($value);
 			elseif($this->_schema[$key] == 'tinyint') 		return (int)($value);
+			elseif($this->_schema[$key] == 'counter') 		return (int)($value);
 			elseif($this->_schema[$key] == 'date') 				return $value === null  ? (new Date($value))->setDefault()->toInt() : (new Date($value))->toInt();
 			elseif($this->_schema[$key] == 'timeuuid') 		return (string)($value);
 			elseif($this->_schema[$key] == 'blob') 				return (new Blob($value))->getContent();
