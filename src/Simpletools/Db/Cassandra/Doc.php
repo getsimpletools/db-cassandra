@@ -297,7 +297,7 @@ class Doc
 		return $this;
 	}
 
-	public function increase($value = 1)
+	public function increase($data)
 	{
 		$this->connect();
 
@@ -319,13 +319,13 @@ class Doc
 
 
 		$this->_query
-			->increase($value)
+			->increase($data)
 			->run();
 
 		return $this;
 	}
 
-	public function decrease($value = 1)
+	public function decrease($data)
 	{
 		$this->connect();
 
@@ -347,7 +347,7 @@ class Doc
 
 
 		$this->_query
-			->decrease($value)
+			->decrease($data)
 			->run();
 
 		return $this->_query;

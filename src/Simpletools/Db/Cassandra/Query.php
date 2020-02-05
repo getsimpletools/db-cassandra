@@ -292,31 +292,27 @@ class Query implements \Iterator
     }
 
    //counter functions
-	public function increase($value = 1)
+	public function increase($data)
 	{
-		$counterField = false;
-		foreach ($this->_schema as $k => $v)
+		foreach ($data as $counter => $v)
 		{
-			if($v =='counter') $counterField = $k;
+			if($this->_schema[$counter] != 'counter') throw new \Exception("Column (".$counter.") isn't a counter column",400);
 		}
-		if(!$counterField) throw new \Exception("Table (".$this->_query['table'].") doesn't support counter field",400);
 		$this->_query['type'] = "INCREASE COUNTER";
-		$this->_query['data'] = (array)(new Body([$counterField => $value]))->toObject();
+		$this->_query['data'] = (array)(new Body($data))->toObject();
 
 		return $this;
 	}
 
-	public function decrease($value = 1)
+	public function decrease($data)
 	{
-		$counterField = false;
-		foreach ($this->_schema as $k => $v)
+		foreach ($data as $counter => $v)
 		{
-			if($v =='counter') $counterField = $k;
+			if($this->_schema[$counter] != 'counter') throw new \Exception("Column (".$counter.") isn't a counter column",400);
 		}
-		if(!$counterField) throw new \Exception("Table (".$this->_query['table'].") doesn't support counter field",400);
 
 		$this->_query['type'] = "DECREASE COUNTER";
-		$this->_query['data'] = (array)(new Body([$counterField => $value]))->toObject();
+		$this->_query['data'] = (array)(new Body($data))->toObject();
 
 		return $this;
 	}
