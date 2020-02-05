@@ -1,3 +1,9 @@
+### 0.3.24 (2020-02-04)
+1. **Simpletools\Db\Cassandra\Query**
+    1. Added ->increase() and ->decrease() for counter table
+2. **Simpletools\Db\Cassandra\Doc**
+    1. Added ->increase() and ->decrease() for counter table
+    
 ### 0.3.20 (2020-01-03)
 1. **Simpletools\Db\Cassandra\Type\Inet**
     1. Introduced new type

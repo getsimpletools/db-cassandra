@@ -291,6 +291,37 @@ class Query implements \Iterator
         return $this;
     }
 
+   //counter functions
+	public function increase($value = 1)
+	{
+		$counterField = false;
+		foreach ($this->_schema as $k => $v)
+		{
+			if($v =='counter') $counterField = $k;
+		}
+		if(!$counterField) throw new \Exception("Table (".$this->_query['table'].") doesn't support counter field",400);
+		$this->_query['type'] = "INCREASE COUNTER";
+		$this->_query['data'] = (array)(new Body([$counterField => $value]))->toObject();
+
+		return $this;
+	}
+
+	public function decrease($value = 1)
+	{
+		$counterField = false;
+		foreach ($this->_schema as $k => $v)
+		{
+			if($v =='counter') $counterField = $k;
+		}
+		if(!$counterField) throw new \Exception("Table (".$this->_query['table'].") doesn't support counter field",400);
+
+		$this->_query['type'] = "DECREASE COUNTER";
+		$this->_query['data'] = (array)(new Body([$counterField => $value]))->toObject();
+
+		return $this;
+	}
+
+
 		public function ifNotExists()
 		{
 			$this->_query['ifNotExists'] = true;
@@ -403,10 +434,11 @@ class Query implements \Iterator
 				elseif($this->_schema[$key] == 'bigint') 			return new BigInt($value);
 				elseif($this->_schema[$key] == 'tinyint') 		return new Tinyint($value);
 				elseif($this->_schema[$key] == 'date') 				return new Date($value);
-                elseif($this->_schema[$key] == 'time') 				return new Time($value);
+				elseif($this->_schema[$key] == 'time') 				return new Time($value);
 				elseif($this->_schema[$key] == 'timeuuid') 		return new Timeuuid($value);
 				elseif($this->_schema[$key] == 'blob') 				return new Blob($value);
-                elseif($this->_schema[$key] == 'inet') 				return new Inet($value);
+				elseif($this->_schema[$key] == 'inet') 				return new Inet($value);
+				elseif($this->_schema[$key] == 'counter') 		return new BigInt($value);
 				else
 					throw new \Exception("Your key($key) using unsupported data type");
 			}
@@ -802,6 +834,32 @@ class Query implements \Iterator
 
             $query[] = implode(', ',$set);
         }
+        elseif ($this->_query['type'] == 'INCREASE COUNTER')
+				{
+					$query[0] = 'UPDATE';
+					$query[] = 'SET';
+					$set = array();
+					foreach($this->_query['data'] as $key => $value)
+					{
+						$set[] = $this->escapeKey($key) . ' = ' . $this->escapeKey($key) . ' + ?';
+						$args[] = $value;
+					}
+
+					$query[] = implode(', ',$set);
+				}
+				elseif ($this->_query['type'] == 'DECREASE COUNTER')
+				{
+					$query[0] = 'UPDATE';
+					$query[] = 'SET';
+					$set = array();
+					foreach($this->_query['data'] as $key => $value)
+					{
+						$set[] = $this->escapeKey($key) . ' = ' . $this->escapeKey($key) . ' - ?';
+						$args[] = $value;
+					}
+
+					$query[] = implode(', ',$set);
+				}
 
         $insertTypes = array(
             'INSERT' 				=> 1

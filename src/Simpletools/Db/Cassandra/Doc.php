@@ -297,6 +297,62 @@ class Doc
 		return $this;
 	}
 
+	public function increase($value = 1)
+	{
+		$this->connect();
+
+		$this->_query
+			->update($this->_body);
+
+		if(is_array($this->_id))
+		{
+			foreach ($this->_query->getPrimaryKey() as $key)
+			{
+				if(isset($this->_id[$key]))
+					$this->_query->filter($key,$this->_id[$key]);
+				else
+					throw new \Exception("Couldn't save the doc, missing primary key($key)",400);
+			}
+		}
+		else
+			throw new \Exception("Couldn't save the doc, missing primary key",400);
+
+
+		$this->_query
+			->increase($value)
+			->run();
+
+		return $this;
+	}
+
+	public function decrease($value = 1)
+	{
+		$this->connect();
+
+		$this->_query
+			->update($this->_body);
+
+		if(is_array($this->_id))
+		{
+			foreach ($this->_query->getPrimaryKey() as $key)
+			{
+				if(isset($this->_id[$key]))
+					$this->_query->filter($key,$this->_id[$key]);
+				else
+					throw new \Exception("Couldn't save the doc, missing primary key($key)",400);
+			}
+		}
+		else
+			throw new \Exception("Couldn't save the doc, missing primary key",400);
+
+
+		$this->_query
+			->decrease($value)
+			->run();
+
+		return $this->_query;
+	}
+
 
 	public function __set($name,$value)
 	{
