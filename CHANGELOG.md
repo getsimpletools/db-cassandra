@@ -1,3 +1,7 @@
+### 0.3.27 (2020-02-11)
+1. **Simpletools\Db\Cassandra\Schema**
+    1. Added support for keyspace on definition, defaults to client default keyspace
+    
 ### 0.3.26 (2020-02-11)
 1. **Simpletools\Db\Cassandra\TempTable**
     1. Introduced new TempTable() functionality

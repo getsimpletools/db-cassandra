@@ -48,7 +48,9 @@ class Schema
         $tableName = $this->_tableName;
 
         $settings = $this->_definition;
-        $settings->keyspace = (new Client())->keyspace();
+
+        if(!@$settings->keyspace)
+            $settings->keyspace = (new Client())->keyspace();
 
         $columns = [];
         $clusteringOrder = [];

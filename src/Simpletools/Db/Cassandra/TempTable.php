@@ -136,7 +136,7 @@ class TempTable
         if($this->_thisCreated && !$this->_keep)
         {
             $client = new Client();
-            $client->execute('DROP TABLE ' . $client->keyspace() . '."' . $this->_schema->name() . '";');
+            $client->execute('DROP TABLE ' . $this->_schema->keyspace() . '."' . $this->_schema->name() . '";');
         }
     }
 }
