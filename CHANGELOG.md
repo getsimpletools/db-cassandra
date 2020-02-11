@@ -1,3 +1,7 @@
+### 0.3.26 (2020-02-11)
+1. **Simpletools\Db\Cassandra\TempTable**
+    1. Introduced new TempTable() functionality
+    
 ### 0.3.24 (2020-02-04)
 1. **Simpletools\Db\Cassandra\Query**
     1. Added ->increase() and ->decrease() for counter table
