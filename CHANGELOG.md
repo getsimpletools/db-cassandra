@@ -1,3 +1,7 @@
+### 0.3.28 (2020-02-11)
+1. **Simpletools\Db\Cassandra\TempTable**
+    1. Added auto create
+    
 ### 0.3.27 (2020-02-11)
 1. **Simpletools\Db\Cassandra\Schema**
     1. Added support for keyspace on definition, defaults to client default keyspace

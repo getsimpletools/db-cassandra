@@ -84,27 +84,10 @@ class TempTable
 
     public function query()
     {
+        if(!$this->_thisCreated)
+            $this->create();
+
         return (new Query($this->thisTableName));
-    }
-
-    public function __get($table)
-    {
-        $query = new Query($table, $this->_schema->keyspace());
-
-        return $query;
-    }
-
-    public function __call($table,$args)
-    {
-        if(count($args) == 1)
-        {
-            $args = $args[0];
-        }
-
-        $query = new Query($table, $this->_schema->keyspace());
-        $query->columns($args);
-
-        return $query;
     }
 
     public function keep()
