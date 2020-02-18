@@ -1,3 +1,19 @@
+### 0.4.0 (2020-02-18)
+1. **Simpletools\Db\Cassandra**
+    1. Added integration with `Simpletools\Db\Replicator` to replicate data between databases
+2. **Simpletools\Db\Cassandra\Query**
+    1. By default foreach on Query or Result will return only first page.
+    2. Added `->autoScroll()` to automatically get next page on foreach
+    3. Added `->getScrollId()` and `->setScrollId()` to manually control pagination
+    4. Added `->size()` to control page size
+3. **Simpletools\Db\Cassandra\Result**
+    1. Added `->getScrollId()` and `->autoScroll()` to control pagination
+4. **Simpletools\Db\Cassandra\Async**
+    1. `->add($batch)` method can handle Batch object
+    2. Added `->disableReplication()` (enabled by default)
+5. **Simpletools\Db\Cassandra\Batch**
+    1. Added `->constraint()` to force constraint index
+
 ### 0.3.24 (2020-02-04)
 1. **Simpletools\Db\Cassandra\Query**
     1. Added ->increase() and ->decrease() for counter table

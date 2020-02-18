@@ -58,6 +58,8 @@ class Result implements \Iterator
     protected $_columnsMap      = array();
     protected $_schema = array();
 		protected $_convertMapToJson;
+		protected $_autoScroll = false;
+		protected $_scroll_id = null;
 
     public function __construct($result, $connection)
     {
@@ -188,6 +190,8 @@ class Result implements \Iterator
 
 				if(!$result)
 				{
+					if(!$this->_autoScroll) return false;
+
 					if($this->_result->isLastPage())
 						return false;
 
@@ -386,5 +390,16 @@ class Result implements \Iterator
 	{
 		$this->_convertMapToJson = $boolean;
 		return $this;
+	}
+
+	public function autoScroll()
+	{
+		$this->_autoScroll = true;
+		return $this;
+	}
+
+	public function getScrollId()
+	{
+		return base64_encode($this->_result->pagingStateToken());
 	}
 }

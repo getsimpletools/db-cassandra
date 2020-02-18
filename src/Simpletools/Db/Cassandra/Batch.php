@@ -1,6 +1,7 @@
 <?php
 
 namespace Simpletools\Db\Cassandra;
+use Simpletools\Db\Replicator;
 
 class Batch
 {
@@ -13,12 +14,21 @@ class Batch
 
     protected $_hasRun  = false;
     protected $_queriesParsed = array();
+    protected $_table = null;
+		protected $_keyspace = null;
+		protected $_replication = false;
+		protected $_replicationQuery;
 
     protected $_runOnBatchSize = 0; //0 - only manual batch run()
 
     public function __construct($type = self::LOGGED)
     {
         $this->_type = $type;
+        $this->_replicationQuery =  (object)[
+					'insert' => [],
+					'update' =>[],
+					'delete' =>[]
+				];
     }
 
     public function client($client)
@@ -32,6 +42,13 @@ class Batch
 
         return $this;
     }
+
+    public function constraint($table, $keyspace = null)
+		{
+			$this->_table = $table;
+			$this->_keyspace = $keyspace;
+			return $this;
+		}
 
     public function add($query)
     {
@@ -55,9 +72,9 @@ class Batch
         return $this;
     }
 
-    public function query($table)
+    public function query($table,  $keyspace = null)
     {
-        $q = new Query($table);
+        $q = new Query($table, $keyspace);
 
         $this->add($q);
 
@@ -72,7 +89,7 @@ class Batch
         }
 
         $_queries = array();
-        $_queries[] = "BEGIN BATCH";
+        $_queries[] = "BEGIN UNLOGGED BATCH";
 
         foreach($this->_queries as $query)
         {
@@ -89,46 +106,126 @@ class Batch
         return count($this->_queries);
     }
 
+    public function getBatch()
+		{
+			if($this->_hasRun)
+			{
+				throw new Exception("This batch has run, reset() and try again",400);
+			}
+
+			if(!$this->_queries)
+			{
+				throw new Exception("Empty batch",400);
+			}
+
+			if(!$this->_client)
+				$this->_client = new Client();
+
+			if($this->_table)//constraint
+			{
+				if($this->_keyspace === null)
+					$this->_keyspace = $this->_client->keyspace();
+
+				$this->_replication = Replicator::exists('cassandra://bulk@'.$this->_keyspace.'.'.$this->_table);
+
+				if(!$this->_queriesParsed)
+				{
+					foreach ($this->_queries as $query)
+					{
+						$rawQuery = $query->getRawQuery();
+
+						if($rawQuery['db'] != $this->_keyspace || $rawQuery['table'] != $this->_table)
+							throw new \Exception("Your batch Query(".$rawQuery['db'].'.'.$rawQuery['table'].") does not match constraint(".$this->_keyspace.'.'.$this->_table.")");
+
+
+						if($this->_replication)
+						{
+							if(@$rawQuery['type'] == 'INSERT')
+							{
+								$this->_replicationQuery->insert[] = $query->getRawQueryData($rawQuery);
+							}
+							elseif (@$rawQuery['type'] == 'UPDATE')
+							{
+								if($data = $query->getRawQueryData($rawQuery))
+								{
+									$this->_replicationQuery->update[] = $data;
+								}
+							}
+							elseif (@$rawQuery['type'] == 'DELETE FROM')
+							{
+								if($data = $query->getRawQueryData($rawQuery))
+								{
+									$this->_replicationQuery->delete[] = $data;
+								}
+							}
+						}
+
+						$q = $query->getQuery(true);
+						$this->_queriesParsed[] = array('statement' => $q['preparedQuery'], 'args' => $q['arguments']);
+					}
+				}
+			}
+			else
+			{
+				if(!$this->_queriesParsed)
+				{
+					foreach ($this->_queries as $query)
+					{
+						$q = $query->getQuery(true);
+						$this->_queriesParsed[] = array('statement' => $q['preparedQuery'], 'args' => $q['arguments']);
+					}
+				}
+			}
+
+			$batch = new \Cassandra\BatchStatement($this->_type);
+
+			foreach($this->_queriesParsed as $q) {
+				$batch->add($q['statement'], $q['args']);
+			}
+
+			return $batch;
+		}
+
     public function run()
     {
-        if($this->_hasRun)
-        {
-            throw new Exception("This batch has run, reset() and try again",400);
-        }
+				if(!$this->_client)
+					$this->_client = new Client();
 
-        if(!$this->_queries)
-        {
-            throw new Exception("Empty batch",400);
-        }
+				$this->_client->connect();
 
-        if(!$this->_queriesParsed) {
+        $res = $this->_client->connector()->execute($this->getBatch());
+        //unset($batch);
 
-            foreach ($this->_queries as $query) {
-                $q = $query->getQuery(true);
-                $this->_queriesParsed[] = array('statement' => $q['preparedQuery'], 'args' => $q['arguments']);
-            }
-        }
 
-        $batch = new \Cassandra\BatchStatement($this->_type);
-
-        if(!$this->_client)
-            $this->_client = new Client();
-
-        $this->_client->connect();
-
-        foreach($this->_queriesParsed as $q) {
-            $batch->add($q['statement'], $q['args']);
-        }
-
-        $res = $this->_client->connector()->execute($batch);
-        unset($batch);
-
+				$this->replicate();;
         $this->_hasRun = true;
 
         $this->reset();
 
         if($res) return true;
     }
+
+    public function replicate()
+		{
+			if($this->_replication)
+			{
+				Replicator::trigger('cassandra://bulk@'.$this->_keyspace.'.'.$this->_table, $this->_replicationQuery);
+			}
+		}
+
+		public function isReplication()
+		{
+			return $this->_replication;
+		}
+
+		public function getReplicationQuery()
+		{
+			return (object)[
+				'keyspace' => $this->_keyspace,
+				'table' => $this->_table,
+				'data' => $this->_replicationQuery
+			];
+		}
 
     public function runIfNotEmpty()
     {
@@ -143,6 +240,11 @@ class Batch
         $this->_hasRun          = false;
         $this->_queries         = array();
         $this->_queriesParsed   = array();
+				$this->_replicationQuery = (object)[
+					'insert' => [],
+					'update' =>[],
+					'delete' =>[]
+				];
 
         return $this;
     }

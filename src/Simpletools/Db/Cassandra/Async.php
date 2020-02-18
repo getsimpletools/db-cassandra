@@ -1,6 +1,7 @@
 <?php
 
 namespace Simpletools\Db\Cassandra;
+use Simpletools\Db\Replicator;
 
 class Async
 {
@@ -8,6 +9,8 @@ class Async
 	protected $_client;
 	protected $_runOnBatchSize = 10000; //0 - only manual batch run()
 	protected $_requestTimeout = 5;
+	protected $_replicationQuery = [];
+	protected $_replication = true;
 
 	public function __construct($batchSize = 10000, $requestTimeout = 5, $client = null)
 	{
@@ -29,9 +32,39 @@ class Async
 		$this->_client->connect();
 	}
 
+	public function disableReplication()
+	{
+		$this->_replication = false;
+	}
 
 	public function add($query)
 	{
+		if($query instanceof  Batch)
+		{
+			$batchId = uniqid();
+			$this->_queries[$batchId] = $this->_client->connector()->executeAsync($query->getBatch());
+
+			if($query->isReplication())
+			{
+
+				$repQuery = $query->getReplicationQuery();
+				$this->_replicationQuery[$batchId] = (object)[
+					'data' => $repQuery->data,
+					'type' => 'bulk',
+					'dest' => $repQuery->keyspace.'.'.$repQuery->table
+				];
+			}
+
+			$query->reset();
+
+			if($this->_runOnBatchSize && count($this->_queries) >= $this->_runOnBatchSize)
+			{
+				$this->run();
+			}
+
+			return $this;
+		}
+
 		if($query instanceof Doc)
 		{
 			$query = $query->getSaveQuery();
@@ -42,11 +75,44 @@ class Async
 			throw new Exception("Query is not of a Query type",400);
 		}
 
-		$query = $query->getQuery(true);
 
-		$this->_queries[] = $this->_client->connector()->executeAsync($query['preparedQuery'],[
+		if($this->_replication)
+		{
+			$rawQuery = $query->getRawQuery();
+			$callId = uniqid();
+
+			$type = false;
+			if($rawQuery['type'] == 'INSERT') $type ='write';
+			elseif($rawQuery['type'] == 'UPDATE') $type ='update';
+			elseif($rawQuery['type'] == 'DELETE FROM') $type ='delete';
+
+			if($type && Replicator::exists('cassandra://'.$type.'@'.$rawQuery['db'].'.'.$rawQuery['table']))
+			{
+				if($data = $query->getRawQueryData($rawQuery))
+				{
+					$this->_replication = true;
+					$this->_replicationQuery[$callId] = (object)[
+						'type' =>  $type,
+						'data' => $data,
+						'dest' => $rawQuery['db'].'.'.$rawQuery['table']
+					];
+				}
+			}
+
+			$query = $query->getQuery(true);
+
+			$this->_queries[$callId] = $this->_client->connector()->executeAsync($query['preparedQuery'],[
 				'arguments' => $query['arguments']
-		]);
+			]);
+		}
+		else
+		{
+			$query = $query->getQuery(true);
+
+			$this->_queries[] = $this->_client->connector()->executeAsync($query['preparedQuery'],[
+				'arguments' => $query['arguments']
+			]);
+		}
 
 		if($this->_runOnBatchSize && count($this->_queries) >= $this->_runOnBatchSize)
 		{
@@ -56,17 +122,34 @@ class Async
 		return $this;
 	}
 
-
-	public function run()
+	public function run($timeout = 5)
 	{
 		if(!$this->_queries)
 		{
 			throw new Exception("Empty async bulk",400);
 		}
 
-		foreach ($this->_queries as $future)
+		if($this->_replication)
 		{
-			$future->get(5);
+			foreach ($this->_queries as $queryId => $future)
+			{
+				$future->get($this->_requestTimeout);
+				unset($this->_queries[$queryId]);
+
+				if(isset($this->_replicationQuery[$queryId]))
+				{
+					Replicator::trigger('cassandra://'.$this->_replicationQuery[$queryId]->type.'@'.$this->_replicationQuery[$queryId]->dest, $this->_replicationQuery[$queryId]->data);
+					unset($this->_replicationQuery[$queryId]);
+				}
+			}
+		}
+		else
+		{
+			foreach ($this->_queries as $queryId => $future)
+			{
+				$future->get($this->_requestTimeout);
+				unset($this->_queries[$queryId]);
+			}
 		}
 
 		$this->reset();
@@ -85,6 +168,7 @@ class Async
 	public function reset()
 	{
 		$this->_queries   = array();
+		$this->_replicationQuery =  [];
 
 		return $this;
 	}

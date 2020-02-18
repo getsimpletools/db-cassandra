@@ -2,6 +2,7 @@
 
 namespace Simpletools\Db\Cassandra;
 
+use http\Params;
 use Simpletools\Db\Cassandra\Doc\Body;
 use Simpletools\Db\Cassandra\Type\AutoIncrement;
 use Simpletools\Db\Cassandra\Type\BigInt;
@@ -17,6 +18,7 @@ use Simpletools\Db\Cassandra\Type\Tinyint;
 use Simpletools\Db\Cassandra\Type\Uuid;
 use Simpletools\Db\Cassandra\Type\Map;
 use Simpletools\Db\Cassandra\Type\Set;
+use Simpletools\Db\Replicator;
 
 class Query implements \Iterator
 {
@@ -42,6 +44,7 @@ class Query implements \Iterator
     protected $_schema      = array();
 		protected $_convertMapToJson;
 		protected $_removeFromSet;
+		protected $_autoScroll = false;
 
     public function __construct($table,$keyspace=null)
     {
@@ -460,12 +463,16 @@ class Query implements \Iterator
     public function run($options=array())
     {
         if($this->_result) return $this;
+
+				$rawQuery = $this->_query;
+
         $query = $this->getQuery(true);
 
         if(!$options)
         {
             $options = $this->___options;
         }
+
 
         $this->_result =
             $this->_client
@@ -474,12 +481,88 @@ class Query implements \Iterator
                 ->execute($query['arguments']);
 
 
+        if(@$rawQuery['type'] == 'INSERT')
+				{
+					Replicator::trigger('cassandra://write@'.$rawQuery['db'].'.'.$rawQuery['table'],(object)$rawQuery['data']);
+				}
+        elseif (@$rawQuery['type'] == 'UPDATE')
+				{
+					$whereKeys = $this->getWhereKeys($rawQuery['where']);
+					if($this->isSingleRowQuery($whereKeys))
+					{
+						Replicator::trigger('cassandra://update@'.$rawQuery['db'].'.'.$rawQuery['table'],(object)array_merge($rawQuery['data'], $whereKeys));
+					}
+				}
+				elseif (@$rawQuery['type'] == 'DELETE FROM')
+				{
+					$whereKeys = $this->getWhereKeys($rawQuery['where']);
+					if($this->isSingleRowQuery($whereKeys))
+					{
+						Replicator::trigger('cassandra://delete@'.$rawQuery['db'].'.'.$rawQuery['table'],(object)$whereKeys);
+					}
+				}
+
         $this->_result->convertMapToJson($this->_convertMapToJson);
 				$this->_result->setSchema($this->_schema);
 				$this->_result->mapColumns($this->_columnsMap);
 
+				if(@$this->_autoScroll)
+				{
+					$this->_result->autoScroll();
+				}
+
         return $this;
     }
+
+    public function getRawQuery()
+		{
+			return $this->_query;
+		}
+
+		public function getRawQueryData($rawQuery = null)
+    {
+    	if(!$rawQuery)
+    		$rawQuery = $this->_query;
+
+    	if(@$rawQuery['type'] == 'INSERT')
+			{
+				return $rawQuery['data'];
+			}
+			elseif (@$rawQuery['type'] == 'UPDATE')
+			{
+				$whereKeys = $this->getWhereKeys($rawQuery['where']);
+				if($this->isSingleRowQuery($whereKeys))
+				{
+					return array_merge($rawQuery['data'], $whereKeys);
+				}
+			}
+			elseif (@$rawQuery['type'] == 'DELETE FROM')
+			{
+				$whereKeys = $this->getWhereKeys($rawQuery['where']);
+				if($this->isSingleRowQuery($whereKeys))
+				{
+					return $whereKeys;
+				}
+			}
+
+    	return false;
+		}
+
+    protected function getWhereKeys($where)
+		{
+			$whereKeys = [];
+			foreach ($where as $condition)
+			{
+				$whereKeys[$condition[0]] = $condition[1];
+			}
+			return $whereKeys;
+		}
+
+    protected function isSingleRowQuery($whereKeys)
+		{
+			return array_diff_key($whereKeys,array_flip($this->getPrimaryKey())) ? false : true;
+		}
+
 
     public function get($id,$column='id')
     {
@@ -1434,5 +1517,28 @@ class Query implements \Iterator
 			$this->_removeFromSet = $data;
 			return $this;
 		}
+
+	public function autoScroll()
+	{
+		$this->_autoScroll = true;
+		return $this;
+	}
+
+	public function getScrollId()
+	{
+		return $this->_result->getScrollId();
+	}
+
+	public function size($pageSize)
+	{
+		$this->___options['page_size'] = (int)$pageSize;
+		return $this;
+	}
+
+	public function setScrollId($scrollId)
+	{
+		$this->___options['paging_state_token'] = base64_decode($scrollId);
+		return $this;
+	}
 
 }

@@ -17,7 +17,8 @@
 		}
     ],
     "require": {
-        "php":              ">=5.6.0"
+        "php":              ">=5.6.0",
+        "simpletools/framework": ">=2.8.18"
     },
     "autoload": {
         "psr-0": {
