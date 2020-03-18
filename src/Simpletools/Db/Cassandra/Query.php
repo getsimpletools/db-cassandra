@@ -394,7 +394,14 @@ class Query implements \Iterator
             }
 			elseif(isset($this->_schema[$key]))
 			{
-				if($this->_schema[$key] == 'int')
+				if($this->_schema[$key] == 'text')
+				{
+					if(!is_string($value) && !is_numeric($value))
+						throw new \Exception("Your key($key) is not a string");
+
+					return (string)$value;
+				}
+				elseif($this->_schema[$key] == 'int')
 				{
 					if(!is_numeric($value))
 						throw new \Exception("Your key($key) is not numeric");
