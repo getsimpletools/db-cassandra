@@ -155,6 +155,8 @@ class TempTable
         if($intervalIso8601===null)
             return self::$_s_expireIntervalIso8601;
 
+        $intervalIso8601 = strtoupper($intervalIso8601);
+
         $d = new \DateInterval($intervalIso8601); //throws exception if wrong format
         unset($d);
 
@@ -165,6 +167,8 @@ class TempTable
     {
         if($intervalIso8601===null)
             return $this->_expireIntervalIso8601;
+
+        $intervalIso8601 = strtoupper($intervalIso8601);
 
         $d = new \DateInterval($intervalIso8601); //throws exception if wrong format
         unset($d);

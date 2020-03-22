@@ -1,3 +1,7 @@
+### 0.6.1 (2020-03-22)
+1. **Simpletools\Db\Cassandra\TempTable**
+    1. Fixed unnecessary case sensitivity for argument of `::expires($intervalIso8601)`, `->expire($intervalIso8601)` methods, normalised to uppercase
+   
 ### 0.6.0 (2020-03-22)
 1. **Simpletools\Db\Cassandra\TempTable**
     1. Added `::expires($intervalIso8601)` to setup global expiration ISO 8601 interval utilised by `::listActiveTempTables($keyspace)` method helping to remove leaky tables, defaults to PT0S - no expiration set
