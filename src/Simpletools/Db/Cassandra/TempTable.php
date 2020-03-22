@@ -4,14 +4,19 @@ namespace Simpletools\Db\Cassandra;
 
 class TempTable
 {
-    protected static $_schemas  = [];
-    protected $schema           = '';
-    protected $thisTableName    = '';
-    protected $_appendix        = '';
-    protected $_thisCreated     = false;
-    protected $_keep            = false;
+    protected static $_schemas                  = [];
+    protected static $_registeredTables         = [];
+    protected static $_registerMaxSize          = 0;
+    protected static $_shutdown                 = false;
+
+    protected $schema                           = '';
+    protected $thisTableName                    = '';
+    protected $_appendix                        = '';
+    protected $_thisCreated                     = false;
+    protected $_keep                            = false;
 
     protected $_schema;
+
     /*
      * STATIC::
      */
@@ -19,6 +24,90 @@ class TempTable
     {
         self::$_schemas[$name] = $schema = new Schema($name);
         return $schema;
+    }
+
+    /*
+     * Usually run once only
+     */
+    public static function listActiveTempTables($keyspace)
+    {
+        $tablesQ = (new Query('tables','system_schema'))
+            ->where('keyspace_name',$keyspace);
+
+        $tables = [];
+
+        foreach($tablesQ as $table)
+        {
+            if(strpos($table->table_name,'tmp_')!==0) continue;
+
+            $index = $table->keyspace_name.'.'.$table->table_name;
+
+            $meta_ = explode('_',$table->table_name);
+
+            $meta = [];
+            $meta['uniqid']         = array_pop($meta_);
+            $meta['created_at']     = array_pop($meta_);
+
+            $meta['created_sec_ago']=time()-$meta['created_at'];
+
+            array_shift($meta_);
+            $meta['schema']         = implode('_',$meta_);
+
+            $tables[$index] = [
+                'fqd'       => $index,
+                'keyspace'  => $table->keyspace_name,
+                'name'      => $table->table_name,
+            ];
+
+            $tables[$index] = (object) array_merge($tables[$index],$meta);
+        }
+
+        return $tables;
+    }
+
+    public static function registerAutoShutdown()
+    {
+        declare(ticks = 1);
+
+        self::$_shutdown = true;
+
+        register_shutdown_function('\Simpletools\Db\Cassandra\TempTable::cleanup');
+
+        pcntl_signal(SIGINT, '\Simpletools\Db\Cassandra\TempTable::cleanup');
+        pcntl_signal(SIGQUIT, '\Simpletools\Db\Cassandra\TempTable::cleanup');
+        pcntl_signal(SIGTERM, '\Simpletools\Db\Cassandra\TempTable::cleanup');
+    }
+
+    public static function registerMaxSize(int $size)
+    {
+        self::$_registerMaxSize = $size;
+    }
+
+    protected static function _register($fqd)
+    {
+        if(self::$_registerMaxSize && ($registeredTablesCount = count(self::$_registeredTables))>=self::$_registerMaxSize)
+            throw new \Exception("You are trying to create: ".($registeredTablesCount+1)." temp tables; max: ".self::$_registerMaxSize,400);
+
+        self::$_registeredTables[$fqd] = 1;
+    }
+
+    protected static function _unregister($fqd)
+    {
+        unset(self::$_registeredTables[$fqd]);
+    }
+
+    public static function cleanup($signo=0)
+    {
+        $client = new Client();
+
+        foreach(self::$_registeredTables as $fqd => $int)
+        {
+            $client->execute('DROP TABLE IF EXISTS '.$fqd.';');
+        }
+
+        unset($client);
+
+        if(self::$_shutdown) exit;
     }
 
     /*
@@ -41,6 +130,9 @@ class TempTable
             $this->thisTableName    = $this->_generateThisTempName();
             $this->_schema          = (new Schema($this->thisTableName))->describe($schema);
             $this->_schema->create();
+
+            self::_register($this->_schema->keyspace() . '.' . $this->thisTableName);
+
             $this->_thisCreated     = true;
         }
     }
@@ -64,6 +156,9 @@ class TempTable
 
             if (!$this->thisTableName)
                 $this->thisTableName = $this->_generateThisTempName();
+
+            if(!$this->_keep)
+                self::_register($this->_schema->keyspace() . '.' . $this->thisTableName);
 
             $this->_schema->name($this->thisTableName)->create();
 
@@ -114,12 +209,24 @@ class TempTable
         return $this;
     }
 
-    public function __destruct()
+    public function drop()
     {
-        if($this->_thisCreated && !$this->_keep)
+        if($this->_thisCreated)
         {
             $client = new Client();
-            $client->execute('DROP TABLE ' . $this->_schema->keyspace() . '."' . $this->_schema->name() . '";');
+
+            $client->execute('DROP TABLE IF EXISTS ' . $this->_schema->keyspace() . '."' . $this->_schema->name() . '";');
+
+            if(!$this->_keep)
+                self::_unregister($this->_schema->keyspace() . '.' . $this->_schema->name());
+
+            $this->_thisCreated = false;
         }
+    }
+
+    public function __destruct()
+    {
+        if(!$this->_keep)
+            $this->drop();
     }
 }
