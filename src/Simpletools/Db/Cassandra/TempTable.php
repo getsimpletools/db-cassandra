@@ -15,6 +15,9 @@ class TempTable
     protected $_thisCreated                     = false;
     protected $_keep                            = false;
 
+    protected $_expireIntervalIso8601           = 'PT0S';
+    protected static $_s_expireIntervalIso8601  = 'PT0S';
+
     protected $_schema;
 
     /*
@@ -22,6 +25,9 @@ class TempTable
      */
     public static function schema($name)
     {
+        if(strlen($name)>10)
+            throw new Exception("Schema name is too long, max 10 characters",400);
+
         self::$_schemas[$name] = $schema = new Schema($name);
         return $schema;
     }
@@ -46,6 +52,11 @@ class TempTable
 
             $meta = [];
             $meta['uniqid']         = array_pop($meta_);
+            $meta['expires']        = array_pop($meta_);
+
+            $dv = new \DateInterval(strtoupper($meta['expires']));
+            $meta['expires_sec']        = $dv->s;
+
             $meta['created_at']     = array_pop($meta_);
 
             $meta['created_sec_ago']=time()-$meta['created_at'];
@@ -135,6 +146,32 @@ class TempTable
 
             $this->_thisCreated     = true;
         }
+
+        $this->_expireIntervalIso8601 = self::$_s_expireIntervalIso8601;
+    }
+
+    public static function expires($intervalIso8601=null)
+    {
+        if($intervalIso8601===null)
+            return self::$_s_expireIntervalIso8601;
+
+        $d = new \DateInterval($intervalIso8601); //throws exception if wrong format
+        unset($d);
+
+        self::$_s_expireIntervalIso8601 = $intervalIso8601;
+    }
+
+    public function expire($intervalIso8601=null)
+    {
+        if($intervalIso8601===null)
+            return $this->_expireIntervalIso8601;
+
+        $d = new \DateInterval($intervalIso8601); //throws exception if wrong format
+        unset($d);
+
+        $this->_expireIntervalIso8601 = $intervalIso8601;
+
+        return $this;
     }
 
     public function name()
@@ -169,7 +206,7 @@ class TempTable
 
     protected function _generateThisTempName()
     {
-        $name = 'tmp_'.$this->schema.'_'.time().'_'.uniqid();
+        $name = 'tmp_'.$this->schema.'_'.time().'_'.strtolower($this->_expireIntervalIso8601).'_'.strrev(uniqid());
 
         if($this->_appendix)
             $name .= '_'.$this->_appendix;

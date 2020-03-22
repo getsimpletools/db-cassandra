@@ -1,9 +1,14 @@
+### 0.6.0 (2020-03-22)
+1. **Simpletools\Db\Cassandra\TempTable**
+    1. Added `::expires($intervalIso8601)` to setup global expiration ISO 8601 interval utilised by `::listActiveTempTables($keyspace)` method helping to remove leaky tables, defaults to PT0S - no expiration set
+    2. Added `->expire($intervalIso8601)` to setup per-table expiration ISO 8601 interval utilised by `::listActiveTempTables($keyspace)` method helping to remove leaky tables, defaults to PT0S - no expiration set
+    
 ### 0.5.0 (2020-03-22)
 1. **Simpletools\Db\Cassandra\TempTable**
     1. Added register functions to improve cleanup and minimise tables leaking 
     2. Added `::registerAutoShutdown()` to enable on terminate process signal and shutdown auto cleanup 
     3. Added `::registerMaxSize()` to specify max size of opened TempTables in the current process
-    4. Added `::cleanup($signal=0)` to start register cleanup and temp tables deletion, otherwise automatically by with `::registerShutdown()`
+    4. Added `::cleanup($signal=0)` to start register cleanup and temp tables deletion, otherwise automatically triggered by `::registerAutoShutdown()`
     5. Added `->drop()` to enable individual object table cleanup
     6. Added `::listActiveTempTables($keyspace)` to get list of all active temp tables in a given keyspace
 
