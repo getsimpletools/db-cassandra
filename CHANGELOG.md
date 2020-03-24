@@ -1,3 +1,7 @@
+### 0.6.2 (2020-03-24)
+1. **Simpletools\Db\Cassandra\Schema**
+    1. Check schema consistency after create a TempTable
+
 ### 0.6.1 (2020-03-22)
 1. **Simpletools\Db\Cassandra\TempTable**
     1. Fixed unnecessary case sensitivity for argument of `::expires($intervalIso8601)`, `->expire($intervalIso8601)` methods, normalised to uppercase

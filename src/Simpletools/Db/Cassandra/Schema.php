@@ -4,123 +4,175 @@ namespace Simpletools\Db\Cassandra;
 
 class Schema
 {
-    protected $_tableName;
-    protected $_definition;
+	protected $_tableName;
+	protected $_definition;
 
-    protected $_thisCreated = false;
+	protected $_thisCreated = false;
 
-    public function __construct($name)
-    {
-        $this->_tableName = $name;
-    }
+	public function __construct($name)
+	{
+		$this->_tableName = $name;
+	}
 
-    public function describe($definition)
-    {
-        $this->_definition = json_decode(json_encode($definition));
+	public function describe($definition)
+	{
+		$this->_definition = json_decode(json_encode($definition));
 
-        return $this;
-    }
+		if(!@$this->_definition->keyspace)
+			$this->_definition->keyspace = (new Client())->keyspace();
 
-    public function create()
-    {
-        (new Client())->execute($this->toCql());
+		return $this;
+	}
 
-        $this->_thisCreated = true;
-        return $this;
-    }
+	/**
+	 * Method to check whether table is populate in the schema after temp table created.
+	 * todo: find better way to check schama consistency
+	 * @param $keyspace
+	 * @param $table
+	 * @param int $timeout | in sec
+	 * @param null $sleep
+	 * @throws Exception
+	 */
+	protected function refreshSchema($client,$keyspace, $table, $timeout=5, $sleep = null)
+	{
+		$schema   = $client->connector()->schema();
+		$keyspaceObj = $schema->keyspace($this->_definition->keyspace);
 
-    public function name($name=null)
-    {
-        if(!$name) return $this->_tableName;
+		if($keyspaceObj===false)
+		{
+			throw new Exception("Provided keyspace (".$this->_definition->keyspace.") doesn't exist",404);
+		}
 
-        $this->_tableName = $name;
+		$tableObj   = $keyspaceObj->table($table);
+		if(!$tableObj)
+		{
+			if($sleep === null)
+			{
+				$timeout = 1000000*$timeout;
+				$sleep = $timeout;
+				for($i=1;$i<=10; $i++)
+				{
+					$sleep = $sleep/2;
+				}
+			}
+			elseif($sleep*2 >= $timeout)
+			{
+				return false;
+			}
 
-        return $this;
-    }
+			usleep($sleep);
+			$sleep = $sleep * 2;
 
-    public function keyspace()
-    {
-        return $this->_definition->keyspace;
-    }
+			$this->refreshSchema($client,$keyspace, $table, $timeout, $sleep);
+		}
+		return true;
+	}
 
-    public function toCql()
-    {
-        $tableName = $this->_tableName;
+	public function create()
+	{
+		$client = new Client();
+		$client->execute( $this->toCql());
 
-        $settings = $this->_definition;
 
-        if(!@$settings->keyspace)
-            $settings->keyspace = (new Client())->keyspace();
+		$this->refreshSchema($client,$this->_definition->keyspace, $this->_tableName);
 
-        $columns = [];
-        $clusteringOrder = [];
-        foreach ($settings->columns as $column => $type)
-            $columns[] = "\"" . $column . "\" " . strtolower($type);
-        $primary = "PRIMARY KEY ((\"" . implode("\", \"", $settings->partition) . "\")";
-        if (isset($settings->clustering))
-        {
-            $clusteringKeys = [];
-            foreach ($settings->clustering as $key => $order)
-            {
-                $clusteringKeys[] = $key;
-                $clusteringOrder[] = "\"" . $key . "\" " . strtoupper($order);
-            }
-            $columns[] = $primary . ", \"" . implode("\", \"", $clusteringKeys) . "\")";
-        }
-        else
-        {
-            $columns[] = $primary . ")";
-        }
+		$this->_thisCreated = true;
+		return $this;
+	}
 
-        $_query = "CREATE TABLE IF NOT EXISTS " . $settings->keyspace . ".\"" . $tableName . "\" (\n";
-        $_query .= implode(", \n", $columns);
-        $_query .= ")";
+	public function name($name=null)
+	{
+		if(!$name) return $this->_tableName;
 
-        if (count($clusteringOrder))
-        {
-            $_query .= " \nWITH CLUSTERING ORDER BY (" . implode(", ", $clusteringOrder) . ")";
-        }
+		$this->_tableName = $name;
 
-        $_parts = [];
-        if(isset($settings->options) && is_iterable($settings->options))
-        {
-            foreach ($settings->options as $option => $value) {
-                $_parts[] = "\"" . $option . "\" = " . $this->prepareOptionValue($value);
-            }
+		return $this;
+	}
 
-            if (count($_parts)) {
-                if (count($clusteringOrder)) {
-                    $_query .= " \nAND";
-                } else {
-                    $_query .= " WITH";
-                }
-                $_query .= " " . implode(" \nAND ", $_parts);
-            }
-        }
+	public function keyspace()
+	{
+		return $this->_definition->keyspace;
+	}
 
-        return $_query;
-    }
+	public function toCql()
+	{
+		$tableName = $this->_tableName;
 
-    /* HELPER METHODS */
-    public function prepareOptionValue($value)
-    {
-        if (is_object($value))
-        {
-            $value = json_encode($value);
-            $value = str_replace('\"', "%SQUOTE%", $value);
-            $value = str_replace("\"", "'", $value);
-            $value = str_replace("%SQUOTE%", '"', $value);
-        }
-        else if (is_array($value))
-        {
-            $value = json_encode($value);
-        }
-        else if (is_string($value))
-        {
-            $value = "'" . $value . "'";
-        }
-        return $value;
-    }
+
+		if(!@$this->_definition->keyspace)
+			$this->_definition->keyspace = (new Client())->keyspace();
+
+		$settings = $this->_definition;
+
+		$columns = [];
+		$clusteringOrder = [];
+		foreach ($settings->columns as $column => $type)
+			$columns[] = "\"" . $column . "\" " . strtolower($type);
+		$primary = "PRIMARY KEY ((\"" . implode("\", \"", $settings->partition) . "\")";
+		if (isset($settings->clustering))
+		{
+			$clusteringKeys = [];
+			foreach ($settings->clustering as $key => $order)
+			{
+				$clusteringKeys[] = $key;
+				$clusteringOrder[] = "\"" . $key . "\" " . strtoupper($order);
+			}
+			$columns[] = $primary . ", \"" . implode("\", \"", $clusteringKeys) . "\")";
+		}
+		else
+		{
+			$columns[] = $primary . ")";
+		}
+
+		$_query = " CREATE TABLE IF NOT EXISTS " . $settings->keyspace . ".\"" . $tableName . "\" (\n";
+		$_query .= implode(", \n", $columns);
+		$_query .= ")";
+
+		if (count($clusteringOrder))
+		{
+			$_query .= " \nWITH CLUSTERING ORDER BY (" . implode(", ", $clusteringOrder) . ")";
+		}
+
+		$_parts = [];
+		if(isset($settings->options) && is_iterable($settings->options))
+		{
+			foreach ($settings->options as $option => $value) {
+				$_parts[] = "\"" . $option . "\" = " . $this->prepareOptionValue($value);
+			}
+
+			if (count($_parts)) {
+				if (count($clusteringOrder)) {
+					$_query .= " \nAND";
+				} else {
+					$_query .= " WITH";
+				}
+				$_query .= " " . implode(" \nAND ", $_parts);
+			}
+		}
+
+		return $_query;
+	}
+
+	/* HELPER METHODS */
+	public function prepareOptionValue($value)
+	{
+		if (is_object($value))
+		{
+			$value = json_encode($value);
+			$value = str_replace('\"', "%SQUOTE%", $value);
+			$value = str_replace("\"", "'", $value);
+			$value = str_replace("%SQUOTE%", '"', $value);
+		}
+		else if (is_array($value))
+		{
+			$value = json_encode($value);
+		}
+		else if (is_string($value))
+		{
+			$value = "'" . $value . "'";
+		}
+		return $value;
+	}
 
 	protected static $_schema = array();
 
