@@ -1,3 +1,7 @@
+### 0.6.3 (2020-04-02)
+1. **Simpletools\Db\Cassandra\Async**
+    1. Fixed the bug with empty Batch
+
 ### 0.6.2 (2020-03-24)
 1. **Simpletools\Db\Cassandra\Schema**
     1. Check schema consistency after create a TempTable

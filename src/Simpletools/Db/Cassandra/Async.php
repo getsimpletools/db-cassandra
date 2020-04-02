@@ -41,6 +41,9 @@ class Async
 	{
 		if($query instanceof  Batch)
 		{
+			if(!$query->size())
+				return $this;
+
 			$batchId = uniqid();
 			$this->_queries[$batchId] = $this->_client->connector()->executeAsync($query->getBatch());
 
