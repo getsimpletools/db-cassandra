@@ -1,3 +1,23 @@
+### 0.7.0 (2020-05-25)
+1. **Simpletools\Db\Cassandra\Async**
+    1. Added `->consistency($level=null)` allowing to specify per query consistency
+2. **Simpletools\Db\Cassandra\Batch**
+    1. Added `->consistency($level=null)` allowing to specify per query consistency
+3. **Simpletools\Db\Cassandra\Client**
+    1. Added query specific options `->execute($input=null,$thisQueryOptions=null)`
+4. **Simpletools\Db\Cassandra\Doc**
+    1. Added `->consistency($level=null)` allowing to specify per query consistency
+5. **Simpletools\Db\Cassandra\Query**
+    1. Added `->consistency($level=null)` allowing to specify per query consistency
+    2. Fixed ability to specify `foo as bar` and get bar on return
+    3. Fixed ability to add columns return mappers `->columns(['column'=>function($column){return $column;}])`
+6. **Simpletools\Db\Cassandra\SessionHandler**
+    1. Added `readConsistency` configuration setting
+    2. Added `writeConsistency` configuration setting
+    3. Changed `::setup($compactionWindowSize=12,$compactionWindowUnit="HOURS")` to set up compaction for session table as `TimeWindowCompactionStrategy` as well as set up `default_time_to_live` to the `$compactionWindowSize` and `$compactionWindowUnit`
+    4. Forced `maxLifeTime` not to be smaller than `1 sec` to avoid never removed SSTables caused by `TimeWindowCompactionStrategy`
+    5. Removed `date_modified` and `date_expires` since they are not needed
+
 ### 0.6.3 (2020-04-02)
 1. **Simpletools\Db\Cassandra\Async**
     1. Fixed the bug with empty Batch

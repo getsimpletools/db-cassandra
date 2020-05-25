@@ -15,9 +15,10 @@ class Batch
     protected $_hasRun  = false;
     protected $_queriesParsed = array();
     protected $_table = null;
-		protected $_keyspace = null;
-		protected $_replication = false;
-		protected $_replicationQuery;
+    protected $_keyspace = null;
+    protected $_replication = false;
+    protected $_replicationQuery;
+    protected $___consistency = null;
 
     protected $_runOnBatchSize = 0; //0 - only manual batch run()
 
@@ -186,18 +187,42 @@ class Batch
 			return $batch;
 		}
 
+    public function consistency($consistency=null)
+    {
+        if($consistency===null) return $this->___consistency;
+
+        $this->___consistency = $consistency;
+
+        return $this;
+    }
+
+    protected $___options = array();
+    public function options($options=array())
+    {
+        $this->___options = $options;
+
+        return $this;
+    }
+
     public function run()
     {
-				if(!$this->_client)
-					$this->_client = new Client();
+        if(!$this->_client)
+            $this->_client = new Client();
 
-				$this->_client->connect();
+        $this->_client->connect();
 
-        $res = $this->_client->connector()->execute($this->getBatch());
+        $options = $this->___options;
+
+        if($this->___consistency!==null) {
+            $options = array_merge($options, [
+                'consistency' => $this->___consistency
+            ]);
+        }
+
+        $res = $this->_client->connector()->execute($this->getBatch(),$options);
         //unset($batch);
 
-
-				$this->replicate();;
+        $this->replicate();;
         $this->_hasRun = true;
 
         $this->reset();

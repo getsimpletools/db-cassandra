@@ -39,13 +39,21 @@ class Async
 
 	public function add($query)
 	{
-		if($query instanceof  Batch)
+		if($query instanceof Batch)
 		{
 			if(!$query->size())
 				return $this;
 
+			$options = array();
+
+            $consistency = $query->consistency();
+			if($consistency!==null)
+            {
+                $options['consistency'] = $consistency;
+            }
+
 			$batchId = uniqid();
-			$this->_queries[$batchId] = $this->_client->connector()->executeAsync($query->getBatch());
+			$this->_queries[$batchId] = $this->_client->connector()->executeAsync($query->getBatch(),$options);
 
 			if($query->isReplication())
 			{
@@ -78,6 +86,7 @@ class Async
 			throw new Exception("Query is not of a Query type",400);
 		}
 
+        $consistency = $query->consistency();
 
 		if($this->_replication)
 		{
@@ -104,17 +113,21 @@ class Async
 
 			$query = $query->getQuery(true);
 
-			$this->_queries[$callId] = $this->_client->connector()->executeAsync($query['preparedQuery'],[
-				'arguments' => $query['arguments']
-			]);
+			$options = ['arguments' => $query['arguments']];
+			if($consistency!==null)
+                $options['consistency'] = $consistency;
+
+			$this->_queries[$callId] = $this->_client->connector()->executeAsync($query['preparedQuery'],$options);
 		}
 		else
 		{
 			$query = $query->getQuery(true);
 
-			$this->_queries[] = $this->_client->connector()->executeAsync($query['preparedQuery'],[
-				'arguments' => $query['arguments']
-			]);
+            $options = ['arguments' => $query['arguments']];
+            if($consistency!==null)
+                $options['consistency'] = $consistency;
+
+			$this->_queries[] = $this->_client->connector()->executeAsync($query['preparedQuery'],$options);
 		}
 
 		if($this->_runOnBatchSize && count($this->_queries) >= $this->_runOnBatchSize)

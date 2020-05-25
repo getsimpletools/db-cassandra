@@ -83,15 +83,19 @@ class Result implements \Iterator
         return $this;
     }
 
-    protected function _parseColumn($column,$value,$rawResultAssoc)
+    protected function _parseColumn($column, $value, $rawResult)
     {
         if(isset($this->_columnsMap[$column]))
         {
             $cast = $this->_columnsMap[$column];
+            if(is_array($cast))
+            {
+                $cast   = $cast['map'];
+            }
 
             if(is_callable($cast))
             {
-                $value = $this->_callReflection($cast,$rawResultAssoc);
+                $value = $this->_callReflection($cast,$rawResult);
             }
             elseif($cast=='json' OR $cast=='json:array' OR $cast=='json:object')
             {
@@ -112,7 +116,7 @@ class Result implements \Iterator
         return $value;
     }
 
-    private function _callReflection($callable, array $args = array())
+    private function _callReflection($callable, $args = null)
     {
         if(is_array($callable))
         {
@@ -132,9 +136,9 @@ class Result implements \Iterator
         foreach($reflection->getParameters() as $param)
         {
             $name = $param->getName();
-            if(isset($args[$name]))
+            if(isset($args->{$name}))
             {
-                $pass[] = $args[$name];
+                $pass[] = $args->{$name};
             }
             else
             {
@@ -211,8 +215,8 @@ class Result implements \Iterator
            // $result[$key] = $this->_parseCell($value);
         }
 
-        return $result;
-        //return $this->_parseColumnsMap($result);
+        //return $result;
+        return $this->_parseColumnsMap($result);
     }
 
     public function setSchema($schema)
@@ -349,7 +353,11 @@ class Result implements \Iterator
 
 	protected function toResultType($key, $value)
 	{
-		if(isset($this->_schema[$key]))
+	    //to enable column1 as column2
+	    if(isset($this->_columnsMap[$key]) && !is_callable($this->_columnsMap[$key]) && isset($this->_columnsMap[$key]['origin']))
+	        $key = $this->_columnsMap[$key]['origin'];
+
+	    if(isset($this->_schema[$key]))
 		{
 			if($this->_schema[$key] == 'int') return (int)0;
 			elseif (substr($this->_schema[$key],0,3)== 'map')

@@ -205,11 +205,15 @@ class Client
         return $this;
     }
 
-    public function execute($input=null)
+    public function execute($input=null,$thisQueryOptions=null)
     {
         $this->connect();
 
         $queryOptions   = $this->_queryOptions;
+
+        if($thisQueryOptions && is_array($thisQueryOptions))
+            $queryOptions = array_merge($queryOptions,$thisQueryOptions);
+
         $query          = $this->_preparedQuery;
 
         if($input && is_array($input))

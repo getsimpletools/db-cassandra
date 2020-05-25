@@ -60,6 +60,7 @@ class Doc
 	protected $_loaded = false;
 	protected $_originBody;
 	protected $_lucene;
+	protected $___consistency = null;
 
 
 //	protected $_diff = [
@@ -87,6 +88,15 @@ class Doc
 			return $this;
 	}
 
+    public function consistency($consistency=null)
+    {
+        if($consistency===null) return $this->___consistency;
+
+        $this->___consistency = $consistency;
+
+        return $this;
+    }
+
 	protected function connect()
 	{
 		if(!$this->_table)
@@ -104,6 +114,10 @@ class Doc
 					$this->_query->getPrimaryKey()[0] => $this->_id
 			];
 		}
+
+        if($this->___consistency!==null) {
+            $this->_query->consistency($this->___consistency);
+        }
 
 		$this->columns($this->_columns);
 	}

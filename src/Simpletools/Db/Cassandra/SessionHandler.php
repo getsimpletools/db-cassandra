@@ -27,6 +27,11 @@ class SessionHandler implements \SessionHandlerInterface, \SessionIdInterface
         {
             $this->_maxLifeTime = get_cfg_var("session.gc_maxlifetime");
         }
+
+        $this->_maxLifeTime = (int) $this->_maxLifeTime;
+
+        if($this->_maxLifeTime<1)
+            throw new Exception('maxLifeTime can\'t be smaller than 1 due to TimeWindowCompactionStrategy');
     }
 
     public function maxLifeTime($seconds=null)
@@ -42,26 +47,31 @@ class SessionHandler implements \SessionHandlerInterface, \SessionIdInterface
     public static function settings($settings)
     {
         self::$_settings = [
-            'cluster'       => @$settings['cluster'],
-            'keyspace'      => @$settings['keyspace'],
-            'table'         => @$settings['table'],
-            'consistency'   => @$settings['consistency'],
-            'maxLifeTime'   => @$settings['maxLifeTime']
+            'cluster'           => @$settings['cluster'],
+            'keyspace'          => @$settings['keyspace'],
+            'table'             => @$settings['table'],
+            'consistency'       => @$settings['consistency'],
+            'maxLifeTime'       => @$settings['maxLifeTime'],
+
+            'readConsistency'   => @$settings['readConsistency'],
+            'writeConsistency'  => @$settings['writeConsistency'],
         ];
     }
 
-    public static function setup()
+    public static function setup($compactionWindowSize=12,$compactionWindowUnit="HOURS")
     {
         $client = new Client(self::$_settings['cluster']);
+
+        $default_time_to_live = strtotime('NOW + '.$compactionWindowSize.' '.$compactionWindowUnit)-time();
 
         $client->execute('
             CREATE TABLE IF NOT EXISTS '.self::$_settings['keyspace'].'.'.self::$_settings['table'].' (
               id text,
               data varchar,
-              date_modified TIMESTAMP,
-              date_expires TIMESTAMP,
               PRIMARY KEY (id)
-            )'
+            ) 
+            WITH "compaction" = {\'class\':\'TimeWindowCompactionStrategy\',\'compaction_window_size\':\''.$compactionWindowSize.'\',\'compaction_window_unit\':\''.$compactionWindowUnit.'\'}
+            AND default_time_to_live = '.$default_time_to_live.';'
         );
     }
 
@@ -85,6 +95,9 @@ class SessionHandler implements \SessionHandlerInterface, \SessionIdInterface
         try
         {
             $q = $this->getQuery();
+
+            if(self::$_settings['readConsistency']!==null)
+                $q->consistency(self::$_settings['readConsistency']);
 
             $res = $q->where('id',$id);
 
@@ -120,11 +133,12 @@ class SessionHandler implements \SessionHandlerInterface, \SessionIdInterface
     {
         $q = $this->getQuery();
 
+        if(self::$_settings['writeConsistency']!==null)
+            $q->consistency(self::$_settings['writeConsistency']);
+
         $q->set([
             'id'                =>  $id,
-            'data'              =>  $data,
-            'date_modified'     =>  time(),
-            'date_expires'      =>  time()+$this->_maxLifeTime
+            'data'              =>  $data
         ])->expires($this->_maxLifeTime)->run();
 
         unset($q);

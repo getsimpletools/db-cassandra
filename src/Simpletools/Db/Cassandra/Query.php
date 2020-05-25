@@ -39,12 +39,13 @@ class Query implements \Iterator
     protected $_query 	    = array();
     protected $_columnsMap  = array();
     protected $_client;
+    protected $___consistency = null;
 
     protected $_result      = null;
     protected $_schema      = array();
-		protected $_convertMapToJson;
-		protected $_removeFromSet;
-		protected $_autoScroll = false;
+    protected $_convertMapToJson;
+    protected $_removeFromSet;
+    protected $_autoScroll = false;
 
     public function __construct($table,$keyspace=null)
     {
@@ -63,7 +64,7 @@ class Query implements \Iterator
             }
         }
 
-				$this->_schema = Schema::getSchema($this->_client, $keyspace, $table);
+        $this->_schema = Schema::getSchema($this->_client, $keyspace, $table);
     }
 
     public function client($client)
@@ -454,39 +455,52 @@ class Query implements \Iterator
 		}
 
     protected function toSchema()
-		{
-			if(isset($this->_query['data']))
-			{
-				foreach ($this->_query['data'] as $key => $val)
-				{
-					if(!is_object($val) || $val instanceof \stdClass)
-					{
-						$this->_query['data'][$key] = $this->toSchemaType($key,$val);
-					}
-				}
-			}
-		}
+    {
+        if(isset($this->_query['data']))
+        {
+            foreach ($this->_query['data'] as $key => $val)
+            {
+                if(!is_object($val) || $val instanceof \stdClass)
+                {
+                    $this->_query['data'][$key] = $this->toSchemaType($key,$val);
+                }
+            }
+        }
+    }
+
+    public function consistency($consistency=null)
+    {
+        if($consistency===null) return $this->___consistency;
+
+        $this->___consistency = $consistency;
+
+        return $this;
+    }
 
     public function run($options=array())
     {
         if($this->_result) return $this;
 
-				$rawQuery = $this->_query;
+        $rawQuery = $this->_query;
 
         $query = $this->getQuery(true);
 
         if(!$options)
-        {
             $options = $this->___options;
-        }
+        elseif($this->___options)
+            $options = array_merge($this->___options,$options);
 
+        if($this->___consistency!==null) {
+            $options = array_merge($options, [
+                'consistency' => $this->___consistency
+            ]);
+        }
 
         $this->_result =
             $this->_client
                 ->queryOptions($options)
                 ->prepare($query['preparedQuery'])
                 ->execute($query['arguments']);
-
 
         if(@$rawQuery['type'] == 'INSERT')
 				{
@@ -729,7 +743,8 @@ class Query implements \Iterator
                     $this->_columnsMap[$idx]      = $column;
                     $column                       = $idx;
                 }
-								elseif($column instanceof Map
+
+                if($column instanceof Map
 										|| $column instanceof Set
 										|| $column instanceof BigInt
 										|| $column instanceof Timestamp
@@ -750,20 +765,19 @@ class Query implements \Iterator
                 }
                 else
                 {
-                    $column = str_replace(' as ',' ',$column);
-
-                    if(strpos($column,' ')!==false)
+                    if(strpos($column,' as ')!==false)
                     {
-                        $column = explode(' ',$column);
-                        foreach($column as $_columnKey => $_columnName)
-                        {
-                            $column[$_columnKey] = $this->escapeKey($_columnName);
+                        $columnDef = explode(' as ',$column);
+
+                        if(isset($this->_columnsMap[$idx])) {
+                            $this->_columnsMap[$columnDef[1]] = [
+                                'origin'    => $columnDef[0],
+                                'map'       => $this->_columnsMap[$idx]
+                            ];
+                            unset($this->_columnsMap[$idx]);
                         }
 
-                        if(isset($this->_columnsMap[$idx]))
-                            $this->_columnsMap[$_columnName]      = $this->_columnsMap[$idx];
-
-                        $this->_query['columns'][$idx] = implode(' ',$column);
+                        $this->_query['columns'][$idx] = $this->escapeKey($columnDef[0]).' as '.$this->escapeKey($columnDef[1]);
                     }
                     else {
                         $this->_query['columns'][$idx] = $this->escapeKey($column);
