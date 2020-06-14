@@ -204,6 +204,7 @@ class SessionHandler implements \SessionHandlerInterface, \SessionIdInterface
 
         $q->delete('id', $id)->run();
 
+        /*
         if (ini_get("session.use_cookies")) {
             $params = session_get_cookie_params();
             setcookie(session_name(), '', time() - 42000,
@@ -211,6 +212,7 @@ class SessionHandler implements \SessionHandlerInterface, \SessionIdInterface
                 $params["secure"], $params["httponly"]
             );
         }
+        */
 
         unset($q);
 

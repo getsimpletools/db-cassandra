@@ -1,3 +1,7 @@
+### 0.7.2 (2020-06-14)
+1. **Simpletools\Db\Cassandra\SessionHandler**
+    1. Updated `->destroy()` to remove set cookie reset
+    
 ### 0.7.1 (2020-06-14)
 1. **Simpletools\Db\Cassandra\SessionHandler**
     1. Added `::regenerateSessionId()` allowing to regenrate sessionId - used natively by `Simpletools\Store\Session`  
