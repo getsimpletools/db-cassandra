@@ -1,3 +1,9 @@
+### 0.7.1 (2020-06-14)
+1. **Simpletools\Db\Cassandra\SessionHandler**
+    1. Added `::regenerateSessionId()` allowing to regenrate sessionId - used natively by `Simpletools\Store\Session`  
+2. **Simpletools\Db\Cassandra\Doc**
+    1. Added `->client($client)` allowing to set custom client
+
 ### 0.7.0 (2020-05-25)
 1. **Simpletools\Db\Cassandra\Async**
     1. Added `->consistency($level=null)` allowing to specify per query consistency

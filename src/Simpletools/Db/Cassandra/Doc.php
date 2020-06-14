@@ -62,6 +62,8 @@ class Doc
 	protected $_lucene;
 	protected $___consistency = null;
 
+	protected $_client = null;
+
 
 //	protected $_diff = [
 //			'upsert' => [],
@@ -97,6 +99,13 @@ class Doc
         return $this;
     }
 
+    public function client($client)
+    {
+        $this->_client = $client;
+
+        return $this;
+    }
+
 	protected function connect()
 	{
 		if(!$this->_table)
@@ -106,6 +115,9 @@ class Doc
 		if(!$this->_query)
 		{
 			$this->_query = new Query($this->_table, $this->_keyspace);
+
+			if($this->_client)
+			    $this->_query->client($this->_client);
 		}
 
 		if($this->_id !== null && !is_array($this->_id))
