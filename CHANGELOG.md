@@ -1,3 +1,7 @@
+### 0.7.3 (2020-06-16)
+1. **Simpletools\Db\Cassandra\Query**
+    1. Added `->cql(string $rawQuery, array $params=[])` for raw CQL query.
+
 ### 0.7.2 (2020-06-14)
 1. **Simpletools\Db\Cassandra\SessionHandler**
     1. Updated `->destroy()` to remove set cookie reset

@@ -46,6 +46,8 @@ class Query implements \Iterator
     protected $_convertMapToJson;
     protected $_removeFromSet;
     protected $_autoScroll = false;
+		protected $_cql = null;
+		protected $_cqlParams = [];
 
     public function __construct($table,$keyspace=null)
     {
@@ -481,9 +483,19 @@ class Query implements \Iterator
     {
         if($this->_result) return $this;
 
-        $rawQuery = $this->_query;
 
-        $query = $this->getQuery(true);
+				if($this->_cql)
+				{
+					$query = [
+						'preparedQuery' => $this->_cql,
+						'arguments' => $this->_cqlParams
+					];
+				}
+				else
+				{
+					$rawQuery = $this->_query;
+					$query = $this->getQuery(true);
+				}
 
         if(!$options)
             $options = $this->___options;
@@ -1408,6 +1420,13 @@ class Query implements \Iterator
 
         return $this;
     }
+
+		public function cql(string $rawQuery, array $params=[])
+		{
+			$this->_cql = $rawQuery;
+			$this->_cqlParams = $params;
+			return $this;
+		}
 
     public function &aka($as)
     {
