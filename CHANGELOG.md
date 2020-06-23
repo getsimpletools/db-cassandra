@@ -1,3 +1,7 @@
+### 0.7.4 (2020-06-23)
+1. **Simpletools\Db\Cassandra\Doc**
+    1. Added `->ifExists()` and `->ifNotExists()` methods.
+
 ### 0.7.3 (2020-06-16)
 1. **Simpletools\Db\Cassandra\Query**
     1. Added `->cql(string $rawQuery, array $params=[])` for raw CQL query.

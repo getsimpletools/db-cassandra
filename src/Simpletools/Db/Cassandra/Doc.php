@@ -61,6 +61,8 @@ class Doc
 	protected $_originBody;
 	protected $_lucene;
 	protected $___consistency = null;
+	protected $_ifNotExists;
+	protected $_ifExists;
 
 	protected $_client = null;
 
@@ -187,6 +189,9 @@ class Doc
 				->expires($this->_ttl)
 				->convertMapToJson($this->_convertMapToJson);
 
+		if($this->_ifExists) 			$this->_query->ifExists();
+		if($this->_ifNotExists) 	$this->_query->ifNotExists();
+
 		return $this->_query;
 	}
 
@@ -202,7 +207,6 @@ class Doc
 	public function getUpdateQuery()
 	{
 		$this->connect();
-
 
 		$this->_query
 				->update($this->_body);
@@ -225,6 +229,9 @@ class Doc
 				->expires($this->_ttl)
 				->removeFromSet($this->_removeFromSet)
 				->convertMapToJson($this->_convertMapToJson);
+
+		if($this->_ifExists) 			$this->_query->ifExists();
+		if($this->_ifNotExists) 	$this->_query->ifNotExists();
 
 		return $this->_query;
 	}
@@ -442,6 +449,9 @@ class Doc
 			}
 		}
 
+		if($this->_ifExists) 			$this->_query->ifExists();
+		if($this->_ifNotExists) 	$this->_query->ifNotExists();
+
 		return $this->_query;
 	}
 
@@ -471,199 +481,16 @@ class Doc
 	}
 
 
-	/*
-	protected function  arrayDiff($arr1, $arr2)
+	public function ifNotExists()
 	{
-		return array_udiff($arr1, $arr2, function($v1, $v2){
-			if(is_object($v1) && is_object($v2))
-			{
-				return json_encode($v1) === json_encode($v2) ? 0 : -1;
-			}
-			elseif(	is_object($v1) || is_object($v2))
-			{
-				return -1;
-			}
-			else
-			{
-				return $v1 === $v2 ? 0 : -1;
-			}
-		});
+		$this->_ifNotExists = true;
+		return $this;
 	}
 
-	protected function getDifference($new, $origin, $currentPath = array())
+	public function ifExists()
 	{
-		foreach ($new as $k => $v)
-		{
-			$path = $currentPath;
-			$path[] = $k;
-
-			if(is_object($v))
-			{
-				if(property_exists($origin, $k))
-				{
-					if(is_object($origin->{$k}))
-					{
-						$this->getDifference($new->{$k},$origin->{$k}, $path);
-					}
-					else
-					{
-						$this->_diff['upsert'][implode('.',$path)] =  $new->{$k};
-					}
-					unset($origin->{$k});
-				}
-				else
-				{
-					$this->_diff['upsert'][implode('.',$path)] = $new->{$k};
-				}
-			}
-			elseif(is_array($v))
-			{
-				if(property_exists($origin, $k))
-				{
-					//echo"<pre>=================";var_dump($origin->{$k},$v);
-					//echo"<pre>++++++++++++++++";var_dump($this->arrayDiff($v,$origin->{$k}) , $this->arrayDiff($origin->{$k},$v));
-
-					if(!is_array($origin->{$k}) || $this->arrayDiff($v,$origin->{$k}) || $this->arrayDiff($origin->{$k},$v))
-					{
-						$this->_diff['upsert'][implode('.',$path)] =  $new->{$k};
-					}
-					unset($origin->{$k});
-				}
-				else
-				{
-					$this->_diff['upsert'][implode('.',$path)] = $new->{$k};
-				}
-			}
-			else
-			{
-				if(property_exists($origin, $k))/
-				{
-					if(gettype ($v) != gettype($origin->{$k}) || $v != $origin->{$k})
-					{
-						$this->_diff['upsert'][implode('.',$path)] =  $new->{$k};
-					}
-					unset($origin->{$k});
-				}
-				else
-				{
-					$this->_diff['upsert'][implode('.',$path)] = $new->{$k};
-				}
-			}
-		}
-
-		if($origin)
-		{
-			foreach ($origin as $k => $v)
-			{
-				$path = $currentPath;
-				$path[] = $k;
-				$this->_diff['delete'][implode('.',$path)] = 1;
-			}
-		}
+		$this->_ifExists = true;
+		return $this;
 	}
 
-
-//	public function save()
-//	{
-//		if($this->_loaded)
-//		{
-//			$this->connect();
-//			$new = $this->_body->toObject();
-//			$origin = $this->_originBody->toObject();
-//
-//			$this->getDifference($new,$origin);
-//			//	$this->_diff['upsert']['engine.variants[0].capacity'] = 2;
-//			//echo"<pre>";var_dump($this->_diff);die;
-//
-//
-//			if($this->_diff['upsert'] || $this->_diff['delete'])
-//			{
-//				$mutateIn = $this->_bucket->mutateIn((string) $this->_id);
-//
-//				foreach ($this->_diff['upsert'] as $k => $v)
-//				{
-//					$mutateIn->upsert($k, $v, true);
-//				}
-//
-//				foreach ($this->_diff['delete'] as $k => $v)
-//				{
-//					$mutateIn->remove($k);
-//				}
-//				if($this->expire()){
-//					$mutateIn->withExpiry($this->expire());
-//				}
-//				$res = $mutateIn->execute();
-//
-//				if($res->error)
-//				{
-//					throw new \Exception($res->error);
-//				}
-//
-//				$this->_diff['upsert'] = [];
-//				$this->_diff['delete'] = [];
-//			}
-//
-//			$this->_originBody = new Body(json_decode(json_encode($this->_body)));
-//		}
-//		else
-//		{
-//			$this->connect();
-//
-//			if($this->_ns)
-//			{
-//				$this->_body->_ns = $this->_ns;
-//			}
-//			$raw = $this->_body->toObject();
-//
-//
-//			$res = $this->_bucket->upsert((string) $this->_id,$raw, $this->_getOptionForSave());
-//
-//			if($res->error)
-//			{
-//				throw new \Exception($res->error);
-//			}
-//		}
-//
-//		return $this;
-//	}
-
-
-	protected function convertToNestedBody($body, $keys, $val)
-	{
-		$key = array_shift($keys);
-		if(!isset($body->{$key}))
-		{
-			$body->{$key} = new \stdClass();
-		}
-
-		if($keys)
-		{
-			$this->convertToNestedBody($body->{$key}, $keys, $val);
-		}
-		else
-		{
-			$body->{$key} = $val;
-		}
-	}
-
-
-//	public function to2d(){
-//
-//		$input = array(
-//				'meta'  => $this->_meta->toObject(),
-//				'body'  => $this->_body->toObject()
-//		);
-//		$ritit = new \RecursiveIteratorIterator(new \RecursiveArrayIterator($input));
-//		$result = array();
-//		foreach ($ritit as $leafValue) {
-//			$keys = array();
-//			foreach (range(0, $ritit->getDepth()) as $depth) {
-//				$keys[] = $ritit->getSubIterator($depth)->key();
-//			}
-//			$result[ join('.', $keys) ] = $leafValue;
-//		}
-//
-//		return $result;
-//	}
-	*/
 }
