@@ -174,6 +174,26 @@ class Schema
 		return $value;
 	}
 
+
+	public static function getTables(Client $client, $keyspace)
+	{
+		$cluster = $client->getCluster();
+
+		$schema   = $client->connector()->schema();
+		$keyspaceObj = $schema->keyspace($keyspace);
+
+		if($keyspaceObj===false)
+		{
+			throw new Exception("Provided keyspace (".$keyspace.") doesn't exist",404);
+		}
+
+		$tables = [];
+		foreach ($keyspaceObj->tables() as $table)
+			$tables[] = $table->name();
+
+		return $tables;
+	}
+
 	protected static $_schema = array();
 
 	public static function getSchema(Client $client, $keyspace, $table)

@@ -1,3 +1,9 @@
+### 0.7.5 (2020-07-06)
+1. **Simpletools\Db\Cassandra\Client**
+    1. Added `->getClusterSettings()` method.
+1. **Simpletools\Db\Cassandra\Schema**
+    1. Added `->getTables()` method.
+
 ### 0.7.4 (2020-06-23)
 1. **Simpletools\Db\Cassandra\Doc**
     1. Added `->ifExists()` and `->ifNotExists()` methods.
