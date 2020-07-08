@@ -77,6 +77,7 @@ class Query implements \Iterator
         }
 
         $this->_client = $client;
+				$this->_schema = Schema::getSchema($this->_client, $this->_query['db'] , $this->_query['table']);
 
         return $this;
     }

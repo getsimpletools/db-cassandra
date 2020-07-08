@@ -1,3 +1,7 @@
+### 0.7.6 (2020-07-08)
+1. **Simpletools\Db\Cassandra\Query**
+    1. Fixed the bug with incorrect schema when changing client.
+
 ### 0.7.5 (2020-07-06)
 1. **Simpletools\Db\Cassandra\Client**
     1. Added `->getClusterSettings()` method.
