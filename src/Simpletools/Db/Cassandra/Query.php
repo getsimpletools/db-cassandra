@@ -919,10 +919,22 @@ class Query implements \Iterator
 
 
 									$queryMap = [];
-									foreach ($mapFieldsToRemove->toObject() as $k => $val)
+
+									if ($value->getKeyType() == 'int')
 									{
-										$queryMap[] = str_replace('"', "'", $this->escapeKey($k));
+										foreach ($mapFieldsToRemove->toObject() as $k => $val)
+										{
+											$queryMap[] = (int)$k;
+										}
 									}
+									else
+									{
+										foreach ($mapFieldsToRemove->toObject() as $k => $val)
+										{
+											$queryMap[] = str_replace('"', "'", $this->escapeKey($k));
+										}
+									}
+
 
 									if ($queryMap)
 										$set[] = $this->escapeKey($key).' = '.$this->escapeKey($key).' - {'.implode(', ',$queryMap).'}';

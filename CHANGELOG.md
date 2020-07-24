@@ -1,3 +1,9 @@
+### 0.7.7 (2020-07-24)
+1. **Simpletools\Db\Cassandra\Query**
+    1. Fixed the bug with incorrect map<int, text> update.
+2. **Simpletools\Db\Cassandra\Type\Map**
+    1. Added `->getKeyType()` and `->getValueType()` methods.
+
 ### 0.7.6 (2020-07-08)
 1. **Simpletools\Db\Cassandra\Query**
     1. Fixed the bug with incorrect schema when changing client.

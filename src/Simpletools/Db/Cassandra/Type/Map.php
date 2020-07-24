@@ -125,17 +125,37 @@ class Map implements \JsonSerializable
 
 	public function removeNullFields()
 	{
-		foreach ($this->_body  as $k =>$v)
+		if(is_array($this->_body))
 		{
-			if($v === null)  unset($this->_body->{$k});
+			foreach ($this->_body  as $k =>$v)
+			{
+				if ($v === null) unset($this->_body[$k]);
+			}
+		}
+		else
+		{
+			foreach ($this->_body  as $k =>$v)
+			{
+				if($v === null)  unset($this->_body->{$k});
+			}
 		}
 	}
 
 	public function removeNotNullFields()
 	{
-		foreach ($this->_body  as $k =>$v)
+		if(is_array($this->_body))
 		{
-			if($v !== null)  unset($this->_body->{$k});
+			foreach ($this->_body  as $k =>$v)
+			{
+				if($v !== null)  unset($this->_body[$k]);
+			}
+		}
+		else
+		{
+			foreach ($this->_body  as $k =>$v)
+			{
+				if($v !== null)  unset($this->_body->{$k});
+			}
 		}
 	}
 
@@ -188,6 +208,16 @@ class Map implements \JsonSerializable
 	{
 		$this->_body = (object) array();
 		return $this;
+	}
+
+	public function getKeyType()
+	{
+		return $this->_keyType;
+	}
+
+	public function getValueType()
+	{
+		return $this->_valueType;
 	}
 
 
