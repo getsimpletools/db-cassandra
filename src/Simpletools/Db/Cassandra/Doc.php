@@ -160,7 +160,7 @@ class Doc
 		if($args)
 		{
 			$this->_columns = $args;
-			if(is_string($this->_columns)) $this->_columns =  explode(',',$this->_columns);
+			if(is_string($this->_columns)) $this->_columns =  explode(', ',$this->_columns);
 		}
 
 		return $this;
