@@ -1,3 +1,7 @@
+### 0.7.9 (2020-09-11)
+1. **Simpletools\Db\Cassandra\Query**
+    1. Added `Client` to `__construct`
+
 ### 0.7.7 (2020-07-24)
 1. **Simpletools\Db\Cassandra\Query**
     1. Fixed the bug with incorrect map<int, text> update.

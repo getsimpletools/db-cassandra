@@ -49,11 +49,15 @@ class Query implements \Iterator
 		protected $_cql = null;
 		protected $_cqlParams = [];
 
-    public function __construct($table,$keyspace=null)
+    public function __construct($table,$keyspace=null, $client = null)
     {
         $this->table($table);
 
-        $this->_client = new Client();
+
+			if($client instanceof Client)
+				$this->_client = $client;
+			else
+				$this->_client = new Client();
 
         if($keyspace)
             $this->keyspace($keyspace);
