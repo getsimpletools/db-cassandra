@@ -1,3 +1,11 @@
+### 0.7.11 (2020-11-19)
+1. **Simpletools\Db\Cassandra\Query**
+    1. Added `->bubble()` for single replication within Batch
+2. **Simpletools\Db\Cassandra\Batch**
+    1. Added `->bubble()` for bulk replication for all Queries inside Batch
+4. **Simpletools\Db\Cassandra\Doc**
+    1. Added `->bubble()` for single replication within Batch
+
 ### 0.7.9 (2020-09-11)
 1. **Simpletools\Db\Cassandra\Query**
     1. Added `Client` to `__construct`

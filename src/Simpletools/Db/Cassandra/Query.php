@@ -48,6 +48,7 @@ class Query implements \Iterator
     protected $_autoScroll = false;
 		protected $_cql = null;
 		protected $_cqlParams = [];
+		protected $_bubble;
 
     public function __construct($table,$keyspace=null, $client = null)
     {
@@ -1596,6 +1597,17 @@ class Query implements \Iterator
 	{
 		$this->___options['paging_state_token'] = base64_decode($scrollId);
 		return $this;
+	}
+
+	public function bubble()
+	{
+		$this->_bubble = true;
+		return $this;
+	}
+
+	public function isBubble()
+	{
+		return $this->_bubble ? true : false;
 	}
 
 }

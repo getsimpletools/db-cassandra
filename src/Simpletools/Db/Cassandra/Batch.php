@@ -21,6 +21,8 @@ class Batch
     protected $___consistency = null;
 
     protected $_runOnBatchSize = 0; //0 - only manual batch run()
+		protected $_bubbles=[];
+		protected $_bubble;
 
     public function __construct($type = self::LOGGED)
     {
@@ -166,12 +168,60 @@ class Batch
 					}
 				}
 			}
+			elseif($this->_bubble)
+			{
+				if(!$this->_queriesParsed)
+				{
+					foreach ($this->_queries as $query)
+					{
+						$rawQuery = $query->getRawQuery();
+
+						if(@$rawQuery['type'] == 'INSERT')
+						{
+							$this->_bubbles[$rawQuery['db'].'.'.$rawQuery['table']]['bulk']['insert'][] = $query->getRawQueryData($rawQuery);
+						}
+						elseif (@$rawQuery['type'] == 'UPDATE')
+						{
+							if($data = $query->getRawQueryData($rawQuery))
+								$this->_bubbles[$rawQuery['db'].'.'.$rawQuery['table']]['bulk']['insert'][] = $data;
+						}
+						elseif (@$rawQuery['type'] == 'DELETE FROM')
+						{
+							if($data = $query->getRawQueryData($rawQuery))
+								$this->_bubbles[$rawQuery['db'].'.'.$rawQuery['table']]['bulk']['insert'][] = $data;
+
+						}
+
+						$q = $query->getQuery(true);
+						$this->_queriesParsed[] = array('statement' => $q['preparedQuery'], 'args' => $q['arguments']);
+					}
+				}
+			}
 			else
 			{
 				if(!$this->_queriesParsed)
 				{
 					foreach ($this->_queries as $query)
 					{
+						if($query->isBubble())
+						{
+							$rawQuery = $query->getRawQuery();
+							if(@$rawQuery['type'] == 'INSERT')
+							{
+								$this->_bubbles[$rawQuery['db'].'.'.$rawQuery['table']]['write'][] = $query->getRawQueryData($rawQuery);
+							}
+							elseif (@$rawQuery['type'] == 'UPDATE')
+							{
+								if($data = $query->getRawQueryData($rawQuery))
+									$this->_bubbles[$rawQuery['db'].'.'.$rawQuery['table']]['update'][] = $data;
+							}
+							elseif (@$rawQuery['type'] == 'DELETE FROM')
+							{
+								if($data = $query->getRawQueryData($rawQuery))
+									$this->_bubbles[$rawQuery['db'].'.'.$rawQuery['table']]['delete'][] = $data;
+							}
+						}
+
 						$q = $query->getQuery(true);
 						$this->_queriesParsed[] = array('statement' => $q['preparedQuery'], 'args' => $q['arguments']);
 					}
@@ -223,6 +273,7 @@ class Batch
         //unset($batch);
 
         $this->replicate();;
+        $this->runBubbles();
         $this->_hasRun = true;
 
         $this->reset();
@@ -237,6 +288,29 @@ class Batch
 				Replicator::trigger('cassandra://bulk@'.$this->_keyspace.'.'.$this->_table, $this->_replicationQuery);
 			}
 		}
+
+		public function runBubbles()
+		{
+			if($this->_bubbles)
+			{
+				foreach ($this->_bubbles as  $keyspaceTable => $actions)
+				{
+					foreach ($actions as $action => $items)
+					{
+						if($action == 'bulk')
+							Replicator::trigger('cassandra://'.$action.'@'.$keyspaceTable, (object) $items);
+						else
+						{
+							foreach ($items as $item)
+							{
+								Replicator::trigger('cassandra://'.$action.'@'.$keyspaceTable, (object) $item);
+							}
+						}
+					}
+				}
+			}
+		}
+
 
 		public function isReplication()
 		{
@@ -270,6 +344,7 @@ class Batch
 					'update' =>[],
 					'delete' =>[]
 				];
+				$this->_bubbles =[];
 
         return $this;
     }
@@ -278,6 +353,12 @@ class Batch
     {
         $this->_runOnBatchSize = (int) $batchSize;
 
+        return $this;
+    }
+
+		public function bubble()
+		{
+			$this->_bubble = true;
         return $this;
     }
 }

@@ -191,6 +191,7 @@ class Doc
 
 		if($this->_ifExists) 			$this->_query->ifExists();
 		if($this->_ifNotExists) 	$this->_query->ifNotExists();
+		if($this->_bubble)				$this->_query->bubble();
 
 		return $this->_query;
 	}
@@ -232,6 +233,7 @@ class Doc
 
 		if($this->_ifExists) 			$this->_query->ifExists();
 		if($this->_ifNotExists) 	$this->_query->ifNotExists();
+		if($this->_bubble)				$this->_query->bubble();
 
 		return $this->_query;
 	}
@@ -451,6 +453,7 @@ class Doc
 
 		if($this->_ifExists) 			$this->_query->ifExists();
 		if($this->_ifNotExists) 	$this->_query->ifNotExists();
+		if($this->_bubble)				$this->_query->bubble();
 
 		return $this->_query;
 	}
@@ -480,6 +483,11 @@ class Doc
 		$this->_query = null;
 	}
 
+	public function bubble()
+	{
+		$this->_bubble = true;
+		return $this;
+	}
 
 	public function ifNotExists()
 	{
