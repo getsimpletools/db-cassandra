@@ -1,3 +1,7 @@
+### 0.7.12 (2020-11-19)
+1. **Simpletools\Db\Cassandra\Query**
+    1. Fixed `->bubble()` exception on `Doc`
+    
 ### 0.7.11 (2020-11-19)
 1. **Simpletools\Db\Cassandra\Query**
     1. Added `->bubble()` for single replication within Batch

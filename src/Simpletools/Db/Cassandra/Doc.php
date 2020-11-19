@@ -63,6 +63,7 @@ class Doc
 	protected $___consistency = null;
 	protected $_ifNotExists;
 	protected $_ifExists;
+    protected $_bubble = false;
 
 	protected $_client = null;
 
