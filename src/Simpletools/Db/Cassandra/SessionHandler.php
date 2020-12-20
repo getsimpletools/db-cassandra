@@ -15,6 +15,7 @@ class SessionHandler implements \SessionHandlerInterface, \SessionIdInterface
 	protected static $_logFile;
 
 	protected static $_onWriteException;
+    protected static $_onConnectException;
 
 
 	public function __construct(array $settings = [])
@@ -218,15 +219,26 @@ class SessionHandler implements \SessionHandlerInterface, \SessionIdInterface
 
 	protected function getQuery()
 	{
-		$q = (new Query(self::$_settings['table'],self::$_settings['keyspace']))
-			->client(new Client(self::$_settings['cluster']));
+	    try {
+            $q = (new Query(self::$_settings['table'], self::$_settings['keyspace']))
+                ->client(new Client(self::$_settings['cluster']));
 
-		if(@self::$_settings['consistency'])
-		{
-			$q->options([
-				'consistency'   => self::$_settings['consistency']
-			]);
-		}
+            if (@self::$_settings['consistency']) {
+                $q->options([
+                    'consistency' => self::$_settings['consistency']
+                ]);
+            }
+        }
+        catch(\Exception $e)
+        {
+            if(self::$_onConnectException)
+            {
+                $callback = self::$_onConnectException;
+                $callback($e);
+            }
+
+            throw $e;
+        }
 
 		return $q;
 	}
@@ -261,6 +273,8 @@ class SessionHandler implements \SessionHandlerInterface, \SessionIdInterface
                 file_put_contents(self::$_logFile,
                     date('Y-m-d H:i:s')."|WRITE|session_id:".$id."|EX:".$e->getMessage()."\n"
                     , FILE_APPEND);
+
+            throw $e;
         }
 
         unset($q);
@@ -307,5 +321,10 @@ class SessionHandler implements \SessionHandlerInterface, \SessionIdInterface
 	public static function onWriteException(callable $callback)
     {
         self::$_onWriteException = $callback;
+    }
+
+    public static function onConnectException(callable $callback)
+    {
+        self::$_onConnectException = $callback;
     }
 }

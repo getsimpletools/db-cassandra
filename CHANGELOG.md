@@ -1,3 +1,7 @@
+### 0.7.14 (2020-12-20)
+1. **Simpletools\Db\Cassandra\SessionHandler**
+    1. Added `::onConnectException($e)` allowing to handle connect exceptions
+    
 ### 0.7.13 (2020-12-20)
 1. **Simpletools\Db\Cassandra\SessionHandler**
     1. Added `::onWriteException($e)` allowing to handle write exceptions
