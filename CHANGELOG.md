@@ -1,3 +1,7 @@
+### 0.7.13 (2020-12-20)
+1. **Simpletools\Db\Cassandra\SessionHandler**
+    1. Added `::onWriteException($e)` allowing to handle write exceptions
+    
 ### 0.7.12 (2020-11-19)
 1. **Simpletools\Db\Cassandra\Query**
     1. Fixed `->bubble()` exception on `Doc`

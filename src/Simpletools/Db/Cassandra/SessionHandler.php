@@ -14,6 +14,8 @@ class SessionHandler implements \SessionHandlerInterface, \SessionIdInterface
 	protected static $_settings;
 	protected static $_logFile;
 
+	protected static $_onWriteException;
+
 
 	public function __construct(array $settings = [])
 	{
@@ -236,17 +238,32 @@ class SessionHandler implements \SessionHandlerInterface, \SessionIdInterface
 		if(self::$_settings['writeConsistency']!==null)
 			$q->consistency(self::$_settings['writeConsistency']);
 
-		$q->set([
-			'id'                =>  $id,
-			'data'              =>  $data
-		])->expires(self::$_maxLifeTime)->run();
+		try {
+            $q->set([
+                'id' => $id,
+                'data' => $data
+            ])->expires(self::$_maxLifeTime)->run();
 
-		if(self::$_logFile)
-			file_put_contents(self::$_logFile,
-				date('Y-m-d H:i:s')."|WRITE|session_id:".$id."|data:".json_encode($data)."|Expiry:".self::$_maxLifeTime."\n"
-				, FILE_APPEND);
+            if (self::$_logFile)
+                file_put_contents(self::$_logFile,
+                    date('Y-m-d H:i:s') . "|WRITE|session_id:" . $id . "|data:" . json_encode($data) . "|Expiry:" . self::$_maxLifeTime . "\n"
+                    , FILE_APPEND);
+        }
+        catch(\Exception $e)
+        {
+            if(self::$_onWriteException)
+            {
+                $callback = self::$_onWriteException;
+                $callback($e);
+            }
 
-		unset($q);
+            if (self::$_logFile)
+                file_put_contents(self::$_logFile,
+                    date('Y-m-d H:i:s')."|WRITE|session_id:".$id."|EX:".$e->getMessage()."\n"
+                    , FILE_APPEND);
+        }
+
+        unset($q);
 
 		return true;
 	}
@@ -286,4 +303,9 @@ class SessionHandler implements \SessionHandlerInterface, \SessionIdInterface
 
 		return true;
 	}
+
+	public static function onWriteException(callable $callback)
+    {
+        self::$_onWriteException = $callback;
+    }
 }
