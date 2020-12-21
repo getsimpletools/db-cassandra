@@ -119,9 +119,12 @@ class SessionHandler implements \SessionHandlerInterface, \SessionIdInterface
 
 	public static function logFile($path=null)
     {
-        if(!$path) return self::$_logFile;
-
-        if(is_writable($path))
+        if($path===null) return self::$_logFile;
+        elseif($path===false)
+        {
+            self::$_logFile = null;
+        }
+        elseif(is_writable($path))
             self::$_logFile = $path;
     }
 

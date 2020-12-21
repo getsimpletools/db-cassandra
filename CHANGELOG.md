@@ -1,3 +1,7 @@
+### 0.7.16 (2020-12-21)
+1. **Simpletools\Db\Cassandra\SessionHandler**
+    1. Added `::logFile(false)` so log file can be switched off
+    
 ### 0.7.15 (2020-12-21)
 1. **Simpletools\Db\Cassandra\SessionHandler**
     1. Added `::logFile($path)` allowing to set logFile path on runtime
