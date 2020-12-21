@@ -1,3 +1,7 @@
+### 0.7.17 (2020-12-21)
+1. **Simpletools\Db\Cassandra\SessionHandler**
+    1. Updated `::logFile()` to be less strict with path
+    
 ### 0.7.16 (2020-12-21)
 1. **Simpletools\Db\Cassandra\SessionHandler**
     1. Added `::logFile(false)` so log file can be switched off
