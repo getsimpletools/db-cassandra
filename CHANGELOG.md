@@ -1,3 +1,7 @@
+### 0.7.18 (2020-12-21)
+1. **Simpletools\Db\Cassandra\SessionHandler**
+    1. Updated all error loggers to catch `Throwable` instead of just `Exception`
+    
 ### 0.7.17 (2020-12-21)
 1. **Simpletools\Db\Cassandra\SessionHandler**
     1. Updated `::logFile()` to be less strict with path

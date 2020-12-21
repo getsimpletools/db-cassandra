@@ -70,7 +70,7 @@ class SessionHandler implements \SessionHandlerInterface, \SessionIdInterface
 				->table(self::$_settings['table'])
 				->load();
 		}
-		catch(\Exception $e)
+		catch(\Throwable $e)
 		{
 
 			if(self::$_logFile)
@@ -272,7 +272,7 @@ class SessionHandler implements \SessionHandlerInterface, \SessionIdInterface
                     date('Y-m-d H:i:s') . "|WRITE|session_id:" . $id . "|data:" . json_encode($data) . "|Expiry:" . self::$_maxLifeTime . "\n"
                     , FILE_APPEND);
         }
-        catch(\Exception $e)
+        catch(\Throwable $e)
         {
             if(self::$_onWriteException)
             {
