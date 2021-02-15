@@ -1,3 +1,7 @@
+### 0.7.19 (2021-02-15)
+1. **Simpletools\Db\Cassandra\Client**
+    1. Added `retryPolicy` and `retryPolicyLogging` settings
+
 ### 0.7.18 (2020-12-21)
 1. **Simpletools\Db\Cassandra\SessionHandler**
     1. Updated all error loggers to catch `Throwable` instead of just `Exception`

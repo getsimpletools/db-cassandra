@@ -127,6 +127,7 @@ class Client
 
         $cluster
             ->withPort($settings['port'])
+						->withRetryPolicy(new \Cassandra\RetryPolicy\DefaultPolicy())
             ->withRoundRobinLoadBalancingPolicy(); //todo - enable more LB policies
 
         if(isset($settings['consistency']))
@@ -149,6 +150,18 @@ class Client
 
 				if(isset($settings['ioThreads']))
 					$cluster->withIOThreads($settings['ioThreads']);
+
+				if(isset($settings['retryPolicy']))
+				{
+					if($settings['retryPolicy'] == 'DefaultPolicy')
+						$cluster->withRetryPolicy(new \Cassandra\RetryPolicy\DefaultPolicy());
+					elseif($settings['retryPolicy'] == 'DowngradingConsistency')
+						$cluster->withRetryPolicy(new \Cassandra\RetryPolicy\DowngradingConsistency());
+					elseif($settings['retryPolicy'] == 'Fallthrough')
+						$cluster->withRetryPolicy(new \Cassandra\RetryPolicy\Fallthrough());
+					elseif($settings['retryPolicy'] == 'Logging' && isset($settings['retryPolicyLogging']))
+						$cluster->withRetryPolicy(new \Cassandra\RetryPolicy\Logging($settings['retryPolicyLogging']));
+				}
 
         if(isset($settings['routing']))
         {
