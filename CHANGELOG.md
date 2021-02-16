@@ -1,3 +1,7 @@
+### 0.7.19 (2021-02-16)
+1. **Simpletools\Db\Cassandra\Type\Timestamp**
+   1. Added support for DateTime value
+   
 ### 0.7.19 (2021-02-15)
 1. **Simpletools\Db\Cassandra\Client**
     1. Added `retryPolicy` and `retryPolicyLogging` settings
