@@ -16,6 +16,8 @@ class Timestamp implements \JsonSerializable
 			$this->_value = new \Cassandra\Timestamp();
 		elseif ($time instanceof \Cassandra\Timestamp)
 			$this->_value = $time;
+		elseif($time instanceof \DateTime)
+            $this->_value = $time->getTimestamp();
 		else
 			throw new \Exception("Timestamp: Value is not a timestamp or date");
 
