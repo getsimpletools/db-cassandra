@@ -44,11 +44,13 @@ class Async
 			throw  new Exception('Unknow retryPolicy: '.$policy.' Use: (reconnect | fallthrough | silence)');
 
 		$this->_retryPolicy = $policy;
+		return $this;
 	}
 
 	public function disableReplication()
 	{
 		$this->_replication = false;
+		return $this;
 	}
 
 	public function add($query)
