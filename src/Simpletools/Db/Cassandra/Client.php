@@ -265,10 +265,29 @@ class Client
             $query = $input;
         }
 
-        $result = $this->___connection->execute($query, $queryOptions);
+      	$result = $this->executeWithReconnect($this->___connection, $query, $queryOptions);
 
         return new Result($result,$this->___connection);
     }
+
+    public function executeWithReconnect($connection,$query, $queryOptions, $attempt = 0)
+		{
+			try{
+				return $connection->execute($query, $queryOptions);
+			}catch (\Exception $e)
+			{
+				if (($e->getCode() == 16777230 || $e->getCode() == '16777225') && $attempt < 3)
+				{
+					if($attempt)
+						usleep($attempt*500);
+					Connection::setOne($this->___cluster,null);
+					$this->connect();
+					return  $this->executeWithReconnect($connection,$query, $queryOptions, $attempt+1);
+				}
+				else
+					throw $e;
+			}
+		}
 
     public function escape($string,$fromEncoding='UTF-8',$toEncoding='UTF-8')
     {

@@ -1,4 +1,10 @@
-### 0.7.19 (2021-02-16)
+### 0.8.0 (2021-02-21)
+1. **Simpletools\Db\Cassandra\Client**
+    1. Added `->executeWithReconnect()` to auto-reconnect all timeout requests
+2. **Simpletools\Db\Cassandra\Async**
+    1. Added `->setRetryPolicy(reconnect|fallthrough|silence)` by default auto-reconnect all timeout requests
+
+### 0.7.20 (2021-02-16)
 1. **Simpletools\Db\Cassandra\Type\Timestamp**
    1. Added support for DateTime value
    
@@ -76,7 +82,7 @@
     
 ### 0.7.1 (2020-06-14)
 1. **Simpletools\Db\Cassandra\SessionHandler**
-    1. Added `::regenerateSessionId()` allowing to regenrate sessionId - used natively by `Simpletools\Store\Session`  
+    1. Added `::regenerateSessionId()` allowing to regenerate sessionId - used natively by `Simpletools\Store\Session`  
 2. **Simpletools\Db\Cassandra\Doc**
     1. Added `->client($client)` allowing to set custom client
 

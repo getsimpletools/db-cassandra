@@ -269,7 +269,7 @@ class Batch
             ]);
         }
 
-        $res = $this->_client->connector()->execute($this->getBatch(),$options);
+        $res = $this->_client->executeWithReconnect($this->_client->connector(),$this->getBatch(),$options);
         //unset($batch);
 
         $this->replicate();;
