@@ -181,7 +181,8 @@ class Async
 					unset($this->_queriesCache[$streamId]);
 				}catch (\Exception $e)
 				{
-					if (($e->getCode() == 16777230 || $e->getCode() == '16777225') && isset($this->_queriesCache[$streamId]) && $this->_queriesCache[$streamId][2] < 3)
+					if (($e->getCode() == 16777230 || $e->getCode() == '16777225'|| $e->getCode() == '33558784' || $e->getCode() == '33559040' ||  $e->getCode() == '33558529')
+							&& isset($this->_queriesCache[$streamId]) && $this->_queriesCache[$streamId][2] < 3)
 					{
 						$this->_queriesCache[$streamId][2]++;
 						$this->_queries[$streamId] = $this->_client->connector()->executeAsync($this->_queriesCache[$streamId][0],$this->_queriesCache[$streamId][1]);
@@ -200,7 +201,7 @@ class Async
 
 				if(isset($this->_replicationQuery[$streamId]))
 				{
-					Replicator::trigger('cassandra://'.$this->_replicationQuery[$streamId]->type.'@'.$this->_replicationQuery[$queryId]->dest, $this->_replicationQuery[$queryId]->data);
+					Replicator::trigger('cassandra://'.$this->_replicationQuery[$streamId]->type.'@'.$this->_replicationQuery[$streamId]->dest, $this->_replicationQuery[$streamId]->data);
 					unset($this->_replicationQuery[$streamId]);
 				}
 			}
@@ -213,7 +214,7 @@ class Async
 					$future->get($this->_requestTimeout);
 					if(isset($this->_replicationQuery[$streamId]))
 					{
-						Replicator::trigger('cassandra://'.$this->_replicationQuery[$streamId]->type.'@'.$this->_replicationQuery[$queryId]->dest, $this->_replicationQuery[$queryId]->data);
+						Replicator::trigger('cassandra://'.$this->_replicationQuery[$streamId]->type.'@'.$this->_replicationQuery[$streamId]->dest, $this->_replicationQuery[$streamId]->data);
 						unset($this->_replicationQuery[$streamId]);
 					}
 				} catch (\Exception $e){}
@@ -230,7 +231,7 @@ class Async
 					unset($this->_queriesCache[$streamId]);
 				}catch (\Exception $e)
 				{
-					if (($e->getCode() == 16777230 || $e->getCode() == '16777225') && isset($this->_queriesCache[$streamId]) && $this->_queriesCache[$streamId][2] < 3)
+					if (($e->getCode() == 16777230 || $e->getCode() == '16777225' || $e->getCode() == '33558784' || $e->getCode() == '33559040' ||  $e->getCode() == '33558529') && isset($this->_queriesCache[$streamId]) && $this->_queriesCache[$streamId][2] < 3)
 					{
 						$this->_queriesCache[$streamId][2]++;
 						$this->_queries[$streamId] = $this->_client->connector()->executeAsync($this->_queriesCache[$streamId][0],$this->_queriesCache[$streamId][1]);

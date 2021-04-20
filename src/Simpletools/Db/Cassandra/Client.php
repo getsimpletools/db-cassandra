@@ -276,7 +276,8 @@ class Client
 				return $connection->execute($query, $queryOptions);
 			}catch (\Exception $e)
 			{
-				if (($e->getCode() == 16777230 || $e->getCode() == '16777225') && $attempt < 3)
+				if (($e->getCode() == 16777230 || $e->getCode() == '16777225'
+								|| $e->getCode() == '33558784' || $e->getCode() == '33559040' ||  $e->getCode() == '33558529') && $attempt < 3)
 				{
 					if($attempt)
 						usleep($attempt*500);

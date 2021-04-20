@@ -1,3 +1,9 @@
+### 0.8.2 (2021-04-20)
+1. **Simpletools\Db\Cassandra\Client**
+    1. Added more error codes for auto-reconnect
+2. **Simpletools\Db\Cassandra\Async**
+    1. Added more error codes for auto-reconnect
+
 ### 0.8.0 (2021-02-21)
 1. **Simpletools\Db\Cassandra\Client**
     1. Added `->executeWithReconnect()` to auto-reconnect all timeout requests
