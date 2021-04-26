@@ -1,3 +1,9 @@
+### 0.8.3 (2021-04-26)
+1. **Simpletools\Db\Cassandra\Client**
+    1. Added `->nextPageWithReconnect(result)` for pagination reconnect
+2. **Simpletools\Db\Cassandra\Result**
+    1. Added Client to construct for pagination reconnect
+
 ### 0.8.2 (2021-04-20)
 1. **Simpletools\Db\Cassandra\Client**
     1. Added more error codes for auto-reconnect

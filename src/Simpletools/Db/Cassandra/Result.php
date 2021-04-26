@@ -48,7 +48,7 @@ use Simpletools\Db\Cassandra\Type\Set;
 class Result implements \Iterator
 {
     protected $_result 	= '';
-    protected $___connection 			= '';
+    protected $_client;
 
     protected $_firstRowCache	= null;
     protected $_firstRowCached	= false;
@@ -61,10 +61,10 @@ class Result implements \Iterator
 		protected $_autoScroll = false;
 		protected $_scroll_id = null;
 
-    public function __construct($result, $connection)
+    public function __construct($result, $client)
     {
         $this->_result              = $result;
-        $this->___connection		= $connection;
+        $this->_client							= $client;
 
         if($result === null OR $result instanceof \Cassandra\Rows)
         {
@@ -199,7 +199,10 @@ class Result implements \Iterator
 					if($this->_result->isLastPage())
 						return false;
 
-					$this->_result = $this->_result->nextPage();
+
+					$this->_result = $this->_client->nextPageWithReconnect($this->_result);
+
+
 					$result = $this->_result->current();
 					$this->_result->next();
 				}
@@ -260,7 +263,7 @@ class Result implements \Iterator
 
     public function getInsertedId()
     {
-        return $this->___connection->insert_id;
+        return $this->_client->connector()->insert_id;
     }
 
     protected function _loadFirstRowCache()

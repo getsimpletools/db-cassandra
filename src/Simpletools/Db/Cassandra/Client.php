@@ -267,7 +267,7 @@ class Client
 
       	$result = $this->executeWithReconnect($this->___connection, $query, $queryOptions);
 
-        return new Result($result,$this->___connection);
+        return new Result($result,$this);
     }
 
     public function executeWithReconnect($connection,$query, $queryOptions, $attempt = 0)
@@ -289,6 +289,26 @@ class Client
 					throw $e;
 			}
 		}
+
+	public function nextPageWithReconnect($result, $attempt = 0)
+	{
+		try{
+			return $result->nextPage();
+		}catch (\Exception $e)
+		{
+			if (($e->getCode() == 16777230 || $e->getCode() == '16777225'
+					|| $e->getCode() == '33558784' || $e->getCode() == '33559040' ||  $e->getCode() == '33558529') && $attempt < 3)
+			{
+				if($attempt)
+					usleep($attempt*500);
+				Connection::setOne($this->___cluster,null);
+				$this->connect();
+				return  $this->nextPageWithReconnect($result, $attempt+1);
+			}
+			else
+				throw $e;
+		}
+	}
 
     public function escape($string,$fromEncoding='UTF-8',$toEncoding='UTF-8')
     {
