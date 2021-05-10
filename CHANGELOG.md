@@ -1,3 +1,7 @@
+### 0.8.4 (2021-05-10)
+1. **Simpletools\Db\Cassandra\Async**
+    1. Fixed reconnect issue
+
 ### 0.8.3 (2021-04-26)
 1. **Simpletools\Db\Cassandra\Client**
     1. Added `->nextPageWithReconnect(result)` for pagination reconnect

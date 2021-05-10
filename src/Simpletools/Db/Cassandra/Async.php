@@ -181,7 +181,7 @@ class Async
 					unset($this->_queriesCache[$streamId]);
 				}catch (\Exception $e)
 				{
-					if (($e->getCode() == 16777230 || $e->getCode() == '16777225'|| $e->getCode() == '33558784' || $e->getCode() == '33559040' ||  $e->getCode() == '33558529')
+					if (($e->getCode() == 0 ||$e->getCode() == 16777230 || $e->getCode() == '16777225'|| $e->getCode() == '33558784' || $e->getCode() == '33559040' ||  $e->getCode() == '33558529')
 							&& isset($this->_queriesCache[$streamId]) && $this->_queriesCache[$streamId][2] < 3)
 					{
 						$this->_queriesCache[$streamId][2]++;
@@ -231,7 +231,7 @@ class Async
 					unset($this->_queriesCache[$streamId]);
 				}catch (\Exception $e)
 				{
-					if (($e->getCode() == 16777230 || $e->getCode() == '16777225' || $e->getCode() == '33558784' || $e->getCode() == '33559040' ||  $e->getCode() == '33558529') && isset($this->_queriesCache[$streamId]) && $this->_queriesCache[$streamId][2] < 3)
+					if (($e->getCode() == 0 || $e->getCode() == 16777230 || $e->getCode() == '16777225' || $e->getCode() == '33558784' || $e->getCode() == '33559040' ||  $e->getCode() == '33558529') && isset($this->_queriesCache[$streamId]) && $this->_queriesCache[$streamId][2] < 3)
 					{
 						$this->_queriesCache[$streamId][2]++;
 						$this->_queries[$streamId] = $this->_client->connector()->executeAsync($this->_queriesCache[$streamId][0],$this->_queriesCache[$streamId][1]);
