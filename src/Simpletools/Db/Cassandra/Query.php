@@ -468,6 +468,11 @@ class Query implements \Iterator
         {
             foreach ($this->_query['data'] as $key => $val)
             {
+            		if(is_object($val) && !($val instanceof \stdClass))
+								{
+									$val = json_decode(json_encode($val));
+								}
+
                 if(!is_object($val) || $val instanceof \stdClass)
                 {
                     $this->_query['data'][$key] = $this->toSchemaType($key,$val);

@@ -1,3 +1,7 @@
+### 0.8.5 (2021-07-20)
+1. **Simpletools\Db\Cassandra\Query**
+    1. Fixed map property object bug
+
 ### 0.8.4 (2021-05-10)
 1. **Simpletools\Db\Cassandra\Async**
     1. Fixed reconnect issue
