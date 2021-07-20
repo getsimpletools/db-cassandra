@@ -468,10 +468,12 @@ class Query implements \Iterator
         {
             foreach ($this->_query['data'] as $key => $val)
             {
-            		if(is_object($val) && !($val instanceof \stdClass))
+            		if(is_object($val) && !($val instanceof \stdClass)
+									&& (@$this->_schema[$key] && (substr($this->_schema[$key],0,3)== 'map' || substr($this->_schema[$key],0,3)== 'set' )))
 								{
 									$val = json_decode(json_encode($val));
 								}
+
 
                 if(!is_object($val) || $val instanceof \stdClass)
                 {

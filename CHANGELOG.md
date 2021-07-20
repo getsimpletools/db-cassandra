@@ -1,3 +1,7 @@
+### 0.8.6 (2021-07-20)
+1. **Simpletools\Db\Cassandra\Query**
+    1. Fixed map property object bug
+
 ### 0.8.5 (2021-07-20)
 1. **Simpletools\Db\Cassandra\Query**
     1. Fixed map property object bug
