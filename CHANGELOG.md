@@ -1,3 +1,7 @@
+### 0.8.7 (2021-08-17)
+1. **Simpletools\Db\Cassandra\Query**
+    1. Added `->if()` for a lightweight transaction
+
 ### 0.8.6 (2021-07-20)
 1. **Simpletools\Db\Cassandra\Query**
     1. Fixed map property object bug

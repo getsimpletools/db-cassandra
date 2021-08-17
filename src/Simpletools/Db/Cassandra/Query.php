@@ -342,6 +342,21 @@ class Query implements \Iterator
 			return $this;
 		}
 
+		public function if()
+		{
+			$args = func_get_args();
+			if(count($args)==1) $args = $args[0];
+
+			if(isset($this->_query['if']))
+			{
+				$args[-1] 	= 'AND';
+			}
+
+			$this->_query['if'][] 	= $args;
+
+			return $this;
+		}
+
     public function replace($data)
     {
         $this->_query['type'] = "REPLACE";
@@ -1211,8 +1226,74 @@ class Query implements \Iterator
 					$query[] = 'ALLOW FILTERING';
 				}
 
+				if(isset($this->_query['if']))
+				{
+					$query['IF'] = 'IF';
 
-				if(!isset($insertTypes[$this->_query['type']]))
+					if(is_array($this->_query['if']))
+					{
+						foreach($this->_query['if'] as $operands)
+						{
+
+							if(!isset($operands[2]))
+							{
+								if($operands[1]===null) {
+									$query[] = @$operands[-1] . ' ' . $this->escapeKey($operands[0]) . " = NULL";
+								}
+								else{
+									//$query[] = @$operands[-1] . ' ' . $this->escapeKey($operands[0]) . " = " . $this->_escape($operands[1]);
+									$query[]    = @$operands[-1] . ' ' . $this->escapeKey($operands[0]) . " = ?";
+									$args[]     = $this->toSchemaType(@$operands[0],$operands[1]);
+								}
+							}
+							else
+							{
+								$operands[1] = strtoupper($operands[1]);
+
+								if($operands[1] == "IN")
+								{
+									$operands_ = array();
+
+									if(is_array($operands[2]))
+									{
+										foreach ($operands[2] as $op) {
+											//$operands_[] = $this->_escape($op);
+											$operands_[] = ' ?';
+											$args[] = $this->toSchemaType($operands[0], $op);
+										}
+									}
+									else
+									{
+										$operands_[] = ' ?';
+										$args[] = $this->toSchemaType($operands[0], $operands[2]);
+									}
+
+									$query[] = @$operands[-1].' '.$this->escapeKey($operands[0])." ".$operands[1]." (".implode(",",$operands_).' )';
+								}
+								else
+								{
+									if($operands[2]===null) {
+										$query[] = @$operands[-1] . ' ' . $this->escapeKey($operands[0]) . " " . $operands[1] . " NULL";
+									}
+									else
+									{
+										//$query[] = @$operands[-1] . ' ' . $this->escapeKey($operands[0]) . " " . $operands[1] . " " . $this->_escape($operands[2]);
+										$query[] = @$operands[-1] . ' ' . $this->escapeKey($operands[0]) . " " . $operands[1] . " ?";
+										$args[] = $this->toSchemaType($operands[0],$operands[2]);
+									}
+
+								}
+							}
+						}
+					}
+					else
+					{
+						//$query[] = 'id = '.$this->_escape($this->_query['where']);
+						$query[]    = 'id = ?';
+						$args[]     = $this->_query['if'];
+					}
+				}
+				elseif(!isset($insertTypes[$this->_query['type']]))
 				{
 					if(isset($this->_query['ifNotExists']))
 					{
