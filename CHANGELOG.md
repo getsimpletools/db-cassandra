@@ -1,3 +1,7 @@
+### 0.8.8 (2022-10-13)
+1. **Simpletools\Db\Cassandra\Batch**
+   1. Fixed replicator bug on bubble
+
 ### 0.8.7 (2021-08-17)
 1. **Simpletools\Db\Cassandra\Query**
     1. Added `->if()` for a lightweight transaction

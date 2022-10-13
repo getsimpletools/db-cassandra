@@ -183,12 +183,12 @@ class Batch
 						elseif (@$rawQuery['type'] == 'UPDATE')
 						{
 							if($data = $query->getRawQueryData($rawQuery))
-								$this->_bubbles[$rawQuery['db'].'.'.$rawQuery['table']]['bulk']['insert'][] = $data;
+								$this->_bubbles[$rawQuery['db'].'.'.$rawQuery['table']]['bulk']['update'][] = $data;
 						}
 						elseif (@$rawQuery['type'] == 'DELETE FROM')
 						{
 							if($data = $query->getRawQueryData($rawQuery))
-								$this->_bubbles[$rawQuery['db'].'.'.$rawQuery['table']]['bulk']['insert'][] = $data;
+								$this->_bubbles[$rawQuery['db'].'.'.$rawQuery['table']]['bulk']['delete'][] = $data;
 
 						}
 
