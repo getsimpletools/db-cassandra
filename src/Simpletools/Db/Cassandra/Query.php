@@ -1613,7 +1613,7 @@ class Query implements \Iterator
 
     public function next() : void
     {
-        return $this->_result->next();
+        $this->_result->next();
     }
 
     public function valid() : bool
@@ -1622,25 +1622,25 @@ class Query implements \Iterator
     }
 
     public function getKeyspace()
-		{
-			return $this->_query['db'];
-		}
+	{
+		return $this->_query['db'];
+	}
 
-		public function getTable()
-		{
-			return $this->_query['table'];
-		}
+	public function getTable()
+	{
+		return $this->_query['table'];
+	}
 
-		public function getWhereArguments()
-		{
-			return $this->_query['where'];
-		}
+	public function getWhereArguments()
+	{
+		return $this->_query['where'];
+	}
 
-		public function resetResult()
-		{
-			$this->_result = null;
-			return $this;
-		}
+	public function resetResult()
+	{
+		$this->_result = null;
+		return $this;
+	}
 
     public function __toString()
     {
