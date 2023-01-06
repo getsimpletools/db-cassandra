@@ -17,7 +17,6 @@
 		}
     ],
     "require": {
-        "php":              ">=8",
         "simpletools/framework": "3.0.*"
     },
     "autoload": {
