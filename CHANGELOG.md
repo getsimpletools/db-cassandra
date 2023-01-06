@@ -1,3 +1,14 @@
+### 1.0.0 (2023-01-06)
+1. **Simpletools\Db\Cassandra\Doc\Body**
+   1. Added `mixed` return type to `jsonSerialize()`
+2. **Simpletools\Db\Cassandra\Query**
+   1. Added return types to iterator functions:
+    * rewind() : void
+    * current() : mixed
+    * key() : mixed
+    * next() : void
+    * valid() : bool
+
 ### 0.8.8 (2022-10-13)
 1. **Simpletools\Db\Cassandra\Batch**
    1. Fixed replicator bug on bubble
