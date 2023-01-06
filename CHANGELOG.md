@@ -1,3 +1,10 @@
+### 1.0.1 (2023-01-06)
+1. **composer.json**
+   1. Composer Invalid fix
+
+2. **Simpletools\Db\Cassandra\Query**
+    1. next returning value when set to void
+
 ### 1.0.0 (2023-01-06)
 1. **Simpletools\Db\Cassandra\Doc\Body**
    1. Added `mixed` return type to `jsonSerialize()`
