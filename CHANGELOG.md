@@ -1,4 +1,8 @@
 ### 1.0.1 (2023-01-06)
+1. **Simpletools\Db\Cassandra\Type\Map**
+    1. `Map::jsonSerialize()` return value set to `mixed` to clear final deprication message.
+
+### 1.0.1 (2023-01-06)
 1. **composer.json**
    1. Composer Invalid fix
 
