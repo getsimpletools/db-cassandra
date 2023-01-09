@@ -1,4 +1,4 @@
-### 1.0.1 (2023-01-06)
+### 1.0.2 (2023-01-06)
 1. **Simpletools\Db\Cassandra\Type\Map**
     1. `Map::jsonSerialize()` return value set to `mixed` to clear final deprication message.
 
