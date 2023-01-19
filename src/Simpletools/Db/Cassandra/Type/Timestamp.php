@@ -28,7 +28,7 @@ class Timestamp implements \JsonSerializable
 		return $this->_value;
 	}
 
-	public function jsonSerialize()
+	public function jsonSerialize() : mixed
 	{
 		return $this->toInt();
 		//return (string)$this->value()->toDateTime()->format(DATE_ATOM);

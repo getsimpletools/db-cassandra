@@ -37,7 +37,7 @@ class Timeuuid implements \JsonSerializable
 			return (int) $this->value();
 		}
 
-    public function jsonSerialize()
+    public function jsonSerialize() : mixed
     {
         return $this->value();
     }

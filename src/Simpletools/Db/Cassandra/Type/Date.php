@@ -21,7 +21,7 @@ class Date implements \JsonSerializable
 				throw new \Exception("Date: Value is not a timestamp or date");
     }
 
-		public function jsonSerialize()
+		public function jsonSerialize() : mixed
 		{
 			return $this->_value->toDateTime()->getTimestamp();
 		}

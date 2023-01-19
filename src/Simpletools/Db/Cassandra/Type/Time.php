@@ -25,7 +25,7 @@ class Time implements \JsonSerializable
 		return $this->_value;
 	}
 
-	public function jsonSerialize()
+	public function jsonSerialize() : mixed
 	{
 		return $this->seconds();}
 

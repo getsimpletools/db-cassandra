@@ -1,3 +1,36 @@
+### 1.0.3 (2023-01-19)
+1. **Simpletools\Db\Cassandra\Type\BigInt**
+  1. jsonSerialize() return value set to `mixed` to clear final deprication message.
+2. **Simpletools\Db\Cassandra\Type\Blob**
+  1. jsonSerialize() return value set to `mixed` to clear final deprication message.
+3. **Simpletools\Db\Cassandra\Type\Date**
+  1. jsonSerialize() return value set to `mixed` to clear final deprication message.
+4. **Simpletools\Db\Cassandra\Type\Decimal**
+  1. jsonSerialize() return value set to `mixed` to clear final deprication message.
+5. **Simpletools\Db\Cassandra\Type\Inet**
+  1. jsonSerialize() return value set to `mixed` to clear final deprication message.
+8. **Simpletools\Db\Cassandra\Type\Set**
+  1. jsonSerialize() return value set to `mixed` to clear final deprication message.
+9. **Simpletools\Db\Cassandra\Type\SimpleFloat**
+  1. jsonSerialize() return value set to `mixed` to clear final deprication message.
+10. **Simpletools\Db\Cassandra\Type\Time**
+  1. jsonSerialize() return value set to `mixed` to clear final deprication message.
+11. **Simpletools\Db\Cassandra\Type\Timestamp**
+  1. jsonSerialize() return value set to `mixed` to clear final deprication message.
+12. **Simpletools\Db\Cassandra\Type\Timeuuid**
+  1. jsonSerialize() return value set to `mixed` to clear final deprication message.
+13. **Simpletools\Db\Cassandra\Type\Tinyint**
+  1. jsonSerialize() return value set to `mixed` to clear final deprication message.
+14. **Simpletools\Db\Cassandra\Type\Uuid**
+  1. jsonSerialize() return value set to `mixed` to clear final deprication message.
+15: **Simpletools\Db\Cassandra\Result**
+  1. Updated Iterator functions with return types
+    - current() : mixed
+    - next() : void
+    - key() : mixed
+    - rewind() : void
+    - valid() : bool
+
 ### 1.0.2 (2023-01-06)
 1. **Simpletools\Db\Cassandra\Type\Map**
     1. `Map::jsonSerialize()` return value set to `mixed` to clear final deprication message.
