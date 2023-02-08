@@ -1,3 +1,9 @@
+### 0.8.9 (2023-02-08)
+1. **Simpletools\Db\Cassandra\Async**
+   1. Added `->get()` and `->collect()` for async reading
+2. **Simpletools\Db\Cassandra\Query**
+   1. Added `getResultFromRawResponse()` to get formatted Result object
+
 ### 0.8.8 (2022-10-13)
 1. **Simpletools\Db\Cassandra\Batch**
    1. Fixed replicator bug on bubble

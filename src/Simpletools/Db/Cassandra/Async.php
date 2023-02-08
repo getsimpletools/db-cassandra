@@ -14,6 +14,9 @@ class Async
 	protected $_replicationQuery = [];
 	protected $_replication = true;
 	protected $_retryPolicy = 'reconnect'; //(reconnect | fallthrough | silence )
+  protected $_collectedResponses = null;
+  protected $_tmpQuery= null; //it is used for keeping field mapping of first query to return correct response in collect() method
+
 
 	public function __construct($batchSize = 10000, $requestTimeout = 5, $client = null)
 	{
@@ -52,6 +55,37 @@ class Async
 		$this->_replication = false;
 		return $this;
 	}
+
+  public function get($query)
+  {
+    if($query instanceof Doc)
+    {
+      $query = $query->getLoadQuery();
+    }
+
+    if(!($query instanceof Query))
+    {
+      throw new Exception("Query is not of a Query type",400);
+    }
+    $streamId = (string)(new Uuid());
+
+    $consistency = $query->consistency();
+    if(!$this->_tmpQuery)
+    {
+      $this->_tmpQuery = $query;
+    }
+    $query = $query->getQuery(true);
+
+    $options = ['arguments' => $query['arguments']];
+    if($consistency!==null)
+      $options['consistency'] = $consistency;
+
+    $this->_queries[$streamId] = $this->_client->connector()->executeAsync($query['preparedQuery'],$options);
+    if($this->_retryPolicy =='reconnect')
+    {
+      $this->_queriesCache[$streamId] = [$query['preparedQuery'],$options,0];
+    }
+  }
 
 	public function add($query)
 	{
@@ -162,6 +196,63 @@ class Async
 
 		return $this;
 	}
+
+  public function collect()
+  {
+    $this->_collectedResponses = [];
+
+    while($this->_queries && count($this->_queries))
+    {
+      if($this->_retryPolicy=='reconnect')
+      {
+        foreach ($this->_queries as $streamId => $future)
+        {
+          try{
+            $res = $future->get($this->_requestTimeout);
+            $this->_collectedResponses = array_merge($this->_collectedResponses, $this->_tmpQuery->getResultFromRawResponse($res)->fetchAll());
+
+            unset($this->_queries[$streamId]);
+            unset($this->_queriesCache[$streamId]);
+          }catch (\Exception $e)
+          {
+            if (($e->getCode() == 0 || $e->getCode() == 16777230 || $e->getCode() == '16777225' || $e->getCode() == '33558784' || $e->getCode() == '33559040' ||  $e->getCode() == '33558529') && isset($this->_queriesCache[$streamId]) && $this->_queriesCache[$streamId][2] < 3)
+            {
+              $this->_queriesCache[$streamId][2]++;
+              $this->_queries[$streamId] = $this->_client->connector()->executeAsync($this->_queriesCache[$streamId][0],$this->_queriesCache[$streamId][1]);
+            }
+            else
+              throw $e;
+          }
+        }
+      }
+      elseif($this->_retryPolicy=='fallthrough')
+      {
+        foreach ($this->_queries as $streamId => $future)
+        {
+          $res = $future->get($this->_requestTimeout);
+          $this->_collectedResponses = array_merge($this->_collectedResponses, $this->_tmpQuery->getResultFromRawResponse($res)->fetchAll());
+          unset($this->_queries[$streamId]);
+        }
+      }
+      elseif($this->_retryPolicy=='silence')
+      {
+        foreach ($this->_queries as $streamId => $future)
+        {
+          try{
+            $res = $future->get($this->_requestTimeout);
+            $this->_collectedResponses = array_merge($this->_collectedResponses, $this->_tmpQuery->getResultFromRawResponse($res)->fetchAll());
+          } catch (\Exception $e){}
+          unset($this->_queries[$streamId]);
+        }
+      }
+    }
+
+    $this->reset();
+
+    $response = $this->_collectedResponses;
+    $this->_collectedResponses = null;
+    return $response;
+  }
 
 	public function run($timeout = 5)
 	{
@@ -283,6 +374,11 @@ class Async
 
 		return $this;
 	}
+
+  public function count()
+  {
+    return count($this->_queries);
+  }
 
 	public function __destruct()
 	{
