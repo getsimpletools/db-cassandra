@@ -1,3 +1,9 @@
+### 1.0.4 (2023-02-08)
+1. **Simpletools\Db\Cassandra\Async**
+   1. Added `->get()` and `->collect()` for async reading
+2. **Simpletools\Db\Cassandra\Query**
+   1. Added `getResultFromRawResponse()` to get formatted Result object
+
 ### 1.0.3 (2023-01-19)
 1. **Simpletools\Db\Cassandra\Type\BigInt**
   1. jsonSerialize() return value set to `mixed` to clear final deprication message.

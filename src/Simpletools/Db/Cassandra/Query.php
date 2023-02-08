@@ -575,6 +575,21 @@ class Query implements \Iterator
         return $this;
     }
 
+    public function getResultFromRawResponse($rawResponse)
+    {
+      $result = new Result($rawResponse,$this->_client);
+
+      $result->convertMapToJson($this->_convertMapToJson);
+      $result->setSchema($this->_schema);
+      $result->mapColumns($this->_columnsMap);
+
+      if(@$this->_autoScroll)
+      {
+        $result->autoScroll();
+      }
+      return $result;
+    }
+
     public function getRawQuery()
 		{
 			return $this->_query;
