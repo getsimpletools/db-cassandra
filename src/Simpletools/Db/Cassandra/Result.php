@@ -47,6 +47,17 @@ use Simpletools\Db\Cassandra\Type\Set;
 
 class Result implements \Iterator
 {
+
+    /**
+    * Initial Variable Values
+    * 
+    *
+    * As of PHP 8.2 you are no longer able create dynamic properties
+    * Initialise variables which were previously dynamically allocated
+    * as public, as per default constructor.
+    **/
+
+
     protected $_result 	= '';
     protected $_client;
 
@@ -57,9 +68,9 @@ class Result implements \Iterator
     protected $_currentRow 		= false;
     protected $_columnsMap      = array();
     protected $_schema = array();
-		protected $_convertMapToJson;
-		protected $_autoScroll = false;
-		protected $_scroll_id = null;
+	protected $_convertMapToJson;
+	protected $_autoScroll = false;
+	protected $_scroll_id = null;
 
     public function __construct($result, $client)
     {
@@ -344,7 +355,7 @@ class Result implements \Iterator
     public function next() : void
     {
         $this->_currentRow = $this->fetch();
-        ++$this->position;
+        ++$this->_position;
         // return $this->_currentRow;
     }
 
