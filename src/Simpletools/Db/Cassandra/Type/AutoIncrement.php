@@ -24,6 +24,8 @@ class AutoIncrement
 
     protected $_cast;
 
+    public $_author;
+
     public static function settings($settings)
     {
         self::$_settings = [
