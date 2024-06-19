@@ -127,8 +127,13 @@ class Client
 
         $cluster
             ->withPort($settings['port'])
-						->withRetryPolicy(new \Cassandra\RetryPolicy\DefaultPolicy())
-            ->withRoundRobinLoadBalancingPolicy(); //todo - enable more LB policies
+						->withRetryPolicy(new \Cassandra\RetryPolicy\DefaultPolicy());
+
+
+        if(isset($settings['datacenter']))
+          $cluster->withDatacenterAwareRoundRobinLoadBalancingPolicy($settings['datacenter'], 0,false);
+        else
+          $cluster->withRoundRobinLoadBalancingPolicy();
 
         if(isset($settings['consistency']))
             $cluster->withDefaultConsistency($settings['consistency']);

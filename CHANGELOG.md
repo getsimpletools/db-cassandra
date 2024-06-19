@@ -1,3 +1,7 @@
+### 1.0.5 (2024-06-19)
+1. **Simpletools\Db\Cassandra\Client**
+   1. Added `datacenter` setting to support `->withDatacenterAwareRoundRobinLoadBalancingPolicy()`
+   
 ### 1.0.4 (2023-02-08)
 1. **Simpletools\Db\Cassandra\Async**
    1. Added `->get()` and `->collect()` for async reading
