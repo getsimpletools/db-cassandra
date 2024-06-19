@@ -9,6 +9,15 @@ class Batch
     const UNLOGGED          = 1;
     const BATCH_COUNTER     = 2;
 
+	/**
+	* Initial Variable Values
+	* 
+	*
+	* As of PHP 8.2 you are no longer able create dynamic properties
+	* Initialise variables which were previously dynamically allocated
+	* as public, as per default constructor.
+	**/
+
     protected $_queries = array();
     protected $_client;
 
@@ -19,7 +28,8 @@ class Batch
     protected $_replication = false;
     protected $_replicationQuery;
     protected $___consistency = null;
-
+    // public as per default constructor
+    public 	  $_type = self::LOGGED;
     protected $_runOnBatchSize = 0; //0 - only manual batch run()
 		protected $_bubbles=[];
 		protected $_bubble;

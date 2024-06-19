@@ -2,16 +2,19 @@
 
 namespace Simpletools\Db\Cassandra;
 
+use Cassandra\RetryPolicy\DefaultPolicy;
+use Cassandra\RetryPolicy\DowngradingConsistency;
+use Cassandra\RetryPolicy\Fallthrough;
+use Cassandra\RetryPolicy\Logging;
+
 class Client
 {
 		protected static $_gSettings            = array();
 		protected static $_pluginSettings            = array(); //['convertMapToJson' => true|false]
-
 		protected static $_defaultCluster       = 'default';
-    protected $___cluster	                = 'default';
-
-    protected $___keyspace;
-    protected $___connection;
+        protected $___cluster	                = 'default';
+            protected $___keyspace;
+        protected $___connection;
 
 
     public function __construct($cluster=null)
@@ -35,7 +38,7 @@ class Client
             throw new Exception("No settings for provided cluser $cluster",400);
         }
 
-				self::$_pluginSettings[$cluster] = array();
+        self::$_pluginSettings[$cluster] = array();
     }
 
     public static function cluster(array $settings,$cluster='default')
@@ -67,24 +70,24 @@ class Client
     }
 
     public function getCluster()
-		{
-			return $this->___cluster;
-		}
+    {
+        return $this->___cluster;
+    }
 
-		public function getClusterSettings()
-		{
-			return self::$_gSettings[$this->___cluster];
-		}
+    public function getClusterSettings()
+    {
+        return self::$_gSettings[$this->___cluster];
+    }
 
     public static function setPluginSetting($settingName, $value, $cluster='default')
-		{
-			self::$_pluginSettings[$cluster][$settingName] = $value;
-		}
+    {
+        self::$_pluginSettings[$cluster][$settingName] = $value;
+    }
 
-		public static function getPluginSetting($settingName,$cluster='default')
-		{
-			return @self::$_pluginSettings[$cluster][$settingName];
-		}
+    public static function getPluginSetting($settingName,$cluster='default')
+    {
+        return @self::$_pluginSettings[$cluster][$settingName];
+    }
 
     public function keyspace($keyspace=null)
     {
@@ -153,20 +156,24 @@ class Client
         if(@$settings['username'] && @$settings['password'])
             $cluster->withCredentials($settings['username'], $settings['password']);
 
-				if(isset($settings['ioThreads']))
-					$cluster->withIOThreads($settings['ioThreads']);
+		if(isset($settings['ioThreads']))
+			$cluster->withIOThreads($settings['ioThreads']);
 
-				if(isset($settings['retryPolicy']))
-				{
-					if($settings['retryPolicy'] == 'DefaultPolicy')
-						$cluster->withRetryPolicy(new \Cassandra\RetryPolicy\DefaultPolicy());
-					elseif($settings['retryPolicy'] == 'DowngradingConsistency')
-						$cluster->withRetryPolicy(new \Cassandra\RetryPolicy\DowngradingConsistency());
-					elseif($settings['retryPolicy'] == 'Fallthrough')
-						$cluster->withRetryPolicy(new \Cassandra\RetryPolicy\Fallthrough());
-					elseif($settings['retryPolicy'] == 'Logging' && isset($settings['retryPolicyLogging']))
-						$cluster->withRetryPolicy(new \Cassandra\RetryPolicy\Logging($settings['retryPolicyLogging']));
-				}
+		if(isset($settings['retryPolicy']))
+		{
+			if($settings['retryPolicy'] == 'DefaultPolicy')
+                $policy = new \Cassandra\RetryPolicy\DefaultPolicy();
+			elseif($settings['retryPolicy'] == 'DowngradingConsistency')
+				$policy = new \Cassandra\RetryPolicy\DowngradingConsistency();
+			elseif($settings['retryPolicy'] == 'Fallthrough')
+				$policy = new \Cassandra\RetryPolicy\Fallthrough();
+			elseif($settings['retryPolicy'] == 'Logging' && isset($settings['retryPolicyLogging']))
+				$policy = new \Cassandra\RetryPolicy\Logging($settings['retryPolicyLogging']);
+            else
+                $policy = new \Cassandra\RetryPolicy\DefaultPolicy();
+
+            $cluster->withRetryPolicy($policy);
+		}
 
         if(isset($settings['routing']))
         {
