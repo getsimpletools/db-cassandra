@@ -1,4 +1,4 @@
-### 1.0.5 (2024-06-19)
+### 1.0.8 (2024-06-19)
 1. **Simpletools\Db\Cassandra\Client**
    1. Added `datacenter` setting to support `->withDatacenterAwareRoundRobinLoadBalancingPolicy()`
    
