@@ -1,3 +1,7 @@
+### 0.8.13 (2024-06-21)
+1. **Simpletools\Db\Cassandra\AutoIncrement**
+   1. Changed `CONSISTENCY_LOCAL_SERIAL` to  `CONSISTENCY_LOCAL_QUORUM`
+
 ### 0.8.12 (2024-06-21)
 1. **Simpletools\Db\Cassandra\AutoIncrement**
    1. Fixed update query for `CONSISTENCY_LOCAL_QUORUM` 

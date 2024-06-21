@@ -130,7 +130,7 @@ class AutoIncrement
         {
             (new Query(self::$_settings['table'] . '_lock'))
                     ->options([
-                        'consistency'   => Query::CONSISTENCY_LOCAL_SERIAL
+                        'consistency'   => Query::CONSISTENCY_LOCAL_QUORUM
                     ])
                     ->insertIgnore($body = [
                         'tag' => $this->_tag,
