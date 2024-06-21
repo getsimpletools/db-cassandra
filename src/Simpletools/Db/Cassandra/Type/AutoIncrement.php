@@ -130,7 +130,7 @@ class AutoIncrement
         {
             (new Query(self::$_settings['table'] . '_lock'))
                     ->options([
-                        'consistency'   => Query::CONSISTENCY_ALL
+                        'consistency'   => Query::CONSISTENCY_LOCAL_SERIAL
                     ])
                     ->insertIgnore($body = [
                         'tag' => $this->_tag,
@@ -156,7 +156,7 @@ class AutoIncrement
 
                 $q = (new Query(self::$_settings['table']))
                     ->options([
-                        'consistency'   => Query::CONSISTENCY_ALL
+                        'consistency'   => Query::CONSISTENCY_LOCAL_SERIAL
                     ])
                     ->update([
                         'seq'   => new Cql('seq + 1')
@@ -167,7 +167,7 @@ class AutoIncrement
 
                 (new Query(self::$_settings['table'] . '_lock'))
                     ->options([
-                        'consistency'   => Query::CONSISTENCY_ALL
+                        'consistency'   => Query::CONSISTENCY_LOCAL_SERIAL
                     ])
                     ->delete('tag',$this->_tag)
                     ->run();

@@ -1,3 +1,7 @@
+### 0.8.11 (2024-06-21)
+1. **Simpletools\Db\Cassandra\AutoIncrement**
+   1. Changed `CONSISTENCY_ALL` to `CONSISTENCY_LOCAL_SERIAL` to better handle multiple datacenters. 
+
 ### 0.8.10 (2024-06-19)
 1. **Simpletools\Db\Cassandra\Client**
    1. Added `datacenter` setting to support `->withDatacenterAwareRoundRobinLoadBalancingPolicy()`
