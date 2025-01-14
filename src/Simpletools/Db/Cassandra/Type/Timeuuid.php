@@ -8,7 +8,7 @@ class Timeuuid implements \JsonSerializable
 {
     protected $_value;
 
-    public function __construct($time=null)
+    public function __construct(string|int|float|null $time=null)
     {
 			if(is_numeric($time) && strlen($time) <= 10)
 				$this->_value = new \Cassandra\Timeuuid((int)$time);

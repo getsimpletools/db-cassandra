@@ -150,7 +150,7 @@ class TempTable
         $this->_expireIntervalIso8601 = self::$_s_expireIntervalIso8601;
     }
 
-    public static function expires($intervalIso8601=null)
+    public static function expires(string|null $intervalIso8601=null)
     {
         if($intervalIso8601===null)
             return self::$_s_expireIntervalIso8601;
@@ -163,7 +163,7 @@ class TempTable
         self::$_s_expireIntervalIso8601 = $intervalIso8601;
     }
 
-    public function expire($intervalIso8601=null)
+    public function expire(string|null $intervalIso8601=null)
     {
         if($intervalIso8601===null)
             return $this->_expireIntervalIso8601;

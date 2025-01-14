@@ -127,7 +127,7 @@ class Result implements \Iterator
         return $value;
     }
 
-    private function _callReflection($callable, $args = null)
+    private function _callReflection($callable, object|null $args = null)
     {
         if(is_array($callable))
         {

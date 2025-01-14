@@ -54,7 +54,7 @@ class Docs implements \Iterator
 	protected $_currentIndex = 0;
 	protected $_whereArgs;
 
-	public function __construct($QueryOrArrayOfDoc = null)
+	public function __construct(Query|array|null $QueryOrArrayOfDoc = null)
 	{
 		if(is_array($QueryOrArrayOfDoc))
 		{

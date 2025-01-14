@@ -10,14 +10,14 @@ use Cassandra\RetryPolicy\Logging;
 class Client
 {
 		protected static $_gSettings            = array();
-		protected static $_pluginSettings            = array(); //['convertMapToJson' => true|false]
+		protected static $_pluginSettings       = array(); //['convertMapToJson' => true|false]
 		protected static $_defaultCluster       = 'default';
         protected $___cluster	                = 'default';
-            protected $___keyspace;
+        protected $___keyspace;
         protected $___connection;
 
 
-    public function __construct($cluster=null)
+    public function __construct(string|null $cluster=null)
     {
         if($cluster)
             $this->___cluster = $cluster;
@@ -89,7 +89,7 @@ class Client
         return @self::$_pluginSettings[$cluster][$settingName];
     }
 
-    public function keyspace($keyspace=null)
+    public function keyspace(string|null $keyspace=null)
     {
         if($keyspace)
         {
@@ -235,7 +235,7 @@ class Client
         return $this;
     }
 
-    public function execute($input=null,$thisQueryOptions=null)
+    public function execute(array|string|null $input=null,array|string|null $thisQueryOptions=null)
     {
         $this->connect();
 

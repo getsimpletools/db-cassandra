@@ -56,7 +56,7 @@ class Batch
         return $this;
     }
 
-    public function constraint($table, $keyspace = null)
+    public function constraint($table,string|null $keyspace = null)
 		{
 			$this->_table = $table;
 			$this->_keyspace = $keyspace;
@@ -85,7 +85,7 @@ class Batch
         return $this;
     }
 
-    public function query($table,  $keyspace = null)
+    public function query($table,string|null $keyspace = null)
     {
         $q = new Query($table, $keyspace);
 
@@ -247,7 +247,7 @@ class Batch
 			return $batch;
 		}
 
-    public function consistency($consistency=null)
+    public function consistency(string|null $consistency=null)
     {
         if($consistency===null) return $this->___consistency;
 

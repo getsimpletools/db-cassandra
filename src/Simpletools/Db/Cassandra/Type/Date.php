@@ -6,7 +6,7 @@ class Date implements \JsonSerializable
 {
     protected $_value;
 
-    public function __construct($time = null)
+    public function __construct(int|float|null $time = null)
     {
 
 			if(is_numeric($time) && strlen($time) <= 10)

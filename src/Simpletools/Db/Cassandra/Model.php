@@ -8,7 +8,7 @@ class Model extends Client
     protected $___cluster;
     protected $___keyspace;
 
-    public function __construct($cluster=null)
+    public function __construct(string|null $cluster=null)
     {
         $this->___cluster 	= defined('static::CLUSTER') ? static::CLUSTER : $cluster;
 

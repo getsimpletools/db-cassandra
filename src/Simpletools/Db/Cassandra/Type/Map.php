@@ -12,7 +12,7 @@ class Map implements \JsonSerializable
 	protected $_valueType;
 	protected $_convertMapToJson;
 
-	public function __construct($body, $keyType = \Cassandra::TYPE_TEXT, $valueType = \Cassandra::TYPE_TEXT, $convertMapToJson = null)
+	public function __construct($body, $keyType = \Cassandra::TYPE_TEXT, $valueType = \Cassandra::TYPE_TEXT,string|array|null $convertMapToJson = null)
 	{
 		$this->_convertMapToJson = $convertMapToJson;
 

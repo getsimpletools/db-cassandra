@@ -18,7 +18,7 @@ class Async
   protected $_tmpQuery= null; //it is used for keeping field mapping of first query to return correct response in collect() method
 
 
-	public function __construct($batchSize = 10000, $requestTimeout = 5, $client = null)
+	public function __construct($batchSize = 10000, $requestTimeout = 5, Client|null $client = null)
 	{
 		if ($client !== null)
 		{

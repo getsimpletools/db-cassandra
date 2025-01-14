@@ -33,7 +33,7 @@ class Schema
 	 * @param null $sleep
 	 * @throws Exception
 	 */
-	protected function refreshSchema($client,$keyspace, $table, $timeout=5, $sleep = null)
+	protected function refreshSchema($client,$keyspace, $table, $timeout=5, int|null $sleep = null)
 	{
 		$schema   = $client->connector()->schema();
 		$keyspaceObj = $schema->keyspace($this->_definition->keyspace);
@@ -80,7 +80,7 @@ class Schema
 		return $this;
 	}
 
-	public function name($name=null)
+	public function name(string|null $name=null)
 	{
 		if(!$name) return $this->_tableName;
 

@@ -1,3 +1,58 @@
+### 1.0.9 (2025-01-14)
+1. **PHP 8.4 Compatibility Changes**
+    1. ***Simpletools\Db\Cassandra\Type\AutoIncrement***
+        1. Amended `await()` function to allow nullable int/float parameter `$time`
+    2. ***Simpletools\Db\Cassandra\Type\Date***
+        1. Amended `__construct()` function to allow nullable int/float parameter `$time`
+    3. ***Simpletools\Db\Cassandra\Type\Map***
+        1. Amended `__construct()` function to allow nullable array/string parameter `$convertMapToJson`
+    4. ***Simpletools\Db\Cassandra\Type\RandomBytes***
+        1. Amended `entropy()` function to allow nullable int/string parameter `$entropy`
+    5. ***Simpletools\Db\Cassandra\Type\Time***
+        1. Amended `__construct()` function to allow nullable string/int/float parameter `$time`
+    6. ***Simpletools\Db\Cassandra\Type\Timestamp***
+        1. Amended `__construct()` function to allow nullable string/int/float parameter `$time`
+    7. ***Simpletools\Db\Cassandra\Type\Timeuuid***
+        1. Amended `__construct()` function to allow nullable string/int/float parameter `$time`
+    8. ***Simpletools\Db\Cassandra\Type\Uuid***
+        1. Amended `__construct()` function to allow nullable Uuid/string parameter `$uuid`
+    9. ***Simpletools\Db\Cassandra\Async***
+        1. Amended `__construct()` function to allow nullable Client parameter `$client`
+    10. ***Simpletools\Db\Cassandra\Batch***
+        1. Amended `constraint()` function to allow nullable string parameter `$keyspace`
+        2. Amended `query()` function to allow nullable string parameter `$keyspace`
+        3. Amended `consistency()` function to allow nullable string parameter `$consistency`
+    11. ***Simpletools\Db\Cassandra\Client***
+        1. Amended `__construct()` function to allow nullable string parameter `$cluster`
+        2. Amended `keyspace()` function to allow nullable string parameter `$keyspace`
+        3. Amended `execute()` function to allow nullable string/array parameters `$input` and `$thisQueryOptions`
+    12. ***Simpletools\Db\Cassandra\Doc***
+        1. Amended `__construct()` function to allow nullable string/array parameter `$id`
+        2. Amended `consistency()` function to allow nullable string parameter `$consistency`
+        3. Amended `body()` function to allow nullable Body/array parameter `$body`
+        4. Amended `expires()` function to allow nullable int parameter `$seconds`
+    13. ***Simpletools\Db\Cassandra\Docs***
+        1. Amended `__construct()` function to allow nullable Query/array parameter `$QueryOrArrayOfDoc`
+    14. ***Simpletools\Db\Cassandra\Model***
+        1. Amended `__construct()` function to allow nullable string parameter `$cluster`
+    15. ***Simpletools\Db\Cassandra\Query***
+        1. Amended `__construct()` function to allow nullable string parameter `$keyspace` and nullable Client parameter `$client`
+        2. Amended `consistency()` function to allow nullable string parameter `$consistency`
+        3. Amended `getRawQueryData()` function to allow nullable array parameter `$rawQuery`
+        4. Amended `whereSql()` function to allow nullable array/string parameter `$vars`
+        5. Amended `ttl()` function to allow nullable int/string parameter `$seconds`
+    16. ***Simpletools\Db\Cassandra\Result***
+        1. Amended `_callReflection()` function to allow nullable object parameter `$args`
+    17. ***Simpletools\Db\Cassandra\Schema***
+        1. Amended `refreshSchema()` function to allow nullable int parameter `$sleep`
+        2. Amended `name()` function to allow nullable string parameter `$name`
+    18. ***Simpletools\Db\Cassandra\SessionHandler***
+        1. Amended `maxLifeTime()` function to allow nullable int parameter `$seconds`
+        2. Amended `logFile()` function to allow nullable string parameter `$path`
+    19. ***Simpletools\Db\Cassandra\TempTable***
+        1. Amended `expires()` function to allow nullable string parameter `$intervalIso8601`
+        2. Amended `expire()` function to allow nullable string parameter `$intervalIso8601`
+
 ### 1.0.8 (2024-06-19)
 1. **Simpletools\Db\Cassandra\Client**
    1. Added `datacenter` setting to support `->withDatacenterAwareRoundRobinLoadBalancingPolicy()`

@@ -50,7 +50,7 @@ class Query implements \Iterator
 		protected $_cqlParams = [];
 		protected $_bubble;
 
-    public function __construct($table,$keyspace=null, $client = null)
+    public function __construct($table,string|null $keyspace=null,Client|null $client = null)
     {
         $this->table($table);
 
@@ -498,7 +498,7 @@ class Query implements \Iterator
         }
     }
 
-    public function consistency($consistency=null)
+    public function consistency(string|null $consistency=null)
     {
         if($consistency===null) return $this->___consistency;
 
@@ -591,53 +591,53 @@ class Query implements \Iterator
     }
 
     public function getRawQuery()
-		{
-			return $this->_query;
-		}
+	{
+		return $this->_query;
+	}
 
-		public function getRawQueryData($rawQuery = null)
+	public function getRawQueryData(array|null $rawQuery = null)
     {
     	if(!$rawQuery)
     		$rawQuery = $this->_query;
 
     	if(@$rawQuery['type'] == 'INSERT')
+		{
+			return $rawQuery['data'];
+		}
+		elseif (@$rawQuery['type'] == 'UPDATE')
+		{
+			$whereKeys = $this->getWhereKeys($rawQuery['where']);
+			if($this->isSingleRowQuery($whereKeys))
 			{
-				return $rawQuery['data'];
+				return array_merge($rawQuery['data'], $whereKeys);
 			}
-			elseif (@$rawQuery['type'] == 'UPDATE')
+		}
+		elseif (@$rawQuery['type'] == 'DELETE FROM')
+		{
+			$whereKeys = $this->getWhereKeys($rawQuery['where']);
+			if($this->isSingleRowQuery($whereKeys))
 			{
-				$whereKeys = $this->getWhereKeys($rawQuery['where']);
-				if($this->isSingleRowQuery($whereKeys))
-				{
-					return array_merge($rawQuery['data'], $whereKeys);
-				}
+				return $whereKeys;
 			}
-			elseif (@$rawQuery['type'] == 'DELETE FROM')
-			{
-				$whereKeys = $this->getWhereKeys($rawQuery['where']);
-				if($this->isSingleRowQuery($whereKeys))
-				{
-					return $whereKeys;
-				}
-			}
+		}
 
     	return false;
-		}
+	}
 
     protected function getWhereKeys($where)
+	{
+		$whereKeys = [];
+		foreach ($where as $condition)
 		{
-			$whereKeys = [];
-			foreach ($where as $condition)
-			{
-				$whereKeys[$condition[0]] = $condition[1];
-			}
-			return $whereKeys;
+			$whereKeys[$condition[0]] = $condition[1];
 		}
+		return $whereKeys;
+	}
 
     protected function isSingleRowQuery($whereKeys)
-		{
-			return array_diff_key($whereKeys,array_flip($this->getPrimaryKey())) ? false : true;
-		}
+	{
+		return array_diff_key($whereKeys,array_flip($this->getPrimaryKey())) ? false : true;
+	}
 
 
     public function get($id,$column='id')
@@ -1415,7 +1415,7 @@ class Query implements \Iterator
         }
     }
 
-    public function &whereSql($statement,$vars=null)
+    public function &whereSql($statement,string|array|null $vars=null)
     {
         $this->_query['whereSql'] = array('statement'=>$statement,'vars'=>$vars);
 
@@ -1431,13 +1431,13 @@ class Query implements \Iterator
 
     protected $_ttl;
 
-    public function ttl($seconds=null)
+    public function ttl(int|string|null $seconds=null)
     {
         if($seconds!==null)
-				{
-					if(is_string($seconds) && !is_numeric($seconds)) $seconds = strtotime($seconds);
-					$this->_ttl = $seconds > time() ? $seconds - time() : (int) $seconds;
-				}
+		{
+			if(is_string($seconds) && !is_numeric($seconds)) $seconds = strtotime($seconds);
+			$this->_ttl = $seconds > time() ? $seconds - time() : (int) $seconds;
+		}
 
         return $this;
     }

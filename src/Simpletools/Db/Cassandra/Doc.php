@@ -73,7 +73,7 @@ class Doc
 //			'delete' => [],
 //	];
 
-	public function __construct($id=null)
+	public function __construct(string|array|null $id=null)
 	{
 		$this->_body = new Body((object) array());
 
@@ -93,7 +93,7 @@ class Doc
 			return $this;
 	}
 
-    public function consistency($consistency=null)
+    public function consistency(string|null $consistency=null)
     {
         if($consistency===null) return $this->___consistency;
 
@@ -411,7 +411,7 @@ class Doc
 	}
 
 
-	public function body($body=null)
+	public function body(Body|array|null $body=null)
 	{
 		if($body===null)
 			return $this;
@@ -428,7 +428,7 @@ class Doc
 	}
 
 
-	public function expires($seconds = null)
+	public function expires(int|null $seconds = null)
 	{
 		$this->_ttl = $seconds;
 		return $this;
