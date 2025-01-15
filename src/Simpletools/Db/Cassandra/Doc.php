@@ -411,7 +411,7 @@ class Doc
 	}
 
 
-	public function body(Body|stdClass|array|null $body=null)
+	public function body(Body|\stdClass|array|null $body=null)
 	{
 		if($body===null)
 			return $this;
