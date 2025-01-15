@@ -1,3 +1,8 @@
+### 1.0.10 (2025-01-15)
+1. **PHP 8.4 Compatibility Changes**
+    1. ***Simpletools\Db\Cassandra\Doc***
+        1. Amended `body()` function to allow nullable stdClass parameter `$body`
+
 ### 1.0.9 (2025-01-14)
 1. **PHP 8.4 Compatibility Changes**
     1. ***Simpletools\Db\Cassandra\Type\AutoIncrement***
