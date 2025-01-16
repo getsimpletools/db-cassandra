@@ -12,7 +12,7 @@ class Time implements \JsonSerializable
 			$this->_value = new \Cassandra\Time((int)$time);
 		elseif (is_string($time) && ($time = strtotime($time)))
 			$this->_value = new \Cassandra\Time($time);
-		elseif ($time===null)
+		elseif ($time===null||$time===false)
 			$this->_value = new \Cassandra\Time();
 		elseif ($time instanceof \Cassandra\Time)
 			$this->_value = $time;

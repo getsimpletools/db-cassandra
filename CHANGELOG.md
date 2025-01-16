@@ -1,3 +1,14 @@
+### 1.0.12 (2025-01-16)
+1. **Timestamp: Value is not a timestamp or date||#0**
+    1. ***Simpletools\Db\Cassandra\Type\Timestamp***
+        1. Amended `__construct()` function to check `false` on passed in variable `$time`
+    2. ***Simpletools\Db\Cassandra\Type\Date***
+        1. Amended `__construct()` function to check `false` on passed in variable `$time`
+    3. ***Simpletools\Db\Cassandra\Type\Time***
+        1. Amended `__construct()` function to check `false` on passed in variable `$time`
+    4. ***Simpletools\Db\Cassandra\Type\Timeuuid***
+        1. Amended `__construct()` function to check `false` on passed in variable `$time`
+
 ### 1.0.11 (2025-01-15)
 1. **PHP 8.4 Compatibility Changes**
     1. ***Simpletools\Db\Cassandra\Doc***

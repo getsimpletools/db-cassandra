@@ -12,7 +12,7 @@ class Timestamp implements \JsonSerializable
 			$this->_value = new \Cassandra\Timestamp((int)$time);
 		elseif (is_string($time) && ($time = strtotime($time)))
 			$this->_value = new \Cassandra\Timestamp($time);
-		elseif ($time===null)
+		elseif ($time===null || $time===false)
 			$this->_value = new \Cassandra\Timestamp();
 		elseif ($time instanceof \Cassandra\Timestamp)
 			$this->_value = $time;

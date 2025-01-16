@@ -16,7 +16,7 @@ class Timeuuid implements \JsonSerializable
 				$this->_value = new \Cassandra\Timeuuid($time);
 			elseif (is_string($time) && ($time = strtotime($time)))
 				$this->_value = new \Cassandra\Timeuuid($time);
-			elseif ($time===null)
+			elseif ($time===null || $time===false)
 				$this->_value = new \Cassandra\Timeuuid();
 			elseif ($time instanceof \Cassandra\Timeuuid)
 				$this->_value = $time;
