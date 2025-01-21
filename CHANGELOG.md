@@ -1,3 +1,14 @@
+### 1.0.13 (2025-01-21)
+1. **Added Cassandra Types to Constructors**
+    1. ***Simpletools\Db\Cassandra\Type\Timestamp***
+        1. Amended `__construct()` function to allow `\Cassandra\Timestamp` type
+    2. ***Simpletools\Db\Cassandra\Type\Date***
+        1. 1. Amended `__construct()` function to allow `\Cassandra\Date` type
+    3. ***Simpletools\Db\Cassandra\Type\Time***
+        1. 1. Amended `__construct()` function to allow `\Cassandra\Time` type
+    4. ***Simpletools\Db\Cassandra\Type\Timeuuid***
+        1. 1. Amended `__construct()` function to allow `\Cassandra\Timeuuid` type
+
 ### 1.0.12 (2025-01-16)
 1. **Timestamp: Value is not a timestamp or date||#0**
     1. ***Simpletools\Db\Cassandra\Type\Timestamp***
