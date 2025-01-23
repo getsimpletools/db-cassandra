@@ -1,3 +1,8 @@
+### 1.0.14 (2025-01-23)
+1. **Added Cassandra Types to Constructors**
+    3. ***Simpletools\Db\Cassandra\Type\Time***
+        1. 1. Amended `__construct()` function to allow `string` type
+
 ### 1.0.13 (2025-01-21)
 1. **Added Cassandra Types to Constructors**
     1. ***Simpletools\Db\Cassandra\Type\Timestamp***
