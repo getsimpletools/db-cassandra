@@ -93,7 +93,7 @@ class Doc
 			return $this;
 	}
 
-    public function consistency(string|null $consistency=null)
+    public function consistency(int|null $consistency=null)
     {
         if($consistency===null) return $this->___consistency;
 

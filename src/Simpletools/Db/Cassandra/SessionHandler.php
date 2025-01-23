@@ -86,7 +86,7 @@ class SessionHandler implements \SessionHandlerInterface, \SessionIdInterface
 			->client(new Client(self::$_settings['cluster']));
 
 		if(@self::$_settings['consistency'])
-			$batch->consistency(self::$_settings['consistency']);
+			$batch->consistency(intval(self::$_settings['consistency']));
 
 		if(@self::$_settings['writeConsistency'])
 			$batch->consistency(self::$_settings['writeConsistency']);
@@ -134,7 +134,7 @@ class SessionHandler implements \SessionHandlerInterface, \SessionIdInterface
 			'cluster'           => @$settings['cluster'],
 			'keyspace'          => @$settings['keyspace'],
 			'table'             => @$settings['table'],
-			'consistency'       => @$settings['consistency'],
+			'consistency'       => @intval($settings['consistency']),
 			'maxLifeTime'       => @$settings['maxLifeTime'],
 
 			'readConsistency'   => @$settings['readConsistency'],
@@ -236,7 +236,7 @@ class SessionHandler implements \SessionHandlerInterface, \SessionIdInterface
 
             if (@self::$_settings['consistency']) {
                 $q->options([
-                    'consistency' => self::$_settings['consistency']
+                    'consistency' => intval(self::$_settings['consistency'])
                 ]);
             }
         }

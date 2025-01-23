@@ -139,7 +139,7 @@ class Client
           $cluster->withRoundRobinLoadBalancingPolicy();
 
         if(isset($settings['consistency']))
-            $cluster->withDefaultConsistency($settings['consistency']);
+            $cluster->withDefaultConsistency(intval($settings['consistency']));
 
         if(isset($settings['pageSize']))
             $cluster->withDefaultPageSize($settings['pageSize']);
