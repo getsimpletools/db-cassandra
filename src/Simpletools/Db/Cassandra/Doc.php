@@ -73,7 +73,7 @@ class Doc
 //			'delete' => [],
 //	];
 
-	public function __construct(string|array|null $id=null)
+	public function __construct(mixed $id=null)
 	{
 		$this->_body = new Body((object) array());
 
@@ -93,7 +93,7 @@ class Doc
 			return $this;
 	}
 
-    public function consistency(int|null $consistency=null)
+    public function consistency(mixed $consistency=null)
     {
         if($consistency===null) return $this->___consistency;
 
@@ -411,7 +411,7 @@ class Doc
 	}
 
 
-	public function body(Body|\stdClass|array|null $body=null)
+	public function body(mixed $body=null)
 	{
 		if($body===null)
 			return $this;
@@ -428,7 +428,7 @@ class Doc
 	}
 
 
-	public function expires(int|null $seconds = null)
+	public function expires(mixed $seconds = null)
 	{
 		$this->_ttl = $seconds;
 		return $this;

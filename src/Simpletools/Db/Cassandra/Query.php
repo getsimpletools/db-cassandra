@@ -50,7 +50,7 @@ class Query implements \Iterator
 		protected $_cqlParams = [];
 		protected $_bubble;
 
-    public function __construct($table,string|null $keyspace=null,Client|null $client = null)
+    public function __construct($table, mixed $keyspace=null, mixed $client = null)
     {
         $this->table($table);
 
@@ -498,7 +498,7 @@ class Query implements \Iterator
         }
     }
 
-    public function consistency(int|null $consistency=null)
+    public function consistency(mixed $consistency=null)
     {
         if($consistency===null) return $this->___consistency;
 
@@ -595,7 +595,7 @@ class Query implements \Iterator
 		return $this->_query;
 	}
 
-	public function getRawQueryData(array|null $rawQuery = null)
+	public function getRawQueryData(mixed $rawQuery = null)
     {
     	if(!$rawQuery)
     		$rawQuery = $this->_query;
@@ -1415,7 +1415,7 @@ class Query implements \Iterator
         }
     }
 
-    public function &whereSql($statement,string|array|null $vars=null)
+    public function &whereSql($statement, mixed $vars=null)
     {
         $this->_query['whereSql'] = array('statement'=>$statement,'vars'=>$vars);
 
@@ -1431,7 +1431,7 @@ class Query implements \Iterator
 
     protected $_ttl;
 
-    public function ttl(int|string|null $seconds=null)
+    public function ttl(mixed $seconds=null)
     {
         if($seconds!==null)
 		{

@@ -6,7 +6,7 @@ class Timestamp implements \JsonSerializable
 {
 	protected $_value;
 
-	public function __construct(\Cassandra\Timestamp|string|int|float|null $time = null)
+	public function __construct(mixed $time = null)
 	{
 		if(is_numeric($time) && strlen($time) <= 10)
 			$this->_value = new \Cassandra\Timestamp((int)$time);

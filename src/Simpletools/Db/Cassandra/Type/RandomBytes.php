@@ -13,7 +13,7 @@ class RandomBytes
         $this->_olength = self::$_length;
     }
 
-    public function entropy(string|int|null $entropy=null)
+    public function entropy(mixed $entropy=null)
     {
         if(!$entropy) return $this->_olength;
         else $this->_olength = (int) $entropy;

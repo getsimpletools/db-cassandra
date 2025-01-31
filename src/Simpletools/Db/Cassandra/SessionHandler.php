@@ -41,7 +41,7 @@ class SessionHandler implements \SessionHandlerInterface, \SessionIdInterface
 			throw new Exception('maxLifeTime can\'t be smaller than 1 due to TimeWindowCompactionStrategy');
 	}
 
-	public function maxLifeTime(int|null $seconds=null)
+	public function maxLifeTime(mixed $seconds=null)
 	{
 		if(!$seconds)
 			return self::$_maxLifeTime;
@@ -117,7 +117,7 @@ class SessionHandler implements \SessionHandlerInterface, \SessionIdInterface
 
 	}
 
-	public static function logFile(string|null $path=null)
+	public static function logFile(mixed $path=null)
     {
         if($path===null) return self::$_logFile;
         elseif($path===false) {

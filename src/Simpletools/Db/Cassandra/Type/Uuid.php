@@ -6,7 +6,7 @@ class Uuid implements \JsonSerializable
 {
     protected $_value;
 
-    public function __construct(\Cassandra\Uuid|string|null $uuid=null)
+    public function __construct(mixed $uuid=null)
     {
 			if($uuid !== null && !is_string($uuid) && $uuid instanceof \Cassandra\Uuid)
 				throw new \Exception("Uuid: value is not a string or null");

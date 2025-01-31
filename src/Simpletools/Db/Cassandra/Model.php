@@ -8,7 +8,7 @@ class Model extends Client
     protected $___cluster;
     protected $___keyspace;
 
-    public function __construct(string|null $cluster=null)
+    public function __construct(mixed $cluster=null)
     {
         $this->___cluster 	= defined('static::CLUSTER') ? static::CLUSTER : $cluster;
 
@@ -42,7 +42,7 @@ class Model extends Client
         return $query;
     }
 
-		public function doc($id =null)
+		public function doc(mixed $id =null)
 		{
 			return new Doc($id);
 		}

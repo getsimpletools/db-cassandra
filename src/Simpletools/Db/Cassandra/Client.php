@@ -17,7 +17,7 @@ class Client
         protected $___connection;
 
 
-    public function __construct(string|null $cluster=null)
+    public function __construct(mixed $cluster=null)
     {
         if($cluster)
             $this->___cluster = $cluster;
@@ -89,7 +89,7 @@ class Client
         return @self::$_pluginSettings[$cluster][$settingName];
     }
 
-    public function keyspace(string|null $keyspace=null)
+    public function keyspace(mixed $keyspace=null)
     {
         if($keyspace)
         {
@@ -235,7 +235,7 @@ class Client
         return $this;
     }
 
-    public function execute(array|string|null $input=null,array|string|null $thisQueryOptions=null)
+    public function execute(mixed $input=null, mixed $thisQueryOptions=null)
     {
         $this->connect();
 

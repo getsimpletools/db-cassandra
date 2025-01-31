@@ -1,3 +1,7 @@
+### 1.0.16 (2025-01-31)
+1. **PHP 8.4 Compatibility Changes**
+   1. Amended all files impacted by `1.0.9` to amend explicit types to `mixed` to prevent type casting in constructors
+
 ### 1.0.15 (2025-01-23)
 1. **Added Cassandra Types to Constructors**
     ***Simpletools/Db/Cassandra/Async***

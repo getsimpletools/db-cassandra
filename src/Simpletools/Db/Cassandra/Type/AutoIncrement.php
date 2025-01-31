@@ -49,7 +49,7 @@ class AutoIncrement
         return $this->_finishTime-$this->_startTime;
     }
 
-    public function await(int|float|null $time=null)
+    public function await(mixed $time=null)
     {
         if($time===null) return $this->_waitLockAcquisition;
 
