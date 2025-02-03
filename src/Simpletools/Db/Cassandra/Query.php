@@ -49,6 +49,7 @@ class Query implements \Iterator
 		protected $_cql = null;
 		protected $_cqlParams = [];
 		protected $_bubble;
+    protected $_meta;
 
     public function __construct($table,$keyspace=null, $client = null)
     {
@@ -544,14 +545,14 @@ class Query implements \Iterator
 
         if(@$rawQuery['type'] == 'INSERT')
 				{
-					Replicator::trigger('cassandra://write@'.$rawQuery['db'].'.'.$rawQuery['table'],(object)$rawQuery['data']);
+					Replicator::trigger('cassandra://write@'.$rawQuery['db'].'.'.$rawQuery['table'],(object)$rawQuery['data'], $this->_meta);
 				}
         elseif (@$rawQuery['type'] == 'UPDATE')
 				{
 					$whereKeys = $this->getWhereKeys($rawQuery['where']);
 					if($this->isSingleRowQuery($whereKeys))
 					{
-						Replicator::trigger('cassandra://update@'.$rawQuery['db'].'.'.$rawQuery['table'],(object)array_merge($rawQuery['data'], $whereKeys));
+						Replicator::trigger('cassandra://update@'.$rawQuery['db'].'.'.$rawQuery['table'],(object)array_merge($rawQuery['data'], $whereKeys), $this->_meta);
 					}
 				}
 				elseif (@$rawQuery['type'] == 'DELETE FROM')
@@ -559,7 +560,7 @@ class Query implements \Iterator
 					$whereKeys = $this->getWhereKeys($rawQuery['where']);
 					if($this->isSingleRowQuery($whereKeys))
 					{
-						Replicator::trigger('cassandra://delete@'.$rawQuery['db'].'.'.$rawQuery['table'],(object)$whereKeys);
+						Replicator::trigger('cassandra://delete@'.$rawQuery['db'].'.'.$rawQuery['table'],(object)$whereKeys,$this->_meta);
 					}
 				}
 
@@ -1712,5 +1713,16 @@ class Query implements \Iterator
 	{
 		return $this->_bubble ? true : false;
 	}
+
+  public function setMeta($meta)
+  {
+        $this->_meta = $meta;
+        return $this;
+  }
+
+  public function getMeta()
+  {
+        return $this->_meta;
+  }
 
 }

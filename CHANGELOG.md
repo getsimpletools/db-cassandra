@@ -1,3 +1,9 @@
+### 0.8.14 (2025-02-03)
+1. **Simpletools\Db\Cassandra\Query**
+   1. Added `setMeta()` and `getMeta()` to exchange additional data with replicators
+2. **Simpletools\Db\Cassandra\Doc**
+   1. Added `setMeta()` and `getMeta()` to exchange additional data with replicators
+
 ### 0.8.13 (2024-06-21)
 1. **Simpletools\Db\Cassandra\AutoIncrement**
    1. Changed `CONSISTENCY_LOCAL_SERIAL` to  `CONSISTENCY_LOCAL_QUORUM`

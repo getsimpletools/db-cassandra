@@ -66,6 +66,7 @@ class Doc
     protected $_bubble = false;
 
 	protected $_client = null;
+  protected $_meta = null;
 
 
 //	protected $_diff = [
@@ -193,6 +194,7 @@ class Doc
 		if($this->_ifExists) 			$this->_query->ifExists();
 		if($this->_ifNotExists) 	$this->_query->ifNotExists();
 		if($this->_bubble)				$this->_query->bubble();
+    if(isset($this->_meta))		$this->_query->setMeta($this->_meta);
 
 		return $this->_query;
 	}
@@ -235,6 +237,7 @@ class Doc
 		if($this->_ifExists) 			$this->_query->ifExists();
 		if($this->_ifNotExists) 	$this->_query->ifNotExists();
 		if($this->_bubble)				$this->_query->bubble();
+    if(isset($this->_meta))		$this->_query->setMeta($this->_meta);
 
 		return $this->_query;
 	}
@@ -455,6 +458,7 @@ class Doc
 		if($this->_ifExists) 			$this->_query->ifExists();
 		if($this->_ifNotExists) 	$this->_query->ifNotExists();
 		if($this->_bubble)				$this->_query->bubble();
+    if(isset($this->_meta))		$this->_query->setMeta($this->_meta);
 
 		return $this->_query;
 	}
@@ -501,5 +505,19 @@ class Doc
 		$this->_ifExists = true;
 		return $this;
 	}
+
+  public function setMeta($meta)
+  {
+    $this->_meta = $meta;
+    return $this;
+  }
+
+  public function getMeta()
+  {
+    if($this->_query)
+      return $this->_query->getMeta();
+    else
+      return $this->_meta;
+  }
 
 }
