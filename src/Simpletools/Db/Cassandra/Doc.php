@@ -468,6 +468,7 @@ class Doc
 		$this->getRemoveQuery();
 		$this->_query->run();
 		$this->body(array());
+    return $this;
 	}
 
 

@@ -1,3 +1,7 @@
+### 0.8.15 (2025-02-03)
+1. **Simpletools\Db\Cassandra\Doc**
+   1. return $this in `remove()`method
+
 ### 0.8.14 (2025-02-03)
 1. **Simpletools\Db\Cassandra\Query**
    1. Added `setMeta()` and `getMeta()` to exchange additional data with replicators
