@@ -1,3 +1,17 @@
+### 1.0.17 (2025-01-31)
+1. **Merged PHP7 Branch changes into Master**
+
+
+### 0.8.15 (2025-02-03)
+1. **Simpletools\Db\Cassandra\Doc**
+    1. return $this in `remove()`method
+
+### 0.8.14 (2025-02-03)
+1. **Simpletools\Db\Cassandra\Query**
+    1. Added `setMeta()` and `getMeta()` to exchange additional data with replicators
+2. **Simpletools\Db\Cassandra\Doc**
+    1. Added `setMeta()` and `getMeta()` to exchange additional data with replicators
+
 ### 1.0.16 (2025-01-31)
 1. **PHP 8.4 Compatibility Changes**
    1. Amended all files impacted by `1.0.9` to amend explicit types to `mixed` to prevent type casting in constructors
@@ -12,7 +26,6 @@
     ***Simpletools/Db/Cassandra/SessionHandler***
         1. Amended instances of consistency being assigned by array with `intval($settings['consistency'])`
         2. Amended function to assign consistency to accept `int|null` instead of `string|null`
-
 
 ### 1.0.14 (2025-01-23)
 1. **Added Cassandra Types to Constructors**
@@ -100,6 +113,18 @@
     19. ***Simpletools\Db\Cassandra\TempTable***
         1. Amended `expires()` function to allow nullable string parameter `$intervalIso8601`
         2. Amended `expire()` function to allow nullable string parameter `$intervalIso8601`
+
+### 0.8.13 (2024-06-21)
+1. **Simpletools\Db\Cassandra\AutoIncrement**
+    1. Changed `CONSISTENCY_LOCAL_SERIAL` to  `CONSISTENCY_LOCAL_QUORUM`
+
+### 0.8.12 (2024-06-21)
+1. **Simpletools\Db\Cassandra\AutoIncrement**
+    1. Fixed update query for `CONSISTENCY_LOCAL_QUORUM`
+
+### 0.8.11 (2024-06-21)
+1. **Simpletools\Db\Cassandra\AutoIncrement**
+    1. Changed `CONSISTENCY_ALL` to `CONSISTENCY_LOCAL_SERIAL` to better handle multiple datacenters.
 
 ### 1.0.8 (2024-06-19)
 1. **Simpletools\Db\Cassandra\Client**

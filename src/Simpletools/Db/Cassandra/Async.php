@@ -78,7 +78,7 @@ class Async
 
     $options = ['arguments' => $query['arguments']];
     if($consistency!==null)
-      $options['consistency'] = intval($consistency);
+      $options['consistency'] = $consistency;
 
     $this->_queries[$streamId] = $this->_client->connector()->executeAsync($query['preparedQuery'],$options);
     if($this->_retryPolicy =='reconnect')
@@ -100,7 +100,7 @@ class Async
             $consistency = $query->consistency();
 			if($consistency!==null)
             {
-                $options['consistency'] = intval($consistency);
+                $options['consistency'] = $consistency;
             }
 
 			$rawQuery = $query->getBatch();
@@ -166,7 +166,7 @@ class Async
 
 			$options = ['arguments' => $query['arguments']];
 			if($consistency!==null)
-                $options['consistency'] = intval($consistency);
+                $options['consistency'] = $consistency;
 
 			$this->_queries[$streamId] = $this->_client->connector()->executeAsync($query['preparedQuery'],$options);
 			if($this->_retryPolicy =='reconnect')
@@ -180,7 +180,7 @@ class Async
 
             $options = ['arguments' => $query['arguments']];
             if($consistency!==null)
-                $options['consistency'] = intval($consistency);
+                $options['consistency'] = $consistency;
 
 			$this->_queries[$streamId] = $this->_client->connector()->executeAsync($query['preparedQuery'],$options);
 			if($this->_retryPolicy =='reconnect')

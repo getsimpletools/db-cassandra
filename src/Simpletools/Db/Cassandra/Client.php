@@ -139,7 +139,7 @@ class Client
           $cluster->withRoundRobinLoadBalancingPolicy();
 
         if(isset($settings['consistency']))
-            $cluster->withDefaultConsistency(intval($settings['consistency']));
+            $cluster->withDefaultConsistency($settings['consistency']);
 
         if(isset($settings['pageSize']))
             $cluster->withDefaultPageSize($settings['pageSize']);
@@ -156,24 +156,20 @@ class Client
         if(@$settings['username'] && @$settings['password'])
             $cluster->withCredentials($settings['username'], $settings['password']);
 
-		if(isset($settings['ioThreads']))
-			$cluster->withIOThreads($settings['ioThreads']);
+				if(isset($settings['ioThreads']))
+					$cluster->withIOThreads($settings['ioThreads']);
 
-		if(isset($settings['retryPolicy']))
-		{
-			if($settings['retryPolicy'] == 'DefaultPolicy')
-                $policy = new \Cassandra\RetryPolicy\DefaultPolicy();
-			elseif($settings['retryPolicy'] == 'DowngradingConsistency')
-				$policy = new \Cassandra\RetryPolicy\DowngradingConsistency();
-			elseif($settings['retryPolicy'] == 'Fallthrough')
-				$policy = new \Cassandra\RetryPolicy\Fallthrough();
-			elseif($settings['retryPolicy'] == 'Logging' && isset($settings['retryPolicyLogging']))
-				$policy = new \Cassandra\RetryPolicy\Logging($settings['retryPolicyLogging']);
-            else
-                $policy = new \Cassandra\RetryPolicy\DefaultPolicy();
-
-            $cluster->withRetryPolicy($policy);
-		}
+				if(isset($settings['retryPolicy']))
+				{
+					if($settings['retryPolicy'] == 'DefaultPolicy')
+						$cluster->withRetryPolicy(new \Cassandra\RetryPolicy\DefaultPolicy());
+					elseif($settings['retryPolicy'] == 'DowngradingConsistency')
+						$cluster->withRetryPolicy(new \Cassandra\RetryPolicy\DowngradingConsistency());
+					elseif($settings['retryPolicy'] == 'Fallthrough')
+						$cluster->withRetryPolicy(new \Cassandra\RetryPolicy\Fallthrough());
+					elseif($settings['retryPolicy'] == 'Logging' && isset($settings['retryPolicyLogging']))
+						$cluster->withRetryPolicy(new \Cassandra\RetryPolicy\Logging($settings['retryPolicyLogging']));
+				}
 
         if(isset($settings['routing']))
         {

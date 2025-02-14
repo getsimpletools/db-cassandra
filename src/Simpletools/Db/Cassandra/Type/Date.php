@@ -13,7 +13,7 @@ class Date implements \JsonSerializable
 				$this->_value = new \Cassandra\Date((int)$time);
 			elseif (is_string($time) && ($time = strtotime($time)))
 				$this->_value = new \Cassandra\Date($time);
-			elseif ($time===null||false)
+			elseif ($time===null || $time===false)
 				$this->_value = new \Cassandra\Date();
 			elseif ($time instanceof \Cassandra\Date)
 				$this->_value = $time;
