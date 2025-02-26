@@ -1,4 +1,4 @@
-### 1.0.19 (2025-02-26)
+### 1.0.20 (2025-02-26)
 1. **Simpletools\Db\Cassandra\Query**
     **Simpletools\Db\Cassandra\Result**
     1: Deprication - base64_decode(): Passing null to parameter #1 ($string) of type string is deprecated. Pass empty string if null.
