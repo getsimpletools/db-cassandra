@@ -1699,7 +1699,7 @@ class Query implements \Iterator
 
 	public function setScrollId($scrollId)
 	{
-		$this->___options['paging_state_token'] = base64_decode($scrollId);
+		$this->___options['paging_state_token'] = base64_decode(($scrollId??''));
 		return $this;
 	}
 
