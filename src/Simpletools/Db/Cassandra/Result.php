@@ -422,6 +422,9 @@ class Result implements \Iterator
 
 	public function getScrollId()
 	{
-		return base64_encode($this->_result->pagingStateToken());
+        if(!is_null($this->_result->pagingStateToken()))
+    		return base64_encode($this->_result->pagingStateToken());
+        else
+            return '';
 	}
 }
