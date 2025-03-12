@@ -196,6 +196,38 @@
     * next() : void
     * valid() : bool
 
+### 0.8.15 (2025-02-03)
+1. **Simpletools\Db\Cassandra\Doc**
+   1. return $this in `remove()`method
+
+### 0.8.14 (2025-02-03)
+1. **Simpletools\Db\Cassandra\Query**
+   1. Added `setMeta()` and `getMeta()` to exchange additional data with replicators
+2. **Simpletools\Db\Cassandra\Doc**
+   1. Added `setMeta()` and `getMeta()` to exchange additional data with replicators
+
+### 0.8.13 (2024-06-21)
+1. **Simpletools\Db\Cassandra\AutoIncrement**
+   1. Changed `CONSISTENCY_LOCAL_SERIAL` to  `CONSISTENCY_LOCAL_QUORUM`
+
+### 0.8.12 (2024-06-21)
+1. **Simpletools\Db\Cassandra\AutoIncrement**
+   1. Fixed update query for `CONSISTENCY_LOCAL_QUORUM` 
+
+### 0.8.11 (2024-06-21)
+1. **Simpletools\Db\Cassandra\AutoIncrement**
+   1. Changed `CONSISTENCY_ALL` to `CONSISTENCY_LOCAL_SERIAL` to better handle multiple datacenters. 
+
+### 0.8.10 (2024-06-19)
+1. **Simpletools\Db\Cassandra\Client**
+   1. Added `datacenter` setting to support `->withDatacenterAwareRoundRobinLoadBalancingPolicy()`
+
+### 0.8.9 (2023-02-08)
+1. **Simpletools\Db\Cassandra\Async**
+   1. Added `->get()` and `->collect()` for async reading
+2. **Simpletools\Db\Cassandra\Query**
+   1. Added `getResultFromRawResponse()` to get formatted Result object
+
 ### 0.8.8 (2022-10-13)
 1. **Simpletools\Db\Cassandra\Batch**
    1. Fixed replicator bug on bubble
