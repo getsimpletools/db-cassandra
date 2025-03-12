@@ -1,3 +1,8 @@
+### 1.0.21 (2025-03-12)
+1. Merged php7 branch changes.
+2. **Simpletools\Db\Cassandra\Query**
+   1. Revised `@$operand[1]` instances to return empty string if not set 
+
 ### 1.0.20 (2025-02-26)
 1. **Simpletools\Db\Cassandra\Query**
     **Simpletools\Db\Cassandra\Result**

@@ -1110,16 +1110,16 @@ class Query implements \Iterator
 										}
                 		else if(is_array($operands) && $operands[0] instanceof Lucene)
 										{
-											$query[] = @$operands[-1]." expr(".$operands[0]->indexName.", '".$operands[0]->statement."')";
+											$query[] = ($operands[-1] ?? '') . " expr(".$operands[0]->indexName.", '".$operands[0]->statement."')";
 										}
                     elseif(!isset($operands[2]))
                     {
                         if($operands[1]===null) {
-                            $query[] = @$operands[-1] . ' ' . $this->escapeKey($operands[0]) . " IS NULL";
+                            $query[] = ($operands[-1] ?? '') . ' ' . $this->escapeKey($operands[0]) . " IS NULL";
                         }
                         else{
-                            //$query[] = @$operands[-1] . ' ' . $this->escapeKey($operands[0]) . " = " . $this->_escape($operands[1]);
-                            $query[]    = @$operands[-1] . ' ' . $this->escapeKey($operands[0]) . " = ?";
+                            //$query[] =($operands[-1] ?? '') . ' ' . $this->escapeKey($operands[0]) . " = " . $this->_escape($operands[1]);
+                            $query[]    = ($operands[-1] ?? '') . ' ' . $this->escapeKey($operands[0]) . " = ?";
                             $args[]     = $this->toSchemaType(@$operands[0],$operands[1]);
                         }
 
@@ -1146,17 +1146,17 @@ class Query implements \Iterator
                                 $args[] = $this->toSchemaType($operands[0], $operands[2]);
                             }
 
-                            $query[] = @$operands[-1].' '.$this->escapeKey($operands[0])." ".$operands[1]." (".implode(",",$operands_).' )';
+                            $query[] = ($operands[-1] ?? '').' '.$this->escapeKey($operands[0])." ".$operands[1]." (".implode(",",$operands_).' )';
                         }
                         else
                         {
                             if($operands[2]===null) {
-                                $query[] = @$operands[-1] . ' ' . $this->escapeKey($operands[0]) . " " . $operands[1] . " NULL";
+                                $query[] = ($operands[-1] ?? '') . ' ' . $this->escapeKey($operands[0]) . " " . $operands[1] . " NULL";
                             }
                             else
                             {
-                                //$query[] = @$operands[-1] . ' ' . $this->escapeKey($operands[0]) . " " . $operands[1] . " " . $this->_escape($operands[2]);
-                                $query[] = @$operands[-1] . ' ' . $this->escapeKey($operands[0]) . " " . $operands[1] . " ?";
+                                //$query[] = ($operands[-1] ?? '') . ' ' . $this->escapeKey($operands[0]) . " " . $operands[1] . " " . $this->_escape($operands[2]);
+                                $query[] = ($operands[-1] ?? '') . ' ' . $this->escapeKey($operands[0]) . " " . $operands[1] . " ?";
                                 $args[] = $this->toSchemaType($operands[0],$operands[2]);
                             }
 
@@ -1254,11 +1254,11 @@ class Query implements \Iterator
 							if(!isset($operands[2]))
 							{
 								if($operands[1]===null) {
-									$query[] = @$operands[-1] . ' ' . $this->escapeKey($operands[0]) . " = NULL";
+									$query[] = ($operands[-1] ?? '') . ' ' . $this->escapeKey($operands[0]) . " = NULL";
 								}
 								else{
-									//$query[] = @$operands[-1] . ' ' . $this->escapeKey($operands[0]) . " = " . $this->_escape($operands[1]);
-									$query[]    = @$operands[-1] . ' ' . $this->escapeKey($operands[0]) . " = ?";
+									//$query[] = ($operands[-1] ?? '') . ' ' . $this->escapeKey($operands[0]) . " = " . $this->_escape($operands[1]);
+									$query[]    = ($operands[-1] ?? '') . ' ' . $this->escapeKey($operands[0]) . " = ?";
 									$args[]     = $this->toSchemaType(@$operands[0],$operands[1]);
 								}
 							}
@@ -1284,17 +1284,17 @@ class Query implements \Iterator
 										$args[] = $this->toSchemaType($operands[0], $operands[2]);
 									}
 
-									$query[] = @$operands[-1].' '.$this->escapeKey($operands[0])." ".$operands[1]." (".implode(",",$operands_).' )';
+									$query[] = ($operands[-1] ?? '').' '.$this->escapeKey($operands[0])." ".$operands[1]." (".implode(",",$operands_).' )';
 								}
 								else
 								{
 									if($operands[2]===null) {
-										$query[] = @$operands[-1] . ' ' . $this->escapeKey($operands[0]) . " " . $operands[1] . " NULL";
+										$query[] = ($operands[-1] ?? '') . ' ' . $this->escapeKey($operands[0]) . " " . $operands[1] . " NULL";
 									}
 									else
 									{
-										//$query[] = @$operands[-1] . ' ' . $this->escapeKey($operands[0]) . " " . $operands[1] . " " . $this->_escape($operands[2]);
-										$query[] = @$operands[-1] . ' ' . $this->escapeKey($operands[0]) . " " . $operands[1] . " ?";
+										//$query[] = ($operands[-1] ?? '') . ' ' . $this->escapeKey($operands[0]) . " " . $operands[1] . " " . $this->_escape($operands[2]);
+										$query[] = ($operands[-1] ?? '') . ' ' . $this->escapeKey($operands[0]) . " " . $operands[1] . " ?";
 										$args[] = $this->toSchemaType($operands[0],$operands[2]);
 									}
 
