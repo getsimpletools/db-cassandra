@@ -1,3 +1,7 @@
+### 1.0.22 (2025-03-13)
+1. **Simpletools\Db\Cassandra\Client**
+    1. Ensure pluginSetting is set before attempting to read.
+
 ### 1.0.21 (2025-03-12)
 1. Merged php7 branch changes.
 2. **Simpletools\Db\Cassandra\Query**

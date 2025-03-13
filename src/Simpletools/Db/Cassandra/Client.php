@@ -86,7 +86,11 @@ class Client
 
     public static function getPluginSetting($settingName,$cluster='default')
     {
-        return @self::$_pluginSettings[$cluster][$settingName];
+        if(!isset(self::$_pluginSettings[$cluster][$settingName]) || !self::$_pluginSettings[$cluster][$settingName])
+            self::setPluginSetting($settingName, '');
+
+
+        return self::$_pluginSettings[$cluster][$settingName];
     }
 
     public function keyspace(mixed $keyspace=null)
