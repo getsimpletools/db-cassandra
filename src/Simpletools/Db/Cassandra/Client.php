@@ -46,7 +46,7 @@ class Client
         $cluster                = (isset($settings['name']) ? $settings['name'] : $cluster);
         $default                = (isset($settings['default']) ? (bool) $settings['default'] : false);
 
-        $settings['host']       = isset($settings['host']) ? $settings['host'] : @$settings['hosts'];
+        $settings['host']       = $settings['host'] ?? ($settings['hosts'] ?? null);
         $settings['port']       = isset($settings['port']) ? (int) $settings['port'] : 9042;
 
         $settings['keyspace']   = isset($settings['keyspace']) ? $settings['keyspace'] : null;
@@ -157,7 +157,8 @@ class Client
 				if(isset($settings['requestTimeout']))
 					$cluster->withRequestTimeout($settings['requestTimeout']);
 
-        if(@$settings['username'] && @$settings['password'])
+        if(isset($settings['username']) && $settings['username']
+            && isset($settings['password']) && $settings['password'])
             $cluster->withCredentials($settings['username'], $settings['password']);
 
 				if(isset($settings['ioThreads']))
@@ -203,7 +204,7 @@ class Client
         }
 
 
-        if(@$settings['persistentSessions'])
+        if($settings['persistentSessions'] ?? null)
             $cluster->withPersistentSessions((bool) $settings['persistentSessions']);
 
 

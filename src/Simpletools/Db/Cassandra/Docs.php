@@ -172,7 +172,7 @@ class Docs implements \Iterator
 	function next()
 	{
 		$this->_currentIndex++;
-		return @$this->_docs[$this->_currentIndex];
+		return $this->_docs[$this->_currentIndex] ?? null;
 	}
 
 	function valid()

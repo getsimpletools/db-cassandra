@@ -29,9 +29,9 @@ class AutoIncrement
     public static function settings($settings)
     {
         self::$_settings = [
-            'cluster'   => @$settings['cluster'],
-            'keyspace'  => @$settings['keyspace'],
-            'table'     => @$settings['table']
+            'cluster'   => ($settings['cluster'] ?? null),
+            'keyspace'  => ($settings['keyspace'] ?? null),
+            'table'     => ($settings['table'] ?? null)
         ];
     }
 

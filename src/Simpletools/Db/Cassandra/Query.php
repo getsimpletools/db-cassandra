@@ -485,7 +485,7 @@ class Query implements \Iterator
             foreach ($this->_query['data'] as $key => $val)
             {
             		if(is_object($val) && !($val instanceof \stdClass)
-									&& (@$this->_schema[$key] && (substr($this->_schema[$key],0,3)== 'map' || substr($this->_schema[$key],0,3)== 'set' )))
+									&& (($this->_schema[$key] ?? null) && (substr($this->_schema[$key],0,3)== 'map' || substr($this->_schema[$key],0,3)== 'set' )))
 								{
 									$val = json_decode(json_encode($val));
 								}
@@ -543,11 +543,11 @@ class Query implements \Iterator
                 ->prepare($query['preparedQuery'])
                 ->execute($query['arguments']);
 
-        if(@$rawQuery['type'] == 'INSERT')
+        if(isset($rawQuery['type']) && $rawQuery['type'] == 'INSERT')
 				{
 					Replicator::trigger('cassandra://write@'.$rawQuery['db'].'.'.$rawQuery['table'],(object)$rawQuery['data'], $this->_meta);
 				}
-        elseif (@$rawQuery['type'] == 'UPDATE')
+        elseif (isset($rawQuery['type']) && $rawQuery['type'] == 'UPDATE')
 				{
 					$whereKeys = $this->getWhereKeys($rawQuery['where']);
 					if($this->isSingleRowQuery($whereKeys))
@@ -555,7 +555,7 @@ class Query implements \Iterator
 						Replicator::trigger('cassandra://update@'.$rawQuery['db'].'.'.$rawQuery['table'],(object)array_merge($rawQuery['data'], $whereKeys), $this->_meta);
 					}
 				}
-				elseif (@$rawQuery['type'] == 'DELETE FROM')
+				elseif (isset($rawQuery['type']) && $rawQuery['type'] == 'DELETE FROM')
 				{
 					$whereKeys = $this->getWhereKeys($rawQuery['where']);
 					if($this->isSingleRowQuery($whereKeys))
@@ -568,7 +568,7 @@ class Query implements \Iterator
 				$this->_result->setSchema($this->_schema);
 				$this->_result->mapColumns($this->_columnsMap);
 
-				if(@$this->_autoScroll)
+				if($this->_autoScroll ?? null)
 				{
 					$this->_result->autoScroll();
 				}
@@ -584,7 +584,7 @@ class Query implements \Iterator
       $result->setSchema($this->_schema);
       $result->mapColumns($this->_columnsMap);
 
-      if(@$this->_autoScroll)
+      if($this->_autoScroll ?? null)
       {
         $result->autoScroll();
       }
@@ -601,11 +601,11 @@ class Query implements \Iterator
     	if(!$rawQuery)
     		$rawQuery = $this->_query;
 
-    	if(@$rawQuery['type'] == 'INSERT')
+    	if(isset($rawQuery['type']) && $rawQuery['type'] == 'INSERT')
 		{
 			return $rawQuery['data'];
 		}
-		elseif (@$rawQuery['type'] == 'UPDATE')
+		elseif (isset($rawQuery['type']) && $rawQuery['type'] == 'UPDATE')
 		{
 			$whereKeys = $this->getWhereKeys($rawQuery['where']);
 			if($this->isSingleRowQuery($whereKeys))
@@ -613,7 +613,7 @@ class Query implements \Iterator
 				return array_merge($rawQuery['data'], $whereKeys);
 			}
 		}
-		elseif (@$rawQuery['type'] == 'DELETE FROM')
+		elseif (isset($rawQuery['type']) && $rawQuery['type'] == 'DELETE FROM')
 		{
 			$whereKeys = $this->getWhereKeys($rawQuery['where']);
 			if($this->isSingleRowQuery($whereKeys))
@@ -1120,7 +1120,7 @@ class Query implements \Iterator
                         else{
                             //$query[] =($operands[-1] ?? '') . ' ' . $this->escapeKey($operands[0]) . " = " . $this->_escape($operands[1]);
                             $query[]    = ($operands[-1] ?? '') . ' ' . $this->escapeKey($operands[0]) . " = ?";
-                            $args[]     = $this->toSchemaType(@$operands[0],$operands[1]);
+                            $args[]     = $this->toSchemaType(($operands[0] ?? null),$operands[1]);
                         }
 
                     }
@@ -1259,7 +1259,7 @@ class Query implements \Iterator
 								else{
 									//$query[] = ($operands[-1] ?? '') . ' ' . $this->escapeKey($operands[0]) . " = " . $this->_escape($operands[1]);
 									$query[]    = ($operands[-1] ?? '') . ' ' . $this->escapeKey($operands[0]) . " = ?";
-									$args[]     = $this->toSchemaType(@$operands[0],$operands[1]);
+									$args[]     = $this->toSchemaType(($operands[0] ?? null),$operands[1]);
 								}
 							}
 							else

@@ -153,18 +153,18 @@ class Batch
 
 						if($this->_replication)
 						{
-							if(@$rawQuery['type'] == 'INSERT')
+							if(isset($rawQuery['type']) && $rawQuery['type'] == 'INSERT')
 							{
 								$this->_replicationQuery->insert[] = $query->getRawQueryData($rawQuery);
 							}
-							elseif (@$rawQuery['type'] == 'UPDATE')
+							elseif (isset($rawQuery['type']) && $rawQuery['type'] == 'UPDATE')
 							{
 								if($data = $query->getRawQueryData($rawQuery))
 								{
 									$this->_replicationQuery->update[] = $data;
 								}
 							}
-							elseif (@$rawQuery['type'] == 'DELETE FROM')
+							elseif (isset($rawQuery['type']) && $rawQuery['type'] == 'DELETE FROM')
 							{
 								if($data = $query->getRawQueryData($rawQuery))
 								{
@@ -186,16 +186,16 @@ class Batch
 					{
 						$rawQuery = $query->getRawQuery();
 
-						if(@$rawQuery['type'] == 'INSERT')
+						if(isset($rawQuery['type']) && $rawQuery['type'] == 'INSERT')
 						{
 							$this->_bubbles[$rawQuery['db'].'.'.$rawQuery['table']]['bulk']['insert'][] = $query->getRawQueryData($rawQuery);
 						}
-						elseif (@$rawQuery['type'] == 'UPDATE')
+						elseif (isset($rawQuery['type']) && $rawQuery['type'] == 'UPDATE')
 						{
 							if($data = $query->getRawQueryData($rawQuery))
 								$this->_bubbles[$rawQuery['db'].'.'.$rawQuery['table']]['bulk']['update'][] = $data;
 						}
-						elseif (@$rawQuery['type'] == 'DELETE FROM')
+						elseif (isset($rawQuery['type']) && $rawQuery['type'] == 'DELETE FROM')
 						{
 							if($data = $query->getRawQueryData($rawQuery))
 								$this->_bubbles[$rawQuery['db'].'.'.$rawQuery['table']]['bulk']['delete'][] = $data;
@@ -216,16 +216,16 @@ class Batch
 						if($query->isBubble())
 						{
 							$rawQuery = $query->getRawQuery();
-							if(@$rawQuery['type'] == 'INSERT')
+							if(isset($rawQuery['type']) && $rawQuery['type'] == 'INSERT')
 							{
 								$this->_bubbles[$rawQuery['db'].'.'.$rawQuery['table']]['write'][] = $query->getRawQueryData($rawQuery);
 							}
-							elseif (@$rawQuery['type'] == 'UPDATE')
+							elseif (isset($rawQuery['type']) && $rawQuery['type'] == 'UPDATE')
 							{
 								if($data = $query->getRawQueryData($rawQuery))
 									$this->_bubbles[$rawQuery['db'].'.'.$rawQuery['table']]['update'][] = $data;
 							}
-							elseif (@$rawQuery['type'] == 'DELETE FROM')
+							elseif (isset($rawQuery['type']) && $rawQuery['type'] == 'DELETE FROM')
 							{
 								if($data = $query->getRawQueryData($rawQuery))
 									$this->_bubbles[$rawQuery['db'].'.'.$rawQuery['table']]['delete'][] = $data;

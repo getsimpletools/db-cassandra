@@ -18,7 +18,7 @@ class Schema
 	{
 		$this->_definition = json_decode(json_encode($definition));
 
-		if(!@$this->_definition->keyspace)
+		if(!isset($this->_definition->keyspace) || !$this->_definition->keyspace)
 			$this->_definition->keyspace = (new Client())->keyspace();
 
 		return $this;
@@ -99,7 +99,7 @@ class Schema
 		$tableName = $this->_tableName;
 
 
-		if(!@$this->_definition->keyspace)
+		if(!isset($this->_definition->keyspace) || !$this->_definition->keyspace)
 			$this->_definition->keyspace = (new Client())->keyspace();
 
 		$settings = $this->_definition;

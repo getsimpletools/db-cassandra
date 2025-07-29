@@ -85,10 +85,10 @@ class SessionHandler implements \SessionHandlerInterface, \SessionIdInterface
 		$batch = (new Batch())
 			->client(new Client(self::$_settings['cluster']));
 
-		if(@self::$_settings['consistency'])
+		if(isset(self::$_settings['consistency']) && self::$_settings['consistency'])
 			$batch->consistency(self::$_settings['consistency']);
 
-		if(@self::$_settings['writeConsistency'])
+		if(isset(self::$_settings['writeConsistency']) && self::$_settings['writeConsistency'])
 			$batch->consistency(self::$_settings['writeConsistency']);
 
 		//session_unset();
@@ -131,14 +131,14 @@ class SessionHandler implements \SessionHandlerInterface, \SessionIdInterface
 	public static function settings($settings)
 	{
 		self::$_settings = [
-			'cluster'           => @$settings['cluster'],
-			'keyspace'          => @$settings['keyspace'],
-			'table'             => @$settings['table'],
-			'consistency'       => @$settings['consistency'],
-			'maxLifeTime'       => @$settings['maxLifeTime'],
+			'cluster'           => ($settings['cluster'] ?? null),
+			'keyspace'          => ($settings['keyspace'] ?? null),
+			'table'             => ($settings['table'] ?? null),
+			'consistency'       => ($settings['consistency'] ?? null),
+			'maxLifeTime'       => ($settings['maxLifeTime'] ?? null),
 
-			'readConsistency'   => @$settings['readConsistency'],
-			'writeConsistency'  => @$settings['writeConsistency'],
+			'readConsistency'   => ($settings['readConsistency'] ?? null),
+			'writeConsistency'  => ($settings['writeConsistency'] ?? null),
 		];
 
 		if(isset($settings['logFile']))
@@ -234,7 +234,7 @@ class SessionHandler implements \SessionHandlerInterface, \SessionIdInterface
             $q = (new Query(self::$_settings['table'], self::$_settings['keyspace']))
                 ->client(new Client(self::$_settings['cluster']));
 
-            if (@self::$_settings['consistency']) {
+            if (isset(self::$_settings['consistency']) && self::$_settings['consistency']) {
                 $q->options([
                     'consistency' => intval(self::$_settings['consistency'])
                 ]);
