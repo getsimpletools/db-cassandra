@@ -1,3 +1,18 @@
+### 1.0.23 (2025-07-29)
+   ***Simpletools/Db/Cassandra/Batch***
+   ***Simpletools/Db/Cassandra/Client***
+   ***Simpletools/Db/Cassandra/Doc***
+   ***Simpletools/Db/Cassandra/Query***
+   ***Simpletools/Db/Cassandra/Schema***
+   ***Simpletools/Db/Cassandra/SessionHandler***
+   ***Simpletools/Db/Cassandra/Type/AutoIncrement***
+    1. Cleared warnings from accessing error suppressed array keys e.g:
+        ```php
+            Undefined array key "type" on $rawQuery['type']
+            becomes:
+            isset($rawQuery['type']) && $rawQuery['type'] == '<COMPARITOR>' 
+        ```
+
 ### 1.0.22 (2025-03-13)
 1. **Simpletools\Db\Cassandra\Client**
     1. Ensure pluginSetting is set before attempting to read.
