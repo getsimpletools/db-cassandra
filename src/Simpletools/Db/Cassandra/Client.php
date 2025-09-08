@@ -275,6 +275,36 @@ class Client
         return new Result($result,$this);
     }
 
+    public function executeSql($query)
+    {
+      $this->connect();
+
+      $statement = new \Cassandra\SimpleStatement($query);
+
+      $result = $this->executeSqlWithReconnect($this->___connection, $statement);
+      return new Result($result,$this);
+    }
+
+  public function executeSqlWithReconnect($connection,$query, $attempt = 0)
+  {
+    try{
+      return $connection->execute($query);
+    }catch (\Exception $e)
+    {
+      if (($e->getCode() == 16777230 || $e->getCode() == '16777225'
+          || $e->getCode() == '33558784' || $e->getCode() == '33559040' ||  $e->getCode() == '33558529') && $attempt < 3)
+      {
+        if($attempt)
+          usleep($attempt*500);
+        Connection::setOne($this->___cluster,null);
+        $this->connect();
+        return  $this->executeSqlWithReconnect($connection,$query, $attempt+1);
+      }
+      else
+        throw $e;
+    }
+  }
+
     public function executeWithReconnect($connection,$query, $queryOptions, $attempt = 0)
 		{
 			try{

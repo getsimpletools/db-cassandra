@@ -31,13 +31,16 @@ class Set implements \JsonSerializable
 	{
 		$this->_value = new \Cassandra\Set($this->_valueType);
 
-		if($this->_body)
-		{
-			foreach ($this->_body as $v)
-			{
-				$this->_value->add($v);
-			}
-		}
+    if($this->_body)
+    {
+      foreach ($this->_body as $v)
+      {
+        if($this->_valueType =='float')
+          $this->_value->add(new \Cassandra\Float($v));
+        else
+          $this->_value->add($v);
+      }
+    }
 
 		return $this->_value;
 	}
