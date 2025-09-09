@@ -220,6 +220,12 @@
     * next() : void
     * valid() : bool
 
+### 0.8.16 (2025-09-08)
+1. **Simpletools\Db\Cassandra\Client**
+    1. Added `executeSql()` and `executeSqlWithReconnect()` to exchange raw CQL query
+2. **Simpletools\Db\Cassandra\Type\Set**
+    1. Added support for float values
+
 ### 0.8.15 (2025-02-03)
 1. **Simpletools\Db\Cassandra\Doc**
    1. return $this in `remove()`method
